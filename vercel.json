@@ -1,0 +1,14 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": true,
+  "rewrites": [
+    {
+      "source": "/programas",
+      "destination": "/programas/index.html"
+    },
+    {
+      "source": "/programas/",
+      "destination": "/programas/index.html"
+    }
+  ]
+}
