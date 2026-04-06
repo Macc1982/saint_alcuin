@@ -3,278 +3,270 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nacional Pesquisa & Educação</title>
+  <title>Saint Alcuin of York Anglican College</title>
+  <meta name="description" content="Instituição de ensino superior estrangeira dedicada à formação acadêmica avançada e à pesquisa científica. Mestrado e Doutorado Internacional.">
+  <meta name="keywords" content="mestrado internacional, doutorado internacional, Saint Alcuin, pós-graduação internacional, Anglican College">
+  <meta name="author" content="Saint Alcuin of York Anglican College">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Saint Alcuin of York Anglican College | Mestrado e Doutorado">
+  <meta property="og:description" content="Formação acadêmica avançada e pesquisa científica de excelência.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.universidadsaintalcuin.com/">
+  <link rel="canonical" href="https://www.universidadsaintalcuin.com/">
 
   <style>
     :root {
-      --primary: #0b2a4a;
+      --primary:   #0b2a4a;
       --secondary: #145da0;
-      --text: #2b2b2b;
-      --light: #f5f7fa;
-      --gray: #6b7280;
+      --text:      #2b2b2b;
+      --light:     #f5f7fa;
+      --white:     #ffffff;
+      --gray:      #6b7280;
+      --border:    #dde3ea;
+      --green:     #166534;
+      --green-bg:  #dcfce7;
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--light); color: var(--text); font-family: "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    }
-
-    body {
-      background: var(--light);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
+    /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff;
-      padding: 60px 20px;
-      text-align: center;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #fff; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     }
-
-    header h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 32px;
+      height: 68px; display: flex; align-items: center;
+      justify-content: space-between; gap: 20px;
     }
-
-    header p {
-      max-width: 720px;
-      margin: auto;
-      opacity: 0.95;
+    .header-logo { display: flex; flex-direction: column; }
+    .header-logo-name { font-size: 1rem; font-weight: 700; letter-spacing: 0.01em; }
+    .header-logo-sub  { font-size: 0.58rem; opacity: 0.72; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+    .header-nav { display: flex; align-items: center; gap: 4px; }
+    .nav-link {
+      color: rgba(255,255,255,.88); text-decoration: none;
+      font-size: 0.84rem; font-weight: 500; padding: 8px 16px;
+      border-radius: 6px; transition: all .15s;
     }
-
-    section {
-      padding: 60px 20px;
-      max-width: 1100px;
-      margin: auto;
+    .nav-link:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .btn-area-aluno {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.13); color: #fff;
+      border: 1.5px solid rgba(255,255,255,.38);
+      padding: 9px 20px; border-radius: 6px;
+      font-size: 0.84rem; font-weight: 600;
+      text-decoration: none; transition: all .2s; white-space: nowrap;
+      margin-left: 6px;
     }
-
-    section h2 {
-      color: var(--primary);
-      margin-bottom: 20px;
-      font-size: 1.8rem;
+    .btn-area-aluno:hover {
+      background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.65);
+      transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.15);
     }
+    .btn-aa-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
 
-    section h3 {
-      margin-top: 30px;
-      margin-bottom: 10px;
-      color: var(--secondary);
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(160deg, var(--primary) 0%, #1a4f8a 55%, var(--secondary) 100%);
+      color: #fff; padding: 72px 32px 80px; text-align: center;
     }
+    .hero-eyebrow { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.75; margin-bottom: 14px; }
+    .hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 14px; line-height: 1.2; }
+    .hero p   { font-size: 1rem; opacity: .9; max-width: 580px; margin: 0 auto 32px; line-height: 1.75; }
+    .hero-cta {
+      display: inline-block; background: #fff; color: var(--primary);
+      font-weight: 700; font-size: .9rem; padding: 13px 32px;
+      border-radius: 6px; text-decoration: none; transition: all .2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    }
+    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
 
+    /* ── SECTIONS ── */
+    section { padding: 52px 28px; max-width: 1100px; margin: 0 auto; }
+    section h2 { color: var(--primary); margin-bottom: 18px; font-size: 1.65rem; font-weight: 700; }
+    section h3 { margin-top: 26px; margin-bottom: 8px; color: var(--secondary); font-size: 1rem; }
     .card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      margin-bottom: 25px;
+      background: var(--white); padding: 24px; border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 20px;
     }
+    ul { padding-left: 20px; margin-top: 8px; }
+    li { margin-bottom: 4px; font-size: .9rem; }
 
-    ul {
-      padding-left: 20px;
-      margin-top: 10px;
+    /* ── INSCRIÇÃO ── */
+    .inscricao-section {
+      background: linear-gradient(135deg, #eef4fb 0%, var(--light) 100%);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 60px 28px;
     }
-
-    footer {
-      background: #0b2a4a;
-      color: #fff;
-      padding: 40px 20px;
-      font-size: 0.9rem;
+    .inscricao-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: start;
     }
-
-    footer p {
-      max-width: 1000px;
-      margin: auto;
-      opacity: 0.9;
+    .inscricao-info h2 { color: var(--primary); font-size: 1.65rem; font-weight: 700; margin-bottom: 12px; }
+    .inscricao-info p  { color: var(--gray); font-size: .9rem; line-height: 1.75; margin-bottom: 22px; }
+    .destaque {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px; background: #fff; border-radius: 8px;
+      border-left: 4px solid var(--secondary);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 12px;
     }
+    .destaque-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .destaque strong { display: block; color: var(--primary); font-size: .86rem; margin-bottom: 1px; }
+    .destaque span   { color: var(--gray); font-size: .8rem; }
 
-    .contact {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* ── FORM CARD ── */
+    .form-card { background: var(--white); border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.1); overflow: hidden; }
+    .form-card-top { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 20px 26px; color: #fff; }
+    .form-card-top h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 2px; }
+    .form-card-top p  { font-size: .72rem; opacity: .82; }
+    .form-card-body { padding: 26px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: .76rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; background: var(--light); border: 1.5px solid var(--border);
+      border-radius: 6px; color: var(--text); font-family: "Segoe UI", sans-serif;
+      font-size: .87rem; padding: 10px 12px; outline: none;
+      transition: border-color .15s, background .15s; appearance: none; -webkit-appearance: none;
     }
-
-    .contact strong {
-      display: block;
-      margin-top: 10px;
+    .form-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23145da0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      padding-right: 34px; background-color: var(--light); cursor: pointer;
     }
+    .form-group select option { background: #fff; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--secondary); background: #fff; box-shadow: 0 0 0 3px rgba(20,93,160,.1);
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #aab0ba; }
+    .form-group textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-submit {
+      width: 100%; background: var(--secondary); color: #fff;
+      font-family: "Segoe UI", sans-serif; font-size: .9rem; font-weight: 700;
+      padding: 13px; border: none; border-radius: 6px; cursor: pointer; transition: all .2s;
+    }
+    .btn-submit:hover { background: #1068b5; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(20,93,160,.3); }
+    .success-box { display: none; text-align: center; padding: 30px 12px; animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+    .success-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--green-bg); color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; font-weight: 700; margin: 0 auto 14px;
+    }
+    .success-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+    .success-sub   { font-size: .84rem; color: var(--gray); line-height: 1.7; }
+    .btn-reset {
+      margin-top: 16px; background: transparent; color: var(--secondary);
+      border: 1.5px solid var(--secondary); font-family: "Segoe UI", sans-serif;
+      font-size: .8rem; font-weight: 600; padding: 9px 22px; border-radius: 6px; cursor: pointer; transition: all .15s;
+    }
+    .btn-reset:hover { background: #eef4fb; }
 
-    @media (max-width: 768px) {
-      header h1 { font-size: 1.8rem; }
-      section { padding: 40px 15px; }
+    /* ── CONTATO / FOOTER ── */
+    .contact { background: var(--white); padding: 26px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+    .contact strong { display: block; margin-top: 10px; color: var(--primary); }
+    footer { background: var(--primary); color: #fff; padding: 36px 28px; font-size: .84rem; }
+    footer p { max-width: 1000px; margin: 0 auto; opacity: .85; text-align: center; line-height: 1.7; }
+
+    /* ── WHATSAPP ── */
+    .whatsapp-float {
+      position: fixed; bottom: 22px; right: 22px; background: #25D366;
+      width: 54px; height: 54px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,.22); z-index: 999; transition: transform .2s;
+    }
+    .whatsapp-float:hover { transform: scale(1.08); }
+
+    @media (max-width: 860px) {
+      .inscricao-inner { grid-template-columns: 1fr; gap: 24px; }
+      .hero h1 { font-size: 1.75rem; }
+    }
+    @media (max-width: 600px) {
+      .header-inner { padding: 0 16px; }
+      .nav-link { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero { padding: 44px 20px 52px; }
+      section { padding: 38px 18px; }
     }
   </style>
-
-  <!-- SEO Básico -->
-  <meta name="description" content="Intermediação educacional internacional para programas de Mestrado e Doutorado acadêmico em universidade estrangeira. Orientação institucional segura e transparente.">
-  <meta name="keywords" content="mestrado internacional, doutorado internacional, mestrado exterior, doutorado exterior, pós-graduação internacional, revalidação de diploma">
-  <meta name="author" content="Nacional Pesquisa & Educação">
-  <meta name="robots" content="index, follow">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Nacional Pesquisa & Educação | Mestrado e Doutorado Internacional">
-  <meta property="og:description" content="Orientação e intermediação educacional internacional para Mestrado e Doutorado acadêmico.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://www.nacionalpesquisa.com.br/">
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://www.nacionalpesquisa.com.br/">
 </head>
-
-<!-- ═══════════════════════════════════════════
-     BOTÃO WHATSAPP FLUTUANTE
-════════════════════════════════════════════ -->
-<a href="https://wa.me/75998403658"
-   target="_blank"
-   aria-label="Fale conosco no WhatsApp"
-   class="whatsapp-float">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="34" height="34" fill="#fff">
-    <path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/>
-  </svg>
-</a>
-
-<style>
-.whatsapp-float {
-  position: fixed;
-  bottom: 22px; right: 22px;
-  background-color: #25D366;
-  width: 58px; height: 58px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-  z-index: 999;
-  transition: transform 0.2s ease;
-}
-.whatsapp-float:hover { transform: scale(1.08); }
-@media (max-width: 480px) {
-  .whatsapp-float { width: 52px; height: 52px; bottom: 18px; right: 18px; }
-}
-</style>
-
-<!-- ═══════════════════════════════════════════
-     BOTÃO PROGRAMAS — CANTO SUPERIOR ESQUERDO
-════════════════════════════════════════════ -->
-<a href="/programas/index.html" class="btn-programas">Programas</a>
-
-<style>
-.btn-programas {
-  position: fixed;
-  top: 18px; left: 18px;
-  background: #c1121f;
-  color: #ffffff;
-  padding: 10px 22px;
-  font-size: 0.95rem; font-weight: 600;
-  border-radius: 6px;
-  text-decoration: none;
-  z-index: 1000;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.btn-programas:hover { background: #9b0f18; transform: scale(1.05); }
-@media (max-width: 600px) {
-  .btn-programas { top: 12px; left: 12px; padding: 9px 18px; font-size: 0.9rem; }
-}
-</style>
-
-<!-- ═══════════════════════════════════════════
-     BOTÃO ÁREA DO ALUNO — CANTO SUPERIOR DIREITO  ← NOVO
-════════════════════════════════════════════ -->
-<a href="/area-do-aluno.html" class="btn-area-aluno">Área do Aluno</a>
-
-<style>
-.btn-area-aluno {
-  position: fixed;
-  top: 18px; right: 18px;
-  background: #0b2a4a;
-  color: #C9A84C;
-  padding: 10px 22px;
-  font-size: 0.95rem; font-weight: 600;
-  border-radius: 6px;
-  text-decoration: none;
-  z-index: 1000;
-  border: 1px solid rgba(201,168,76,0.4);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-.btn-area-aluno:hover { background: #0d3560; transform: scale(1.05); }
-@media (max-width: 600px) {
-  .btn-area-aluno { top: 12px; right: 12px; padding: 9px 16px; font-size: 0.88rem; }
-}
-</style>
-
 <body>
 
+<!-- ── HEADER ── -->
 <header>
-  <h1>Nacional Pesquisa & Educação</h1>
-  <p>Intermediação educacional internacional para programas de Mestrado e Doutorado acadêmico</p>
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="header-logo-name">Saint Alcuin of York Anglican College</div>
+      <div class="header-logo-sub">Instituição de Ensino Superior Internacional</div>
+    </div>
+    <nav class="header-nav">
+      <a href="/programas/index.html" class="nav-link">Programas</a>
+      <a href="#inscricao" class="nav-link">Inscrição</a>
+      <a href="/area-do-aluno.html" class="btn-area-aluno">
+        <span class="btn-aa-dot"></span>
+        Área do Aluno
+      </a>
+    </nav>
+  </div>
 </header>
 
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-eyebrow">Saint Alcuin of York Anglican College</div>
+  <h1>Mestrado e Doutorado Internacional</h1>
+  <p>Instituição de ensino superior estrangeira dedicada à formação acadêmica avançada e à pesquisa científica de excelência.</p>
+  <a href="#inscricao" class="hero-cta">Quero me inscrever</a>
+</div>
+
+<!-- ── APRESENTAÇÃO ── -->
 <section>
   <h2>Apresentação Institucional</h2>
   <div class="card">
-    <p>
-      A <strong>Nacional Pesquisa & Educação</strong> é uma empresa brasileira especializada em
-      <strong>intermediação educacional internacional</strong>, atuando na orientação, informação e apoio
-      institucional a estudantes interessados em programas de pós-graduação stricto sensu
-      (Mestrado e Doutorado) ofertados por universidade estrangeira devidamente constituída.
-    </p>
-    <p>
-      A empresa não é instituição de ensino, não ministra aulas e não emite diplomas, atuando
-      exclusivamente como intermediadora educacional.
-    </p>
+    <p>O <strong>Saint Alcuin of York Anglican College</strong> é uma instituição de ensino superior estrangeira, regularmente constituída em seu país de origem, com atuação acadêmica em nível de pós-graduação.</p>
+    <p style="margin-top:10px;">A instituição oferece programas de Mestrado e Doutorado acadêmico, desenvolvidos para a formação de pesquisadores e profissionais de alto nível, com foco em produção científica original e rigor metodológico.</p>
   </div>
 </section>
 
+<!-- ── PROGRAMAS ── -->
 <section>
   <h2>Programas de Pós-Graduação</h2>
-
   <div class="card">
     <h3>Mestrado Acadêmico</h3>
-    <p>
-      O Mestrado Acadêmico tem como objetivo aprofundar a formação científica do estudante,
-      desenvolvendo competências em pesquisa e metodologia científica.
-    </p>
+    <p>O Mestrado Acadêmico tem como objetivo aprofundar a formação científica do estudante, desenvolvendo competências em pesquisa e metodologia científica.</p>
     <ul>
       <li>Formação científica e acadêmica</li>
       <li>Projeto de pesquisa e dissertação</li>
       <li>Orientação acadêmica individual</li>
       <li>Produção de artigos científicos</li>
     </ul>
-    <p><strong>Duração média:</strong> 18 a 24 meses</p>
+    <p style="margin-top:12px;"><strong>Duração média:</strong> 26 meses &nbsp;·&nbsp; <a href="/programas/index.html" style="color:var(--secondary);font-weight:600;font-size:.88rem;">Ver todos os programas →</a></p>
   </div>
-
   <div class="card">
     <h3>Doutorado Acadêmico</h3>
-    <p>
-      O Doutorado Acadêmico visa à formação de pesquisadores de alto nível, capazes de produzir
-      conhecimento original e relevante em sua área de atuação.
-    </p>
+    <p>O Doutorado Acadêmico visa à formação de pesquisadores de alto nível, capazes de produzir conhecimento original e relevante em sua área de atuação.</p>
     <ul>
       <li>Pesquisa científica aprofundada</li>
       <li>Elaboração de tese original</li>
       <li>Orientação acadêmica contínua</li>
       <li>Produção científica avançada</li>
     </ul>
-    <p><strong>Duração média:</strong> 36 a 48 meses</p>
+    <p style="margin-top:12px;"><strong>Duração média:</strong> 36 meses &nbsp;·&nbsp; <a href="/programas/index.html" style="color:var(--secondary);font-weight:600;font-size:.88rem;">Ver todos os programas →</a></p>
   </div>
 </section>
 
+<!-- ── MODALIDADE ── -->
 <section>
   <h2>Modalidade e Funcionamento</h2>
   <div class="card">
-    <p>
-      Os programas são ofertados por <strong>universidade estrangeira</strong>, com atividades acadêmicas
-      realizadas no país de origem da instituição, conforme a legislação educacional vigente.
-    </p>
-    <p>
-      A Nacional Pesquisa & Educação atua exclusivamente na orientação e intermediação institucional,
-      não realizando aulas, avaliações, bancas ou certificações no Brasil.
-    </p>
+    <p>Os programas são desenvolvidos pela instituição estrangeira, com atividades acadêmicas realizadas conforme a legislação educacional vigente no país de origem.</p>
+    <p style="margin-top:10px;">O reconhecimento dos títulos no Brasil depende de processo próprio conforme normas do Ministério da Educação (MEC).</p>
   </div>
 </section>
 
+<!-- ── PROCESSO ── -->
 <section>
   <h2>Processo de Ingresso</h2>
   <div class="card">
@@ -282,47 +274,153 @@
       <li>Análise documental e acadêmica</li>
       <li>Avaliação do histórico acadêmico</li>
       <li>Verificação de aderência à linha de pesquisa</li>
-      <li>Encaminhamento à universidade estrangeira</li>
+      <li>Encaminhamento e matrícula institucional</li>
     </ul>
-    <p>
-      Os critérios de aceitação são definidos exclusivamente pela instituição de ensino responsável
-      pelo programa.
-    </p>
+    <p style="margin-top:12px;">Os critérios de aceitação são definidos exclusivamente pelo Saint Alcuin of York Anglican College.</p>
   </div>
 </section>
 
-<section>
-  <h2>Reconhecimento e Validade no Brasil</h2>
-  <div class="card">
-    <p>
-      Os diplomas são emitidos por universidade estrangeira. Para fins de validade no Brasil,
-      poderão ser submetidos a processo de reconhecimento junto a universidades públicas brasileiras,
-      conforme normas do Ministério da Educação (MEC).
-    </p>
-    <p>
-      O reconhecimento não é automático e depende de análise individual, sendo de responsabilidade
-      do titular do diploma.
-    </p>
-  </div>
-</section>
+<!-- ── INSCRIÇÃO ── -->
+<div class="inscricao-section" id="inscricao">
+  <div class="inscricao-inner">
+    <div class="inscricao-info">
+      <h2>Faça sua inscrição</h2>
+      <p>Preencha o formulário com seus dados. Nossa equipe entrará em contato pelo WhatsApp para orientar você sobre o programa ideal e os próximos passos.</p>
+      <div class="destaque">
+        <div class="destaque-icon">✓</div>
+        <div><strong>Processo simples e rápido</strong><span>Retorno em até 24h pelo WhatsApp</span></div>
+      </div>
+      <div class="destaque">
+        <div class="destaque-icon">🎓</div>
+        <div><strong>8 programas disponíveis</strong><span>Mestrado e Doutorado em 4 áreas do conhecimento</span></div>
+      </div>
+      <div class="destaque">
+        <div class="destaque-icon">🌐</div>
+        <div><strong>Instituição internacional</strong><span>Saint Alcuin of York Anglican College</span></div>
+      </div>
+    </div>
 
+    <div>
+      <div class="form-card">
+        <div class="form-card-top">
+          <h3>Formulário de Inscrição</h3>
+          <p>Campos com * são obrigatórios</p>
+        </div>
+        <div class="form-card-body">
+          <div id="form-wrapper">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nome completo *</label>
+                <input type="text" id="f-nome" placeholder="Seu nome completo" />
+              </div>
+              <div class="form-group">
+                <label>WhatsApp *</label>
+                <input type="tel" id="f-whats" placeholder="(11) 99999-9999" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Curso desejado *</label>
+              <select id="f-curso">
+                <option value="">Selecione o curso</option>
+                <optgroup label="── Mestrados Acadêmicos (26 meses)">
+                  <option>Mestrado em Saúde Pública</option>
+                  <option>Mestrado em Educação</option>
+                  <option>Mestrado em Psicologia</option>
+                  <option>Mestrado em Antropologia</option>
+                </optgroup>
+                <optgroup label="── Doutorados Acadêmicos (36 meses)">
+                  <option>Doutorado em Saúde Pública</option>
+                  <option>Doutorado em Educação</option>
+                  <option>Doutorado em Psicologia</option>
+                  <option>Doutorado em Antropologia</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Graduação (formação atual) *</label>
+              <select id="f-grad">
+                <option value="">Selecione sua graduação</option>
+                <option>Administração</option>
+                <option>Ciências Biológicas</option>
+                <option>Ciências Sociais</option>
+                <option>Direito</option>
+                <option>Economia</option>
+                <option>Educação Física</option>
+                <option>Enfermagem</option>
+                <option>Engenharia</option>
+                <option>Farmácia</option>
+                <option>Medicina</option>
+                <option>Nutrição</option>
+                <option>Pedagogia</option>
+                <option>Psicologia</option>
+                <option>Serviço Social</option>
+                <option>Outra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Dúvidas ou mensagem (opcional)</label>
+              <textarea id="f-msg" placeholder="Conte sobre sua motivação ou faça perguntas..."></textarea>
+            </div>
+            <button class="btn-submit" onclick="enviarInscricao()">Enviar Inscrição →</button>
+          </div>
+          <div class="success-box" id="success-box">
+            <div class="success-icon">✓</div>
+            <div class="success-title">Inscrição enviada com sucesso!</div>
+            <p class="success-sub">Recebemos sua solicitação.<br/>Entraremos em contato pelo <strong>WhatsApp</strong> em breve.</p>
+            <button class="btn-reset" onclick="resetForm()">Fazer nova inscrição</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTATO ── -->
 <section>
   <h2>Contato</h2>
   <div class="contact">
-    <p>Para informações institucionais sobre os programas:</p>
-    <strong>E-mail:</strong> contato@nacionalpesquisa.com.br
-    <strong>Site:</strong> www.nacionalpesquisa.com.br
+    <p>Para informações sobre os programas e processo de ingresso:</p>
+    <strong>WhatsApp: (75) 99840-3658</strong>
+    <strong>Site: universidadsaintalcuin.com</strong>
   </div>
 </section>
 
+<!-- ── FOOTER ── -->
 <footer>
   <p>
-    A Nacional Pesquisa & Educação não é instituição de ensino superior, não ministra aulas,
-    não realiza atividades acadêmicas e não emite diplomas. Atua exclusivamente como
-    intermediadora educacional internacional. Os diplomas são emitidos por universidade
-    estrangeira e o reconhecimento no Brasil depende de processo próprio conforme normas do MEC.
+    © Saint Alcuin of York Anglican College — Todos os direitos reservados.<br/>
+    Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
+    O reconhecimento dos títulos no Brasil depende de processo próprio conforme normas do MEC.
   </p>
 </footer>
 
+<!-- ── WHATSAPP ── -->
+<a href="https://wa.me/75998403658" target="_blank" aria-label="WhatsApp" class="whatsapp-float">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff">
+    <path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/>
+  </svg>
+</a>
+
+<script>
+  function enviarInscricao() {
+    const nome  = document.getElementById('f-nome').value.trim();
+    const whats = document.getElementById('f-whats').value.trim();
+    const curso = document.getElementById('f-curso').value;
+    const grad  = document.getElementById('f-grad').value;
+    if (!nome || !whats || !curso || !grad) {
+      alert('Por favor, preencha todos os campos obrigatórios (*).');
+      return;
+    }
+    console.log('Inscrição:', { nome, whats, curso, grad, msg: document.getElementById('f-msg').value });
+    document.getElementById('form-wrapper').style.display = 'none';
+    document.getElementById('success-box').style.display  = 'block';
+  }
+  function resetForm() {
+    ['f-nome','f-whats','f-msg'].forEach(id => document.getElementById(id).value = '');
+    ['f-curso','f-grad'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('form-wrapper').style.display = 'block';
+    document.getElementById('success-box').style.display  = 'none';
+  }
+</script>
 </body>
 </html>
