@@ -4,348 +4,421 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Saint Alcuin of York — Área do Aluno</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg:        #060810;
-    --bg2:       #0c0f1a;
-    --bg3:       #111625;
-    --gold:      #C9A84C;
-    --gold2:     #e8c96a;
-    --gold-dim:  rgba(201,168,76,0.18);
-    --gold-glow: rgba(201,168,76,0.06);
-    --cream:     #f0ead8;
-    --muted:     rgba(240,234,216,0.45);
-    --border:    rgba(201,168,76,0.22);
-    --border2:   rgba(240,234,216,0.08);
-    --red:       #c0392b;
-    --green:     #27ae60;
+    --primary:   #0b2a4a;
+    --secondary: #145da0;
+    --accent:    #c1121f;
+    --gold:      #b8902a;
+    --text:      #2b2b2b;
+    --light:     #f5f7fa;
+    --white:     #ffffff;
+    --gray:      #6b7280;
+    --border:    #dde3ea;
+    --green:     #166534;
+    --green-bg:  #dcfce7;
+    --red-bg:    #fee2e2;
+    --red-text:  #991b1b;
+    --yellow-bg: #fef9c3;
+    --yellow-text: #854d0e;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
-    color: var(--cream);
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background: var(--light);
+    color: var(--text);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.6;
   }
 
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 999; opacity: 0.5;
-  }
-
-  .screen { display: none; min-height: 100vh; animation: fadeIn .5s ease; }
-  .screen.active { display: flex; flex-direction: column; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  .screen { display: none; min-height: 100vh; flex-direction: column; animation: fadeIn .35s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
   /* ── HEADER ── */
-  header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 24px 52px;
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0;
-    background: rgba(6,8,16,0.94);
-    backdrop-filter: blur(20px);
+  .site-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 0 28px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
     z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
-  .logo-block { display: flex; flex-direction: column; gap: 2px; }
-  .logo-main {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.15rem; font-weight: 400;
-    letter-spacing: 0.18em; color: var(--gold);
-    text-transform: uppercase;
-  }
-  .logo-sub {
-    font-size: 0.55rem; letter-spacing: 0.3em;
-    color: var(--muted); text-transform: uppercase;
-  }
-  .header-actions { display: flex; gap: 12px; align-items: center; }
+  .header-brand { display: flex; flex-direction: column; }
+  .header-brand-name { font-size: 1rem; font-weight: 600; letter-spacing: 0.03em; }
+  .header-brand-sub  { font-size: 0.65rem; opacity: 0.8; letter-spacing: 0.06em; }
+  .header-nav { display: flex; gap: 10px; align-items: center; }
 
   /* ── BUTTONS ── */
   .btn {
-    font-family: 'Jost', sans-serif; font-size: 0.68rem;
-    font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;
-    padding: 11px 26px; border-radius: 2px; cursor: pointer;
-    border: none; transition: all .22s;
+    font-family: "Segoe UI", sans-serif;
+    font-size: 0.82rem; font-weight: 600;
+    padding: 9px 22px; border-radius: 6px;
+    cursor: pointer; border: none;
+    transition: all .18s; text-decoration: none;
+    display: inline-block;
   }
-  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
-  .btn-ghost:hover { color: var(--cream); border-color: var(--border); }
-  .btn-gold { background: var(--gold); color: #060810; font-weight: 500; }
-  .btn-gold:hover { background: var(--gold2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,.25); }
-  .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
-  .btn-outline:hover { background: var(--gold-dim); }
-  .btn-danger { background: transparent; color: #e74c3c; border: 1px solid rgba(231,76,60,.3); font-size: .62rem; padding: 8px 16px; }
-  .btn-danger:hover { background: rgba(231,76,60,.1); }
-  .btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
+  .btn-white  { background: #fff; color: var(--primary); }
+  .btn-white:hover { background: #e8f0f8; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: #0d3460; transform: translateY(-1px); }
+  .btn-secondary { background: var(--secondary); color: #fff; }
+  .btn-secondary:hover { background: #1068b5; transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--secondary); border: 1.5px solid var(--secondary); }
+  .btn-outline:hover { background: #eef4fb; }
+  .btn-danger { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); font-size: 0.75rem; padding: 7px 16px; }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn-ghost { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .btn-ghost:hover { background: rgba(255,255,255,0.25); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none !important; }
+  .btn-full { width: 100%; text-align: center; padding: 12px; }
 
-  /* ── LANDING ── */
-  .landing-hero { display: grid; grid-template-columns: 1fr 1fr; flex: 1; }
-  .hero-left {
-    padding: 80px 64px; display: flex; flex-direction: column;
-    justify-content: center; position: relative;
+  /* ── FORM ELEMENTS ── */
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: 0.78rem; font-weight: 600;
+    color: var(--primary); margin-bottom: 5px;
   }
-  .hero-left::after {
-    content: ''; position: absolute; right: 0; top: 8%; bottom: 8%;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--border), transparent);
-  }
-  .hero-eyebrow { font-size: .62rem; letter-spacing: .35em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2.6rem,4.5vw,4rem); font-weight: 300;
-    line-height: 1.12; color: var(--cream); margin-bottom: 24px;
-  }
-  .hero-title em { font-style: italic; color: var(--gold); }
-  .hero-sub { font-size: .85rem; line-height: 1.85; color: var(--muted); max-width: 400px; margin-bottom: 44px; }
-  .programs-preview { display: flex; flex-direction: column; gap: 10px; }
-  .prog-line {
-    display: flex; align-items: center; gap: 14px;
-    font-size: .72rem; color: var(--muted); letter-spacing: .06em;
-  }
-  .prog-line::before {
-    content: ''; flex-shrink: 0; width: 20px; height: 1px; background: var(--gold);
-  }
-  .prog-line strong { color: var(--cream); font-weight: 400; }
-
-  /* ── FORM SIDE ── */
-  .hero-right {
-    padding: 60px 64px 60px 72px;
-    display: flex; flex-direction: column; justify-content: center;
-    background: linear-gradient(140deg, var(--bg2) 0%, var(--bg) 100%);
-  }
-  .form-title { font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 400; color: var(--cream); margin-bottom: 4px; }
-  .form-sub { font-size: .72rem; color: var(--muted); letter-spacing: .06em; margin-bottom: 32px; }
-
-  .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
   .form-group input,
   .form-group select,
   .form-group textarea {
-    width: 100%; background: rgba(255,255,255,.03);
-    border: 1px solid var(--border2); border-radius: 2px;
-    color: var(--cream); font-family: 'Jost', sans-serif;
-    font-size: .84rem; font-weight: 300; padding: 12px 15px;
-    outline: none; transition: border-color .2s, background .2s;
+    width: 100%; background: var(--white);
+    border: 1.5px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: "Segoe UI", sans-serif;
+    font-size: 0.88rem; padding: 10px 13px;
+    outline: none; transition: border-color .18s;
     appearance: none; -webkit-appearance: none;
   }
   .form-group select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 14px center;
-    padding-right: 38px; background-color: rgba(255,255,255,.03); cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23145da0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 36px; background-color: var(--white); cursor: pointer;
   }
-  .form-group select option { background: #111625; color: var(--cream); }
+  .form-group select option { background: #fff; color: var(--text); }
   .form-group input:focus,
   .form-group select:focus,
-  .form-group textarea:focus { border-color: var(--gold); background: rgba(201,168,76,.05); }
+  .form-group textarea:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(20,93,160,0.1); }
   .form-group input::placeholder,
-  .form-group textarea::placeholder { color: rgba(240,234,216,.22); }
-  .form-group textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+  .form-group textarea::placeholder { color: #aab0ba; }
+  .form-group textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-  .optgroup-label {
-    font-size: .58rem; letter-spacing: .2em; text-transform: uppercase;
-    color: var(--gold); padding: 6px 0 2px; opacity: .7;
+  /* ══════════════════════════════
+     TELA 1 — LANDING
+  ══════════════════════════════ */
+  #screen-landing { background: var(--light); }
+
+  .landing-hero {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    padding: 64px 28px;
+    text-align: center;
+  }
+  .landing-hero h1 { font-size: 2rem; margin-bottom: 10px; font-weight: 600; }
+  .landing-hero p  { max-width: 640px; margin: 0 auto; opacity: 0.92; font-size: 0.95rem; }
+
+  .landing-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 28px;
   }
 
-  /* ── SUCCESS ── */
-  .success-card { display: none; text-align: center; padding: 32px 12px; animation: fadeIn .5s ease; }
+  /* Coluna esquerda — info */
+  .info-col h2 { color: var(--primary); font-size: 1.4rem; margin-bottom: 16px; }
+  .program-list { list-style: none; margin-bottom: 28px; }
+  .program-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 0.88rem;
+  }
+  .program-list li:last-child { border-bottom: none; }
+  .prog-dot {
+    flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--secondary); margin-top: 6px;
+  }
+  .prog-dot.red { background: var(--accent); }
+  .prog-name { font-weight: 600; color: var(--primary); }
+  .prog-dur  { font-size: 0.75rem; color: var(--gray); }
+
+  /* Coluna direita — formulário */
+  .form-col .card { margin-bottom: 0; }
+  .form-col .card-title { font-size: 1.15rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+  .form-col .card-sub   { font-size: 0.78rem; color: var(--gray); margin-bottom: 22px; }
+
+  .success-box {
+    display: none; text-align: center; padding: 32px 16px; animation: fadeIn .4s ease;
+  }
   .success-icon {
-    width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--gold);
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--green-bg); color: var(--green);
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px; font-size: 1.5rem;
+    font-size: 1.6rem; margin: 0 auto 16px;
   }
-  .success-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; color: var(--gold); margin-bottom: 10px; font-weight: 400; }
-  .success-sub { font-size: .8rem; color: var(--muted); line-height: 1.9; }
+  .success-title { font-size: 1.2rem; font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+  .success-sub   { font-size: 0.85rem; color: var(--gray); line-height: 1.7; }
 
-  .divider { display: flex; align-items: center; gap: 14px; margin: 28px 0; }
-  .divider-line { flex: 1; height: 1px; background: var(--border2); }
-  .divider-text { font-size: .6rem; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+  .divider {
+    display: flex; align-items: center; gap: 12px; margin: 20px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text { font-size: 0.72rem; color: var(--gray); white-space: nowrap; }
 
-  /* ── LOGIN ── */
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  /* ══════════════════════════════
+     TELA 2 — LOGIN
+  ══════════════════════════════ */
   #screen-login {
     align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,.07) 0%, transparent 60%);
+    background: var(--light);
   }
   .login-box {
-    width: 100%; max-width: 420px; padding: 52px 44px;
-    border: 1px solid var(--border); border-radius: 3px;
-    background: var(--bg2); position: relative;
+    width: 100%; max-width: 420px;
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+    overflow: hidden;
   }
-  .login-box::before {
-    content: ''; position: absolute; top: 0; left: 20%; right: 20%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  .login-top {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    padding: 32px 36px;
+    text-align: center; color: #fff;
   }
-  .login-logo { text-align: center; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; letter-spacing: .25em; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
-  .login-subtitle { text-align: center; font-size: .6rem; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; margin-bottom: 36px; }
+  .login-top h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 4px; }
+  .login-top p  { font-size: 0.72rem; opacity: 0.85; }
+  .login-body { padding: 32px 36px; }
   .login-error {
-    background: rgba(192,57,43,.12); border: 1px solid rgba(192,57,43,.3);
-    color: #e74c3c; font-size: .72rem; padding: 10px; border-radius: 2px;
+    background: var(--red-bg); border: 1px solid #fca5a5;
+    color: var(--red-text); font-size: 0.78rem;
+    padding: 10px 14px; border-radius: 6px;
     margin-bottom: 14px; display: none; text-align: center;
   }
   .login-forgot { text-align: right; margin-top: -8px; margin-bottom: 18px; }
-  .login-forgot a { font-size: .65rem; color: var(--muted); text-decoration: none; }
-  .login-forgot a:hover { color: var(--gold); }
-  .login-back { text-align: center; margin-top: 20px; font-size: .65rem; color: var(--muted); }
-  .login-back a { color: var(--gold); text-decoration: none; cursor: pointer; }
-  .demo-hint { margin-top: 18px; padding: 10px; border: 1px dashed var(--border); border-radius: 2px; font-size: .65rem; color: var(--muted); text-align: center; line-height: 1.9; }
-  .demo-hint strong { color: var(--gold); }
+  .login-forgot a { font-size: 0.72rem; color: var(--secondary); text-decoration: none; }
+  .login-forgot a:hover { text-decoration: underline; }
+  .login-back { text-align: center; margin-top: 18px; font-size: 0.75rem; color: var(--gray); }
+  .login-back a { color: var(--secondary); cursor: pointer; text-decoration: none; }
+  .login-back a:hover { text-decoration: underline; }
+  .demo-hint {
+    margin-top: 16px; padding: 12px 14px;
+    background: #eef4fb; border: 1px dashed #93c5fd;
+    border-radius: 6px; font-size: 0.72rem; color: var(--gray);
+    text-align: center; line-height: 1.9;
+  }
+  .demo-hint strong { color: var(--secondary); }
 
-  /* ── DASHBOARD ── */
-  #screen-dashboard { flex-direction: column; }
-  .dash-header {
+  /* ══════════════════════════════
+     TELA 3 — DASHBOARD
+  ══════════════════════════════ */
+  #screen-dashboard { background: var(--light); }
+
+  .dash-topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 48px; border-bottom: 1px solid var(--border2); background: var(--bg2);
   }
   .dash-user { display: flex; align-items: center; gap: 12px; }
   .dash-avatar {
     width: 36px; height: 36px; border-radius: 50%;
-    background: var(--gold-dim); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cormorant Garamond', serif; font-size: .95rem; color: var(--gold);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 0.95rem;
   }
-  .dash-name { font-size: .82rem; color: var(--cream); font-weight: 400; }
-  .dash-course { font-size: .62rem; color: var(--muted); letter-spacing: .06em; margin-top: 1px; }
+  .dash-name   { font-size: 0.88rem; font-weight: 600; color: var(--primary); }
+  .dash-course { font-size: 0.7rem; color: var(--gray); }
 
-  .dash-body { display: grid; grid-template-columns: 210px 1fr; flex: 1; min-height: 0; }
+  .dash-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    flex: 1;
+  }
 
-  .sidebar { background: var(--bg2); border-right: 1px solid var(--border2); padding: 28px 0; }
-  .sidebar-section { padding: 0 20px; margin-bottom: 6px; }
-  .sidebar-section-title { font-size: .52rem; letter-spacing: .3em; text-transform: uppercase; color: rgba(201,168,76,.45); margin-bottom: 8px; padding: 0 4px; }
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+  }
+  .sidebar-section { margin-bottom: 4px; }
+  .sidebar-label {
+    font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gray); padding: 8px 20px 4px;
+  }
   .nav-item {
     display: flex; align-items: center; gap: 10px;
-    padding: 9px 10px; border-radius: 2px; cursor: pointer;
-    transition: all .18s; margin-bottom: 2px; font-size: .75rem;
-    color: var(--muted); letter-spacing: .04em; border: 1px solid transparent;
+    padding: 10px 20px; cursor: pointer;
+    font-size: 0.84rem; color: var(--text);
+    transition: all .15s; border-left: 3px solid transparent;
   }
-  .nav-item:hover { background: var(--gold-glow); color: var(--cream); }
-  .nav-item.active { background: var(--gold-dim); color: var(--gold); border-color: var(--border); }
-  .nav-icon { font-size: .95rem; }
+  .nav-item:hover { background: #eef4fb; color: var(--secondary); }
+  .nav-item.active {
+    background: #eef4fb; color: var(--secondary);
+    border-left-color: var(--secondary); font-weight: 600;
+  }
+  .nav-icon { font-size: 1rem; flex-shrink: 0; }
   .nav-badge {
-    margin-left: auto; font-size: .55rem; background: var(--gold);
-    color: #060810; padding: 2px 6px; border-radius: 20px; font-weight: 500;
+    margin-left: auto; font-size: 0.6rem;
+    background: var(--secondary); color: #fff;
+    padding: 2px 7px; border-radius: 20px; font-weight: 600;
   }
-  .nav-badge.red { background: rgba(231,76,60,.85); color: #fff; }
+  .nav-badge.red { background: var(--accent); }
 
-  .dash-main { overflow-y: auto; padding: 36px 48px; }
-  .tab-content { display: none; animation: fadeIn .32s ease; }
+  /* MAIN */
+  .dash-main { padding: 32px 36px; overflow-y: auto; }
+  .tab-content { display: none; animation: fadeIn .28s ease; }
   .tab-content.active { display: block; }
 
-  .section-header {
-    display: flex; align-items: baseline; justify-content: space-between;
-    margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid var(--border2);
+  .page-title {
+    font-size: 1.5rem; font-weight: 600;
+    color: var(--primary); margin-bottom: 6px;
   }
-  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.85rem; font-weight: 300; color: var(--cream); }
-  .section-title span { color: var(--gold); }
-  .section-count { font-size: .67rem; color: var(--muted); letter-spacing: .1em; }
+  .page-sub { font-size: 0.8rem; color: var(--gray); margin-bottom: 24px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
-  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 14px; }
-  .card {
-    background: var(--bg2); border: 1px solid var(--border2); border-radius: 3px;
-    padding: 22px; transition: all .22s; cursor: pointer; position: relative; overflow: hidden;
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--white); border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 20px 22px; border-top: 3px solid var(--secondary);
   }
-  .card:hover { border-color: var(--border); background: var(--bg3); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.28); }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(to right, var(--gold), transparent); opacity: 0; transition: opacity .22s;
-  }
-  .card:hover::before { opacity: 1; }
-  .card-icon { font-size: 1.6rem; margin-bottom: 12px; }
-  .card-label { font-size: .57rem; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
-  .card-title { font-size: .86rem; color: var(--cream); font-weight: 400; line-height: 1.4; }
-  .card-meta { font-size: .65rem; color: var(--muted); margin-top: 8px; }
-  .card-action {
-    display: inline-flex; align-items: center; gap: 5px; margin-top: 14px;
-    font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold);
-    border-bottom: 1px solid transparent; transition: border-color .18s;
-    cursor: pointer; background: none; border-left: none; border-right: none;
-    border-top: none; font-family: 'Jost', sans-serif; padding: 0;
-  }
-  .card-action:hover { border-bottom-color: var(--gold); }
+  .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; }
 
+  /* WELCOME */
+  .welcome-card {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff; border-radius: 8px; padding: 24px 28px;
+    margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .welcome-card h2 { font-size: 1.25rem; margin-bottom: 4px; }
+  .welcome-card p  { font-size: 0.8rem; opacity: 0.88; }
+  .welcome-badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 600; white-space: nowrap;
+  }
+
+  /* QUICK ACCESS */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 16px; }
+  .quick-card {
+    background: var(--white); border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 22px; cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all .2s;
+  }
+  .quick-card:hover { border-color: var(--secondary); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+  .quick-icon { font-size: 1.8rem; margin-bottom: 10px; }
+  .quick-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary); margin-bottom: 4px; }
+  .quick-title { font-size: 0.88rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+  .quick-meta  { font-size: 0.7rem; color: var(--gray); }
+  .quick-link  { display: inline-block; margin-top: 12px; font-size: 0.72rem; font-weight: 600; color: var(--secondary); text-decoration: none; }
+  .quick-link:hover { text-decoration: underline; }
+
+  /* TABLE */
+  .table-wrap { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
   .data-table { width: 100%; border-collapse: collapse; }
   .data-table th {
-    text-align: left; font-size: .58rem; letter-spacing: .2em; text-transform: uppercase;
-    color: var(--gold); padding: 0 14px 12px; border-bottom: 1px solid var(--border); font-weight: 400;
+    text-align: left; font-size: 0.72rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--gray); padding: 12px 16px;
+    background: var(--light); border-bottom: 1px solid var(--border);
   }
-  .data-table td { padding: 14px; border-bottom: 1px solid var(--border2); font-size: .78rem; color: var(--cream); }
-  .data-table tr:hover td { background: var(--gold-glow); }
+  .data-table td { padding: 13px 16px; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:hover td { background: #f8fafc; }
+
+  /* BADGES */
   .badge {
-    display: inline-block; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
-    padding: 3px 9px; border-radius: 20px; font-weight: 400;
+    display: inline-block; font-size: 0.68rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
   }
-  .badge-green { background: rgba(39,174,96,.15); color: #2ecc71; border: 1px solid rgba(39,174,96,.25); }
-  .badge-gold  { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
-  .badge-red   { background: rgba(231,76,60,.12); color: #e74c3c; border: 1px solid rgba(231,76,60,.2); }
-  .badge-muted { background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--border2); }
+  .badge-green  { background: var(--green-bg); color: var(--green); }
+  .badge-blue   { background: #dbeafe; color: #1e40af; }
+  .badge-yellow { background: var(--yellow-bg); color: var(--yellow-text); }
+  .badge-red    { background: var(--red-bg); color: var(--red-text); }
+  .badge-gray   { background: #f3f4f6; color: var(--gray); }
 
-  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 32px; }
-  .stat-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 2px; padding: 18px 22px; }
-  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; color: var(--gold); line-height: 1; margin-bottom: 4px; }
-  .stat-label { font-size: .62rem; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
-
-  .welcome-banner {
-    background: linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 100%);
-    border: 1px solid var(--border); border-radius: 3px;
-    padding: 28px 36px; margin-bottom: 28px; position: relative; overflow: hidden;
-  }
-  .welcome-banner::after {
-    content: 'SAY'; position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
-    font-family: 'Cormorant Garamond', serif; font-size: 5rem;
-    color: rgba(201,168,76,.05); font-weight: 300; line-height: 1;
-  }
-  .welcome-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 300; color: var(--cream); margin-bottom: 5px; }
-  .welcome-title span { color: var(--gold); }
-  .welcome-sub { font-size: .75rem; color: var(--muted); line-height: 1.8; }
-
-  .nota-header { display: flex; align-items: center; gap: 28px; margin-bottom: 28px; }
+  /* NOTA RING */
+  .nota-header { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
   .nota-ring {
-    width: 90px; height: 90px; border-radius: 50%;
-    background: conic-gradient(var(--gold) 0% 80%, var(--border2) 80% 100%);
-    display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0;
+    width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0;
+    background: conic-gradient(var(--secondary) 0% 83%, var(--border) 83% 100%);
+    display: flex; align-items: center; justify-content: center; position: relative;
   }
-  .nota-ring::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--bg2); }
-  .nota-ring-value { position: relative; z-index: 1; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--gold); }
-  .nota-info-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--cream); margin-bottom: 5px; }
-  .nota-info-sub { font-size: .72rem; color: var(--muted); }
+  .nota-ring::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--white); }
+  .nota-ring-val { position: relative; z-index: 1; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+  .nota-info-title { font-size: 1.05rem; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+  .nota-info-sub   { font-size: 0.78rem; color: var(--gray); }
 
-  .payment-alert {
+  /* ALERT */
+  .alert {
     display: flex; align-items: center; gap: 14px;
-    padding: 16px 22px; border: 1px solid rgba(201,168,76,.3); border-radius: 3px;
-    background: rgba(201,168,76,.05); margin-bottom: 24px;
+    padding: 14px 20px; border-radius: 8px; margin-bottom: 20px;
+    font-size: 0.84rem;
   }
-  .payment-alert-icon { font-size: 1.3rem; }
-  .payment-alert-text { flex: 1; font-size: .78rem; color: var(--cream); line-height: 1.6; }
-  .payment-alert-text strong { color: var(--gold); }
+  .alert-warning { background: var(--yellow-bg); border: 1px solid #fde68a; color: var(--yellow-text); }
+  .alert-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .alert-text { flex: 1; }
 
-  .decl-card {
-    display: flex; align-items: center; gap: 18px; padding: 20px 24px;
-    border: 1px solid var(--border2); border-radius: 2px; background: var(--bg2);
-    margin-bottom: 10px; transition: all .18s;
+  /* DECLARAÇÃO */
+  .decl-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 20px; border-bottom: 1px solid var(--border);
+    transition: background .15s;
   }
-  .decl-card:hover { border-color: var(--border); background: var(--bg3); }
-  .decl-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .decl-item:last-child { border-bottom: none; }
+  .decl-item:hover { background: #f8fafc; }
+  .decl-icon { font-size: 1.5rem; flex-shrink: 0; }
   .decl-info { flex: 1; }
-  .decl-title { font-size: .85rem; color: var(--cream); font-weight: 400; margin-bottom: 3px; }
-  .decl-sub { font-size: .68rem; color: var(--muted); }
+  .decl-title { font-size: 0.88rem; font-weight: 600; color: var(--primary); }
+  .decl-sub   { font-size: 0.72rem; color: var(--gray); margin-top: 2px; }
 
-  @media (max-width: 860px) {
-    .landing-hero { grid-template-columns: 1fr; }
-    .hero-left::after { display: none; }
-    .hero-left { padding: 44px 28px; }
-    .hero-right { padding: 28px; }
-    header { padding: 18px 22px; }
+  /* WHATSAPP FLOAT */
+  .whatsapp-float {
+    position: fixed; bottom: 22px; right: 22px;
+    background: #25D366; width: 54px; height: 54px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 999;
+    transition: transform .2s;
+  }
+  .whatsapp-float:hover { transform: scale(1.08); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .landing-body { grid-template-columns: 1fr; }
     .dash-body { grid-template-columns: 1fr; }
     .sidebar { display: none; }
-    .dash-main { padding: 22px 18px; }
+    .dash-main { padding: 20px 16px; }
     .stats-row { grid-template-columns: 1fr 1fr; }
     .form-row { grid-template-columns: 1fr; }
+    .welcome-card { flex-direction: column; gap: 14px; align-items: flex-start; }
+  }
+  @media (max-width: 600px) {
+    .landing-hero h1 { font-size: 1.5rem; }
+    .site-header { padding: 0 16px; }
   }
 </style>
 </head>
@@ -355,237 +428,234 @@
      TELA 1 — LANDING + INSCRIÇÃO
 ════════════════════════════════ -->
 <div id="screen-landing" class="screen active">
-  <header>
-    <div class="logo-block">
-      <div class="logo-main">Saint Alcuin of York</div>
-      <div class="logo-sub">Anglican College · Área do Aluno</div>
+
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="header-brand-name">Saint Alcuin of York</div>
+      <div class="header-brand-sub">Anglican College · Portal Acadêmico</div>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-ghost" onclick="showScreen('screen-login')">Área do Aluno</button>
-      <button class="btn btn-gold" onclick="document.getElementById('ancora-form').scrollIntoView({behavior:'smooth'})">Inscreva-se</button>
+    <div class="header-nav">
+      <a href="/index.html" class="btn btn-ghost" style="font-size:.78rem;padding:7px 16px;">← Site principal</a>
+      <button class="btn btn-white" onclick="showScreen('screen-login')">Área do Aluno</button>
     </div>
   </header>
 
   <div class="landing-hero">
+    <h1>Pós-Graduação Internacional</h1>
+    <p>Mestrado e Doutorado com reconhecimento internacional, voltados à pesquisa científica e formação acadêmica de excelência.</p>
+  </div>
 
-    <!-- ESQUERDA -->
-    <div class="hero-left">
-      <p class="hero-eyebrow">Pós-Graduação Internacional</p>
-      <h1 class="hero-title">
-        Formação<br/>acadêmica de<br/><em>alto nível</em>
-      </h1>
-      <p class="hero-sub">
-        Mestrados e Doutorados com reconhecimento internacional,
-        voltados à pesquisa científica e à formação de líderes de excelência.
-      </p>
-      <div class="programs-preview">
-        <div class="prog-line"><strong>Mestrado</strong> em Saúde Pública · 26 meses</div>
-        <div class="prog-line"><strong>Mestrado</strong> em Educação · 26 meses</div>
-        <div class="prog-line"><strong>Mestrado</strong> em Psicologia · 26 meses</div>
-        <div class="prog-line"><strong>Mestrado</strong> em Antropologia · 26 meses</div>
-        <div class="prog-line"><strong>Doutorado</strong> em Saúde Pública · 36 meses</div>
-        <div class="prog-line"><strong>Doutorado</strong> em Educação · 36 meses</div>
-        <div class="prog-line"><strong>Doutorado</strong> em Psicologia · 36 meses</div>
-        <div class="prog-line"><strong>Doutorado</strong> em Antropologia · 36 meses</div>
+  <div class="landing-body">
+
+    <!-- INFO -->
+    <div class="info-col">
+      <h2>Programas disponíveis</h2>
+      <ul class="program-list">
+        <li><div class="prog-dot"></div><div><div class="prog-name">Mestrado em Saúde Pública</div><div class="prog-dur">26 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot"></div><div><div class="prog-name">Mestrado em Educação</div><div class="prog-dur">26 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot"></div><div><div class="prog-name">Mestrado em Psicologia</div><div class="prog-dur">26 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot"></div><div><div class="prog-name">Mestrado em Antropologia</div><div class="prog-dur">26 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot red"></div><div><div class="prog-name">Doutorado em Saúde Pública</div><div class="prog-dur">36 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot red"></div><div><div class="prog-name">Doutorado em Educação</div><div class="prog-dur">36 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot red"></div><div><div class="prog-name">Doutorado em Psicologia</div><div class="prog-dur">36 meses · Acadêmico</div></div></li>
+        <li><div class="prog-dot red"></div><div><div class="prog-name">Doutorado em Antropologia</div><div class="prog-dur">36 meses · Acadêmico</div></div></li>
+      </ul>
+
+      <div class="card" style="border-left: 4px solid var(--secondary);">
+        <strong style="color:var(--primary);display:block;margin-bottom:6px;">Processo de ingresso</strong>
+        <p style="font-size:.84rem;color:var(--gray);line-height:1.7;">Análise documental, histórico acadêmico e aderência à linha de pesquisa. Preencha o formulário ao lado e entraremos em contato pelo WhatsApp.</p>
       </div>
     </div>
 
-    <!-- DIREITA — FORMULÁRIO -->
-    <div class="hero-right" id="ancora-form">
+    <!-- FORMULÁRIO -->
+    <div class="form-col">
+      <div class="card">
+        <div id="form-wrapper">
+          <div class="card-title">Faça sua inscrição</div>
+          <div class="card-sub">Preencha os dados — retornaremos pelo WhatsApp</div>
 
-      <div id="form-wrapper">
-        <p class="form-title">Faça sua inscrição</p>
-        <p class="form-sub">Preencha abaixo — retornaremos pelo WhatsApp</p>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nome completo *</label>
-            <input type="text" id="f-nome" placeholder="Seu nome completo" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome completo *</label>
+              <input type="text" id="f-nome" placeholder="Seu nome completo" />
+            </div>
+            <div class="form-group">
+              <label>WhatsApp *</label>
+              <input type="tel" id="f-whats" placeholder="(11) 99999-9999" />
+            </div>
           </div>
+
           <div class="form-group">
-            <label>WhatsApp *</label>
-            <input type="tel" id="f-whats" placeholder="(11) 99999-9999" />
+            <label>Curso desejado *</label>
+            <select id="f-curso">
+              <option value="">Selecione o curso</option>
+              <optgroup label="── Mestrados Acadêmicos (26 meses)">
+                <option>Mestrado em Saúde Pública</option>
+                <option>Mestrado em Educação</option>
+                <option>Mestrado em Psicologia</option>
+                <option>Mestrado em Antropologia</option>
+              </optgroup>
+              <optgroup label="── Doutorados Acadêmicos (36 meses)">
+                <option>Doutorado em Saúde Pública</option>
+                <option>Doutorado em Educação</option>
+                <option>Doutorado em Psicologia</option>
+                <option>Doutorado em Antropologia</option>
+              </optgroup>
+            </select>
           </div>
+
+          <div class="form-group">
+            <label>Graduação (formação atual) *</label>
+            <select id="f-grad">
+              <option value="">Selecione sua graduação</option>
+              <option>Administração</option>
+              <option>Ciências Biológicas</option>
+              <option>Ciências Sociais</option>
+              <option>Direito</option>
+              <option>Economia</option>
+              <option>Educação Física</option>
+              <option>Enfermagem</option>
+              <option>Engenharia</option>
+              <option>Farmácia</option>
+              <option>Medicina</option>
+              <option>Nutrição</option>
+              <option>Pedagogia</option>
+              <option>Psicologia</option>
+              <option>Serviço Social</option>
+              <option>Outra</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Dúvidas ou mensagem (opcional)</label>
+            <textarea id="f-msg" placeholder="Conte sobre sua motivação ou faça perguntas..."></textarea>
+          </div>
+
+          <button class="btn btn-secondary btn-full" onclick="enviarInscricao()">
+            Enviar Inscrição
+          </button>
         </div>
 
-        <div class="form-group">
-          <label>Curso desejado *</label>
-          <select id="f-curso">
-            <option value="">Selecione o curso</option>
-            <optgroup label="── Mestrados Acadêmicos (26 meses)">
-              <option>Mestrado em Saúde Pública</option>
-              <option>Mestrado em Educação</option>
-              <option>Mestrado em Psicologia</option>
-              <option>Mestrado em Antropologia</option>
-            </optgroup>
-            <optgroup label="── Doutorados Acadêmicos (36 meses)">
-              <option>Doutorado em Saúde Pública</option>
-              <option>Doutorado em Educação</option>
-              <option>Doutorado em Psicologia</option>
-              <option>Doutorado em Antropologia</option>
-            </optgroup>
-          </select>
+        <!-- SUCESSO -->
+        <div class="success-box" id="success-box">
+          <div class="success-icon">✓</div>
+          <div class="success-title">Inscrição enviada com sucesso!</div>
+          <p class="success-sub">
+            Recebemos sua solicitação.<br/>
+            Entraremos em contato pelo <strong>WhatsApp</strong> em breve.
+          </p>
+          <button class="btn btn-outline" style="margin-top:20px;" onclick="resetForm()">Nova inscrição</button>
         </div>
 
-        <div class="form-group">
-          <label>Graduação (formação atual) *</label>
-          <select id="f-grad">
-            <option value="">Selecione sua graduação</option>
-            <option>Administração</option>
-            <option>Ciências Biológicas</option>
-            <option>Ciências Sociais</option>
-            <option>Direito</option>
-            <option>Economia</option>
-            <option>Educação Física</option>
-            <option>Enfermagem</option>
-            <option>Engenharia</option>
-            <option>Farmácia</option>
-            <option>Medicina</option>
-            <option>Nutrição</option>
-            <option>Pedagogia</option>
-            <option>Psicologia</option>
-            <option>Serviço Social</option>
-            <option>Outra</option>
-          </select>
+        <div class="divider">
+          <div class="divider-line"></div>
+          <div class="divider-text">Já é aluno?</div>
+          <div class="divider-line"></div>
         </div>
-
-        <div class="form-group">
-          <label>Dúvidas ou mensagem (opcional)</label>
-          <textarea id="f-msg" placeholder="Conte sobre sua motivação ou faça perguntas..."></textarea>
-        </div>
-
-        <button class="btn btn-gold" style="width:100%;padding:13px;" onclick="enviarInscricao()">
-          Enviar Inscrição
+        <button class="btn btn-outline btn-full" onclick="showScreen('screen-login')">
+          Acessar Área do Aluno
         </button>
       </div>
-
-      <!-- SUCESSO -->
-      <div class="success-card" id="success-card">
-        <div class="success-icon">✦</div>
-        <p class="success-title">Inscrição enviada!</p>
-        <p class="success-sub">
-          Recebemos sua solicitação com sucesso.<br/>
-          Entraremos em contato pelo <strong style="color:var(--gold)">WhatsApp</strong> em breve.
-        </p>
-        <div style="margin-top:28px;">
-          <button class="btn btn-ghost" onclick="resetForm()">Nova inscrição</button>
-        </div>
-      </div>
-
-      <div class="divider">
-        <div class="divider-line"></div>
-        <div class="divider-text">Já é aluno?</div>
-        <div class="divider-line"></div>
-      </div>
-      <button class="btn btn-outline" style="width:100%" onclick="showScreen('screen-login')">
-        Acessar Área do Aluno
-      </button>
     </div>
   </div>
+
+  <footer style="background:#0b2a4a;color:#fff;padding:32px 20px;font-size:0.82rem;">
+    <p style="max-width:1000px;margin:auto;opacity:.85;text-align:center;">
+      A Nacional Pesquisa & Educação não é instituição de ensino superior e não emite diplomas. Atua exclusivamente como intermediadora educacional internacional.
+    </p>
+  </footer>
 </div>
 
 <!-- ══════════════════════════════
      TELA 2 — LOGIN
 ════════════════════════════════ -->
-<div id="screen-login" class="screen">
+<div id="screen-login" class="screen" style="justify-content:center;align-items:center;background:var(--light);padding:40px 20px;">
   <div class="login-box">
-    <div class="login-logo">Saint Alcuin of York</div>
-    <div class="login-subtitle">Área do Aluno — Portal Acadêmico</div>
-
-    <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
-
-    <div class="form-group">
-      <label>E-mail institucional</label>
-      <input type="email" id="l-email" placeholder="seu@email.com" />
+    <div class="login-top">
+      <h2>Saint Alcuin of York</h2>
+      <p>Portal do Aluno — Acesso Institucional</p>
     </div>
-    <div class="form-group">
-      <label>Senha</label>
-      <input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()" />
-    </div>
-    <div class="login-forgot"><a href="#">Esqueci minha senha</a></div>
+    <div class="login-body">
+      <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
 
-    <button class="btn btn-gold" style="width:100%;padding:13px;" onclick="fazerLogin()">Entrar</button>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="l-email" placeholder="seu@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()" />
+      </div>
+      <div class="login-forgot"><a href="#">Esqueci minha senha</a></div>
 
-    <div class="demo-hint">
-      <strong>Acesso demonstração</strong><br/>
-      E-mail: <strong>aluno@saintalcuin.com</strong><br/>
-      Senha: <strong>saintalcuin2024</strong>
-    </div>
+      <button class="btn btn-secondary btn-full" onclick="fazerLogin()">Entrar</button>
 
-    <div class="login-back">
-      <a onclick="showScreen('screen-landing')">← Voltar ao site</a>
+      <div class="demo-hint">
+        <strong>Acesso demonstração</strong><br/>
+        E-mail: <strong>aluno@saintalcuin.com</strong><br/>
+        Senha: <strong>saintalcuin2024</strong>
+      </div>
+
+      <div class="login-back">
+        <a onclick="showScreen('screen-landing')">← Voltar ao site</a>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- ══════════════════════════════
-     TELA 3 — DASHBOARD DO ALUNO
+     TELA 3 — DASHBOARD
 ════════════════════════════════ -->
 <div id="screen-dashboard" class="screen">
 
-  <div class="dash-header">
-    <div style="display:flex;align-items:center;gap:20px;">
-      <div class="logo-block">
-        <div class="logo-main" style="font-size:.95rem;">Saint Alcuin of York</div>
-        <div class="logo-sub">Portal Acadêmico</div>
-      </div>
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="header-brand-name">Saint Alcuin of York</div>
+      <div class="header-brand-sub">Portal Acadêmico</div>
     </div>
     <div class="dash-user">
-      <div>
+      <div style="text-align:right;">
         <div class="dash-name" id="dash-name">—</div>
-        <div class="dash-course" id="dash-course">—</div>
+        <div class="dash-course" id="dash-course" style="color:rgba(255,255,255,.75);font-size:.68rem;">—</div>
       </div>
       <div class="dash-avatar" id="dash-avatar">—</div>
-      <button class="btn btn-danger" onclick="fazerLogout()">Sair</button>
+      <button class="btn btn-danger" style="color:#fca5a5;border-color:rgba(252,165,165,.4);" onclick="fazerLogout()">Sair</button>
     </div>
-  </div>
+  </header>
 
   <div class="dash-body">
 
     <!-- SIDEBAR -->
     <nav class="sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-section-title">Principal</div>
-        <div class="nav-item active" onclick="showTab('home',this)">
-          <span class="nav-icon">⌂</span> Início
-        </div>
-        <div class="nav-item" onclick="showTab('materiais',this)">
-          <span class="nav-icon">📄</span> Materiais PDF
-          <span class="nav-badge">6</span>
-        </div>
-        <div class="nav-item" onclick="showTab('aulas',this)">
-          <span class="nav-icon">▶</span> Aulas
-        </div>
+        <div class="sidebar-label">Principal</div>
+        <div class="nav-item active" onclick="showTab('home',this)"><span class="nav-icon">⌂</span> Início</div>
+        <div class="nav-item" onclick="showTab('materiais',this)"><span class="nav-icon">📄</span> Materiais PDF <span class="nav-badge">6</span></div>
+        <div class="nav-item" onclick="showTab('aulas',this)"><span class="nav-icon">▶</span> Aulas</div>
       </div>
-      <div class="sidebar-section" style="margin-top:20px;">
-        <div class="sidebar-section-title">Acadêmico</div>
-        <div class="nav-item" onclick="showTab('disciplinas',this)">
-          <span class="nav-icon">◈</span> Disciplinas
-        </div>
-        <div class="nav-item" onclick="showTab('notas',this)">
-          <span class="nav-icon">◎</span> Notas
-        </div>
+      <div class="sidebar-section" style="margin-top:16px;">
+        <div class="sidebar-label">Acadêmico</div>
+        <div class="nav-item" onclick="showTab('disciplinas',this)"><span class="nav-icon">◈</span> Disciplinas</div>
+        <div class="nav-item" onclick="showTab('notas',this)"><span class="nav-icon">◎</span> Notas</div>
       </div>
-      <div class="sidebar-section" style="margin-top:20px;">
-        <div class="sidebar-section-title">Financeiro</div>
-        <div class="nav-item" onclick="showTab('pagamentos',this)">
-          <span class="nav-icon">◇</span> Pagamentos
-          <span class="nav-badge red">1</span>
-        </div>
-        <div class="nav-item" onclick="showTab('declaracoes',this)">
-          <span class="nav-icon">☰</span> Declarações
-        </div>
+      <div class="sidebar-section" style="margin-top:16px;">
+        <div class="sidebar-label">Financeiro</div>
+        <div class="nav-item" onclick="showTab('pagamentos',this)"><span class="nav-icon">◇</span> Pagamentos <span class="nav-badge red">1</span></div>
+        <div class="nav-item" onclick="showTab('declaracoes',this)"><span class="nav-icon">☰</span> Declarações</div>
       </div>
     </nav>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- MAIN -->
     <div class="dash-main">
 
       <!-- HOME -->
       <div class="tab-content active" id="tab-home">
-        <div class="welcome-banner">
-          <div class="welcome-title">Bem-vindo, <span id="welcome-name">Aluno</span></div>
-          <p class="welcome-sub" id="welcome-info">Semestre: 2024/2 · Matrícula: SAY-2024-0001 · Status: Ativo</p>
+        <div class="welcome-card">
+          <div>
+            <h2>Bem-vindo, <span id="welcome-name">Aluno</span></h2>
+            <p id="welcome-info">Semestre 2024/2 · Matrícula: SAY-2024-0001 · Status: Ativo</p>
+          </div>
+          <div class="welcome-badge">✓ Matrícula ativa</div>
         </div>
         <div class="stats-row">
           <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Disciplinas</div></div>
@@ -593,194 +663,190 @@
           <div class="stat-card"><div class="stat-value">89%</div><div class="stat-label">Frequência</div></div>
           <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">Materiais</div></div>
         </div>
-        <div class="section-header">
-          <div class="section-title">Acesso <span>Rápido</span></div>
-        </div>
+        <h3 style="font-size:1rem;color:var(--primary);margin-bottom:16px;">Acesso rápido</h3>
         <div class="card-grid">
-          <div class="card" onclick="showTab('materiais',null)">
-            <div class="card-icon">📄</div><div class="card-label">Biblioteca</div>
-            <div class="card-title">Materiais e apostilas em PDF</div>
-            <div class="card-meta">6 arquivos disponíveis</div>
-            <button class="card-action">Acessar →</button>
+          <div class="quick-card" onclick="showTab('materiais',null)">
+            <div class="quick-icon">📄</div><div class="quick-label">Biblioteca</div>
+            <div class="quick-title">Materiais em PDF</div>
+            <div class="quick-meta">6 arquivos disponíveis</div>
+            <span class="quick-link">Acessar →</span>
           </div>
-          <div class="card" onclick="showTab('aulas',null)">
-            <div class="card-icon">▶</div><div class="card-label">Videoaulas</div>
-            <div class="card-title">Aulas gravadas e ao vivo</div>
-            <div class="card-meta">10 aulas disponíveis</div>
-            <button class="card-action">Assistir →</button>
+          <div class="quick-card" onclick="showTab('aulas',null)">
+            <div class="quick-icon">▶</div><div class="quick-label">Videoaulas</div>
+            <div class="quick-title">Aulas gravadas</div>
+            <div class="quick-meta">10 aulas disponíveis</div>
+            <span class="quick-link">Assistir →</span>
           </div>
-          <div class="card" onclick="showTab('notas',null)">
-            <div class="card-icon">◎</div><div class="card-label">Desempenho</div>
-            <div class="card-title">Notas e avaliações</div>
-            <div class="card-meta">Média atual: 8.3</div>
-            <button class="card-action">Ver notas →</button>
+          <div class="quick-card" onclick="showTab('notas',null)">
+            <div class="quick-icon">◎</div><div class="quick-label">Desempenho</div>
+            <div class="quick-title">Notas e avaliações</div>
+            <div class="quick-meta">Média: 8.3</div>
+            <span class="quick-link">Ver notas →</span>
           </div>
-          <div class="card" onclick="showTab('declaracoes',null)">
-            <div class="card-icon">☰</div><div class="card-label">Documentos</div>
-            <div class="card-title">Declarações e certificados</div>
-            <div class="card-meta">Emissão instantânea</div>
-            <button class="card-action">Emitir →</button>
+          <div class="quick-card" onclick="showTab('declaracoes',null)">
+            <div class="quick-icon">📋</div><div class="quick-label">Documentos</div>
+            <div class="quick-title">Declarações</div>
+            <div class="quick-meta">Emissão instantânea</div>
+            <span class="quick-link">Emitir →</span>
           </div>
         </div>
       </div>
 
       <!-- MATERIAIS -->
       <div class="tab-content" id="tab-materiais">
-        <div class="section-header">
-          <div class="section-title">Materiais <span>PDF</span></div>
-          <div class="section-count">6 arquivos</div>
-        </div>
+        <div class="page-title">Materiais PDF</div>
+        <div class="page-sub">6 arquivos disponíveis para download</div>
         <div class="card-grid">
-          <div class="card"><div class="card-icon">📄</div><div class="card-label">Módulo 1</div><div class="card-title">Fundamentos da Pesquisa Científica</div><div class="card-meta">Coord. Acadêmica · 54 págs</div><button class="card-action">Baixar PDF →</button></div>
-          <div class="card"><div class="card-icon">📄</div><div class="card-label">Módulo 2</div><div class="card-title">Metodologia Qualitativa e Quantitativa</div><div class="card-meta">Prof. Dr. Costa · 68 págs</div><button class="card-action">Baixar PDF →</button></div>
-          <div class="card"><div class="card-icon">📄</div><div class="card-label">Módulo 3</div><div class="card-title">Epistemologia e Teoria do Conhecimento</div><div class="card-meta">Prof. Dra. Alves · 48 págs</div><button class="card-action">Baixar PDF →</button></div>
-          <div class="card"><div class="card-icon">📄</div><div class="card-label">Módulo 4</div><div class="card-title">Análise e Interpretação de Dados</div><div class="card-meta">Prof. Dr. Lima · 62 págs</div><button class="card-action">Baixar PDF →</button></div>
-          <div class="card"><div class="card-icon">📄</div><div class="card-label">Suplementar</div><div class="card-title">Artigos e Referências Bibliográficas</div><div class="card-meta">Biblioteca · 130 págs</div><button class="card-action">Baixar PDF →</button></div>
-          <div class="card"><div class="card-icon">📄</div><div class="card-label">Dissertação</div><div class="card-title">Guia de Dissertação e Tese</div><div class="card-meta">Coordenação · Edição 2024</div><button class="card-action">Baixar PDF →</button></div>
+          <div class="quick-card"><div class="quick-icon">📄</div><div class="quick-label">Módulo 1</div><div class="quick-title">Fundamentos da Pesquisa Científica</div><div class="quick-meta">54 págs · Coord. Acadêmica</div><span class="quick-link">Baixar PDF →</span></div>
+          <div class="quick-card"><div class="quick-icon">📄</div><div class="quick-label">Módulo 2</div><div class="quick-title">Metodologia Qualitativa e Quantitativa</div><div class="quick-meta">68 págs · Prof. Dr. Costa</div><span class="quick-link">Baixar PDF →</span></div>
+          <div class="quick-card"><div class="quick-icon">📄</div><div class="quick-label">Módulo 3</div><div class="quick-title">Epistemologia e Teoria do Conhecimento</div><div class="quick-meta">48 págs · Prof. Dra. Alves</div><span class="quick-link">Baixar PDF →</span></div>
+          <div class="quick-card"><div class="quick-icon">📄</div><div class="quick-label">Módulo 4</div><div class="quick-title">Análise e Interpretação de Dados</div><div class="quick-meta">62 págs · Prof. Dr. Lima</div><span class="quick-link">Baixar PDF →</span></div>
+          <div class="quick-card"><div class="quick-icon">📄</div><div class="quick-label">Suplementar</div><div class="quick-title">Artigos e Referências Bibliográficas</div><div class="quick-meta">130 págs · Biblioteca</div><span class="quick-link">Baixar PDF →</span></div>
+          <div class="quick-card"><div class="quick-icon">📄</div><div class="quick-label">Dissertação</div><div class="quick-title">Guia de Dissertação e Tese</div><div class="quick-meta">Coord. Acadêmica · 2024</div><span class="quick-link">Baixar PDF →</span></div>
         </div>
       </div>
 
       <!-- AULAS -->
       <div class="tab-content" id="tab-aulas">
-        <div class="section-header">
-          <div class="section-title">Aulas <span>Gravadas</span></div>
-          <div class="section-count">10 aulas</div>
+        <div class="page-title">Aulas Gravadas</div>
+        <div class="page-sub">10 aulas disponíveis</div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Aula</th><th>Disciplina</th><th>Duração</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>Aula 01 — Introdução à Pesquisa</td><td>Fundamentos</td><td>1h 22min</td><td><span class="badge badge-green">Assistida</span></td><td><a class="quick-link">Rever →</a></td></tr>
+              <tr><td>Aula 02 — Problema de Pesquisa</td><td>Fundamentos</td><td>1h 08min</td><td><span class="badge badge-green">Assistida</span></td><td><a class="quick-link">Rever →</a></td></tr>
+              <tr><td>Aula 03 — Revisão Sistemática</td><td>Metodologia</td><td>1h 35min</td><td><span class="badge badge-green">Assistida</span></td><td><a class="quick-link">Rever →</a></td></tr>
+              <tr><td>Aula 04 — Entrevista e Observação</td><td>Metodologia</td><td>58min</td><td><span class="badge badge-blue">Em andamento</span></td><td><a class="quick-link">Continuar →</a></td></tr>
+              <tr><td>Aula 05 — Análise Estatística</td><td>Dados</td><td>1h 48min</td><td><span class="badge badge-gray">Disponível</span></td><td><a class="quick-link">Assistir →</a></td></tr>
+              <tr><td>Aula 06 — Escrita Científica</td><td>Dissertação</td><td>1h 15min</td><td><span class="badge badge-gray">Disponível</span></td><td><a class="quick-link">Assistir →</a></td></tr>
+            </tbody>
+          </table>
         </div>
-        <table class="data-table">
-          <thead><tr><th>Aula</th><th>Disciplina</th><th>Duração</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr><td>Aula 01 — Introdução à Pesquisa</td><td>Fundamentos</td><td>1h 22min</td><td><span class="badge badge-green">Assistida</span></td><td><button class="card-action">Rever →</button></td></tr>
-            <tr><td>Aula 02 — Problema de Pesquisa</td><td>Fundamentos</td><td>1h 08min</td><td><span class="badge badge-green">Assistida</span></td><td><button class="card-action">Rever →</button></td></tr>
-            <tr><td>Aula 03 — Revisão Sistemática</td><td>Metodologia</td><td>1h 35min</td><td><span class="badge badge-green">Assistida</span></td><td><button class="card-action">Rever →</button></td></tr>
-            <tr><td>Aula 04 — Entrevista e Observação</td><td>Metodologia</td><td>58min</td><td><span class="badge badge-gold">Em andamento</span></td><td><button class="card-action">Continuar →</button></td></tr>
-            <tr><td>Aula 05 — Análise Estatística</td><td>Dados</td><td>1h 48min</td><td><span class="badge badge-muted">Disponível</span></td><td><button class="card-action">Assistir →</button></td></tr>
-            <tr><td>Aula 06 — Escrita Científica</td><td>Dissertação</td><td>1h 15min</td><td><span class="badge badge-muted">Disponível</span></td><td><button class="card-action">Assistir →</button></td></tr>
-          </tbody>
-        </table>
       </div>
 
       <!-- DISCIPLINAS -->
       <div class="tab-content" id="tab-disciplinas">
-        <div class="section-header">
-          <div class="section-title">Minhas <span>Disciplinas</span></div>
-          <div class="section-count">Semestre 2024/2</div>
+        <div class="page-title">Minhas Disciplinas</div>
+        <div class="page-sub">Semestre 2024/2</div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Disciplina</th><th>Professor</th><th>Carga Horária</th><th>Frequência</th><th>Situação</th></tr></thead>
+            <tbody>
+              <tr><td>Fundamentos da Pesquisa Científica</td><td>Dr. Costa</td><td>60h</td><td>93%</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Metodologia de Pesquisa</td><td>Dra. Alves</td><td>60h</td><td>88%</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Epistemologia</td><td>Dr. Nunes</td><td>45h</td><td>85%</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Análise de Dados</td><td>Dr. Lima</td><td>45h</td><td>90%</td><td><span class="badge badge-green">Regular</span></td></tr>
+              <tr><td>Escrita e Publicação Científica</td><td>Dra. Rocha</td><td>30h</td><td>80%</td><td><span class="badge badge-yellow">Atenção</span></td></tr>
+            </tbody>
+          </table>
         </div>
-        <table class="data-table">
-          <thead><tr><th>Disciplina</th><th>Professor</th><th>Carga Horária</th><th>Frequência</th><th>Situação</th></tr></thead>
-          <tbody>
-            <tr><td>Fundamentos da Pesquisa Científica</td><td>Dr. Costa</td><td>60h</td><td>93%</td><td><span class="badge badge-green">Regular</span></td></tr>
-            <tr><td>Metodologia de Pesquisa</td><td>Dra. Alves</td><td>60h</td><td>88%</td><td><span class="badge badge-green">Regular</span></td></tr>
-            <tr><td>Epistemologia</td><td>Dr. Nunes</td><td>45h</td><td>85%</td><td><span class="badge badge-green">Regular</span></td></tr>
-            <tr><td>Análise de Dados</td><td>Dr. Lima</td><td>45h</td><td>90%</td><td><span class="badge badge-green">Regular</span></td></tr>
-            <tr><td>Escrita e Publicação Científica</td><td>Dra. Rocha</td><td>30h</td><td>80%</td><td><span class="badge badge-gold">Atenção</span></td></tr>
-          </tbody>
-        </table>
       </div>
 
       <!-- NOTAS -->
       <div class="tab-content" id="tab-notas">
-        <div class="section-header">
-          <div class="section-title">Notas e <span>Desempenho</span></div>
-        </div>
-        <div class="nota-header">
-          <div class="nota-ring"><div class="nota-ring-value">8.3</div></div>
-          <div class="nota-info">
-            <div class="nota-info-title">Média Geral do Semestre</div>
-            <div class="nota-info-sub">Semestre 2024/2 · 5 disciplinas · Aprovado em 4 de 5</div>
+        <div class="page-title">Notas e Desempenho</div>
+        <div class="page-sub">Semestre 2024/2</div>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="nota-header">
+            <div class="nota-ring"><div class="nota-ring-val">8.3</div></div>
+            <div>
+              <div class="nota-info-title">Média Geral do Semestre</div>
+              <div class="nota-info-sub">5 disciplinas · Aprovado em 4 de 5</div>
+            </div>
           </div>
         </div>
-        <table class="data-table">
-          <thead><tr><th>Disciplina</th><th>Nota 1</th><th>Nota 2</th><th>Trabalho</th><th>Média</th><th>Situação</th></tr></thead>
-          <tbody>
-            <tr><td>Fundamentos da Pesquisa</td><td>8.5</td><td>9.0</td><td>8.5</td><td><strong>8.7</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
-            <tr><td>Metodologia de Pesquisa</td><td>8.0</td><td>8.5</td><td>8.0</td><td><strong>8.2</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
-            <tr><td>Epistemologia</td><td>9.0</td><td>8.5</td><td>9.5</td><td><strong>9.0</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
-            <tr><td>Análise de Dados</td><td>7.5</td><td>8.0</td><td>8.0</td><td><strong>7.8</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
-            <tr><td>Escrita Científica</td><td>6.0</td><td>6.5</td><td>7.0</td><td><strong>6.5</strong></td><td><span class="badge badge-gold">Recuperação</span></td></tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Disciplina</th><th>Nota 1</th><th>Nota 2</th><th>Trabalho</th><th>Média</th><th>Situação</th></tr></thead>
+            <tbody>
+              <tr><td>Fundamentos da Pesquisa</td><td>8.5</td><td>9.0</td><td>8.5</td><td><strong>8.7</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
+              <tr><td>Metodologia de Pesquisa</td><td>8.0</td><td>8.5</td><td>8.0</td><td><strong>8.2</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
+              <tr><td>Epistemologia</td><td>9.0</td><td>8.5</td><td>9.5</td><td><strong>9.0</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
+              <tr><td>Análise de Dados</td><td>7.5</td><td>8.0</td><td>8.0</td><td><strong>7.8</strong></td><td><span class="badge badge-green">Aprovado</span></td></tr>
+              <tr><td>Escrita Científica</td><td>6.0</td><td>6.5</td><td>7.0</td><td><strong>6.5</strong></td><td><span class="badge badge-yellow">Recuperação</span></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- PAGAMENTOS -->
       <div class="tab-content" id="tab-pagamentos">
-        <div class="section-header">
-          <div class="section-title">Financeiro e <span>Pagamentos</span></div>
+        <div class="page-title">Financeiro e Pagamentos</div>
+        <div class="page-sub">Histórico de mensalidades</div>
+        <div class="alert alert-warning">
+          <div class="alert-icon">⚠</div>
+          <div class="alert-text">Você possui <strong>1 parcela em aberto</strong> com vencimento em <strong>15/12/2024</strong>. Regularize para manter acesso pleno ao portal.</div>
+          <button class="btn btn-secondary" style="flex-shrink:0;font-size:.78rem;padding:8px 18px;">Pagar agora</button>
         </div>
-        <div class="payment-alert">
-          <div class="payment-alert-icon">⚠</div>
-          <div class="payment-alert-text">
-            Você possui <strong>1 parcela em aberto</strong> com vencimento em <strong>15/12/2024</strong>.
-            Regularize para manter acesso pleno ao portal.
-          </div>
-          <button class="btn btn-gold" style="flex-shrink:0">Pagar agora</button>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Referência</th><th>Descrição</th><th>Vencimento</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>01/26</td><td>Mensalidade — Mestrado</td><td>15/01/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><a class="quick-link">Recibo →</a></td></tr>
+              <tr><td>02/26</td><td>Mensalidade — Mestrado</td><td>15/02/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><a class="quick-link">Recibo →</a></td></tr>
+              <tr><td>10/26</td><td>Mensalidade — Mestrado</td><td>15/10/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><a class="quick-link">Recibo →</a></td></tr>
+              <tr><td>11/26</td><td>Mensalidade — Mestrado</td><td>15/11/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><a class="quick-link">Recibo →</a></td></tr>
+              <tr><td>12/26</td><td>Mensalidade — Mestrado</td><td>15/12/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-red">Em aberto</span></td><td><button class="btn btn-secondary" style="font-size:.72rem;padding:6px 14px;">Pagar</button></td></tr>
+            </tbody>
+          </table>
         </div>
-        <table class="data-table">
-          <thead><tr><th>Referência</th><th>Descrição</th><th>Vencimento</th><th>Valor</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            <tr><td>01/26</td><td>Mensalidade — Mestrado</td><td>15/01/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><button class="card-action">Recibo →</button></td></tr>
-            <tr><td>02/26</td><td>Mensalidade — Mestrado</td><td>15/02/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><button class="card-action">Recibo →</button></td></tr>
-            <tr><td>10/26</td><td>Mensalidade — Mestrado</td><td>15/10/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><button class="card-action">Recibo →</button></td></tr>
-            <tr><td>11/26</td><td>Mensalidade — Mestrado</td><td>15/11/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-green">Pago</span></td><td><button class="card-action">Recibo →</button></td></tr>
-            <tr><td>12/26</td><td>Mensalidade — Mestrado</td><td>15/12/2024</td><td>R$ 2.200,00</td><td><span class="badge badge-red">Em aberto</span></td><td><button class="btn btn-gold" style="font-size:.6rem;padding:6px 12px;">Pagar</button></td></tr>
-          </tbody>
-        </table>
       </div>
 
       <!-- DECLARAÇÕES -->
       <div class="tab-content" id="tab-declaracoes">
-        <div class="section-header">
-          <div class="section-title">Declarações e <span>Documentos</span></div>
-          <div class="section-count">Emissão instantânea</div>
-        </div>
-        <div class="decl-card">
-          <div class="decl-icon">📋</div>
-          <div class="decl-info">
-            <div class="decl-title">Declaração de Matrícula</div>
-            <div class="decl-sub">Comprova vínculo ativo com a instituição · Gerado em tempo real</div>
+        <div class="page-title">Declarações e Documentos</div>
+        <div class="page-sub">Emissão instantânea em PDF</div>
+        <div class="card" style="padding:0;">
+          <div class="decl-item">
+            <div class="decl-icon">📋</div>
+            <div class="decl-info">
+              <div class="decl-title">Declaração de Matrícula</div>
+              <div class="decl-sub">Comprova vínculo ativo com a instituição · Gerado em tempo real</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:.78rem;">Emitir PDF</button>
           </div>
-          <button class="btn btn-outline">Emitir PDF</button>
-        </div>
-        <div class="decl-card">
-          <div class="decl-icon">📋</div>
-          <div class="decl-info">
-            <div class="decl-title">Declaração de Frequência</div>
-            <div class="decl-sub">Frequência detalhada por disciplina no semestre atual</div>
+          <div class="decl-item">
+            <div class="decl-icon">📋</div>
+            <div class="decl-info">
+              <div class="decl-title">Declaração de Frequência</div>
+              <div class="decl-sub">Frequência detalhada por disciplina no semestre atual</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:.78rem;">Emitir PDF</button>
           </div>
-          <button class="btn btn-outline">Emitir PDF</button>
-        </div>
-        <div class="decl-card">
-          <div class="decl-icon">📋</div>
-          <div class="decl-info">
-            <div class="decl-title">Histórico Escolar</div>
-            <div class="decl-sub">Notas e disciplinas cursadas até o semestre atual</div>
+          <div class="decl-item">
+            <div class="decl-icon">📋</div>
+            <div class="decl-info">
+              <div class="decl-title">Histórico Escolar</div>
+              <div class="decl-sub">Notas e disciplinas cursadas até o semestre atual</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:.78rem;">Emitir PDF</button>
           </div>
-          <button class="btn btn-outline">Emitir PDF</button>
-        </div>
-        <div class="decl-card" style="opacity:.45;cursor:not-allowed;">
-          <div class="decl-icon">🎓</div>
-          <div class="decl-info">
-            <div class="decl-title">Certificado de Conclusão</div>
-            <div class="decl-sub">Disponível após a conclusão do curso</div>
+          <div class="decl-item" style="opacity:.5;">
+            <div class="decl-icon">🎓</div>
+            <div class="decl-info">
+              <div class="decl-title">Certificado de Conclusão</div>
+              <div class="decl-sub">Disponível após a conclusão do curso</div>
+            </div>
+            <button class="btn" style="font-size:.78rem;background:#f3f4f6;color:var(--gray);" disabled>Indisponível</button>
           </div>
-          <button class="btn btn-ghost" disabled>Indisponível</button>
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /dash-main -->
+  </div><!-- /dash-body -->
+</div><!-- /screen-dashboard -->
 
-<!-- ══════ JS ══════ -->
+<!-- WHATSAPP -->
+<a href="https://wa.me/75998403658" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff">
+    <path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/>
+  </svg>
+</a>
+
 <script>
-  /* Demo users — substituir por Supabase Auth */
   const USUARIOS = [
-    {
-      email:   'aluno@saintalcuin.com',
-      senha:   'saintalcuin2024',
-      nome:    'Maria Clara Ferreira',
-      curso:   'Mestrado em Psicologia',
-      inicial: 'M'
-    }
+    { email: 'aluno@saintalcuin.com', senha: 'saintalcuin2024', nome: 'Maria Clara Ferreira', curso: 'Mestrado em Psicologia', inicial: 'M' }
   ];
 
   function showScreen(id) {
@@ -804,20 +870,19 @@
     const curso = document.getElementById('f-curso').value;
     const grad  = document.getElementById('f-grad').value;
     if (!nome || !whats || !curso || !grad) {
-      alert('Por favor, preencha todos os campos obrigatórios (*).');
+      alert('Preencha todos os campos obrigatórios (*).');
       return;
     }
-    // → Conectar ao Supabase / Webhook / n8n aqui
     console.log('Inscrição:', { nome, whats, curso, grad, msg: document.getElementById('f-msg').value });
     document.getElementById('form-wrapper').style.display = 'none';
-    document.getElementById('success-card').style.display = 'block';
+    document.getElementById('success-box').style.display  = 'block';
   }
 
   function resetForm() {
     ['f-nome','f-whats','f-msg'].forEach(id => document.getElementById(id).value = '');
     ['f-curso','f-grad'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('form-wrapper').style.display = 'block';
-    document.getElementById('success-card').style.display = 'none';
+    document.getElementById('success-box').style.display  = 'none';
   }
 
   function fazerLogin() {
@@ -827,9 +892,9 @@
     const user  = USUARIOS.find(u => u.email === email && u.senha === senha);
     if (!user) { err.style.display = 'block'; return; }
     err.style.display = 'none';
-    document.getElementById('dash-name').textContent   = user.nome;
-    document.getElementById('dash-course').textContent = user.curso;
-    document.getElementById('dash-avatar').textContent = user.inicial;
+    document.getElementById('dash-name').textContent    = user.nome;
+    document.getElementById('dash-course').textContent  = user.curso;
+    document.getElementById('dash-avatar').textContent  = user.inicial;
     document.getElementById('welcome-name').textContent = user.nome.split(' ')[0];
     showTab('home', document.querySelector('.nav-item'));
     showScreen('screen-dashboard');
