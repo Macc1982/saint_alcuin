@@ -407,11 +407,20 @@
     const whats = document.getElementById('f-whats').value.trim();
     const curso = document.getElementById('f-curso').value;
     const grad  = document.getElementById('f-grad').value;
+    const msg   = document.getElementById('f-msg').value.trim();
     if (!nome || !whats || !curso || !grad) {
       alert('Por favor, preencha todos os campos obrigatórios (*).');
       return;
     }
-    console.log('Inscrição:', { nome, whats, curso, grad, msg: document.getElementById('f-msg').value });
+    const texto =
+      '\u{1F4CB} *Nova Inscri\u00E7\u00E3o \u2014 Saint Alcuin of York*\n\n' +
+      '\u{1F464} *Nome:* ' + nome + '\n' +
+      '\u{1F4F1} *WhatsApp:* ' + whats + '\n' +
+      '\u{1F393} *Curso:* ' + curso + '\n' +
+      '\u{1F4DA} *Gradua\u00E7\u00E3o:* ' + grad +
+      (msg ? '\n\u{1F4AC} *Mensagem:* ' + msg : '');
+    const url = 'https://wa.me/75998403658?text=' + encodeURIComponent(texto);
+    window.open(url, '_blank');
     document.getElementById('form-wrapper').style.display = 'none';
     document.getElementById('success-box').style.display  = 'block';
   }
