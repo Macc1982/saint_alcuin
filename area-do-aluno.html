@@ -590,12 +590,6 @@
 
       <button class="btn btn-secondary btn-full" onclick="fazerLogin()">Entrar</button>
 
-      <div class="demo-hint">
-        <strong>Acesso demonstração</strong><br/>
-        E-mail: <strong>aluno@saintalcuin.com</strong><br/>
-        Senha: <strong>saintalcuin2024</strong>
-      </div>
-
       <div class="login-back">
         <a onclick="showScreen('screen-landing')">← Voltar ao site</a>
       </div>
@@ -844,7 +838,7 @@
   </svg>
 </a>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   const USUARIOS = [
     { email: 'aluno@saintalcuin.com', senha: 'saintalcuin2024', nome: 'Maria Clara Ferreira', curso: 'Mestrado em Psicologia', inicial: 'M' }
   ];
@@ -897,14 +891,3 @@
     document.getElementById('dash-avatar').textContent  = user.inicial;
     document.getElementById('welcome-name').textContent = user.nome.split(' ')[0];
     showTab('home', document.querySelector('.nav-item'));
-    showScreen('screen-dashboard');
-  }
-
-  function fazerLogout() {
-    document.getElementById('l-email').value = '';
-    document.getElementById('l-senha').value = '';
-    showScreen('screen-landing');
-  }
-</script>
-</body>
-</html>
