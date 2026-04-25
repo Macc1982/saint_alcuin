@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Painel Administrativo | Saint Alcuin of York</title>
+  <link rel="stylesheet" href="/assets/repositorio.css" />
+</head>
+<body class="admin-shell">
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="header-logo-name">Saint Alcuin of York Anglican College</div>
+      <div class="header-logo-sub">Administração — Repositório</div>
+    </a>
+    <nav class="header-nav">
+      <a href="/repositorio/" target="_blank" class="nav-link" data-i18n="nav_repository">Repositório</a>
+      <div class="lang-pill">
+        <button class="lang-btn" data-lang="pt">PT</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="admin-page">
+  <div class="admin-head">
+    <h1>
+      <small data-i18n="admin_subtitle">Repositório Acadêmico</small>
+      <span data-i18n="admin_title">Painel Administrativo</span>
+    </h1>
+    <div class="admin-head__user">
+      <span><b id="userEmail">…</b></span>
+      <button class="btn-logout" id="logoutBtn" data-i18n="admin_logout">Sair</button>
+    </div>
+  </div>
+
+  <div class="admin-grid">
+
+    <!-- ===== Form ===== -->
+    <section class="section-card">
+      <div class="section-card__top">
+        <h2 data-i18n="admin_new">Novo depósito</h2>
+        <p>Preencha os dados e envie o PDF</p>
+      </div>
+      <div class="section-card__body">
+        <form id="depositForm">
+          <div id="formAlert" class="alert" hidden></div>
+
+          <div class="form-group">
+            <label for="titulo" data-i18n="admin_field_title">Título do trabalho</label>
+            <input id="titulo" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="titulo_en" data-i18n="admin_field_title_en">Título em inglês (opcional)</label>
+            <input id="titulo_en" type="text" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ano" data-i18n="admin_field_year">Ano de conclusão</label>
+              <input id="ano" type="number" min="1900" max="2100" required />
+            </div>
+            <div class="form-group">
+              <label for="tipo" data-i18n="admin_field_type">Natureza</label>
+              <select id="tipo" required>
+                <option value="dissertacao" data-i18n-opt="type_dissertacao">Dissertação de Mestrado</option>
+                <option value="tese" data-i18n-opt="type_tese">Tese de Doutorado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="autor" data-i18n="admin_field_author">Nome do autor (mestre/doutor)</label>
+            <input id="autor" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="orientador" data-i18n="admin_field_advisor">Nome do orientador</label>
+            <input id="orientador" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="banca" data-i18n="admin_field_committee">Banca examinadora (um nome por linha)</label>
+            <textarea id="banca" rows="3" placeholder="Prof. Dr. ...&#10;Prof. Dr. ...&#10;Prof. Dr. ..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="resumo" data-i18n="admin_field_abstract">Resumo (opcional)</label>
+            <textarea id="resumo" rows="4"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="pdf" data-i18n="admin_field_pdf">Arquivo PDF</label>
+            <input id="pdf" type="file" accept="application/pdf" required />
+          </div>
+
+          <div class="form-group">
+            <label for="link_diploma" data-i18n="admin_field_diploma">Link do diploma (apostilamento federal)</label>
+            <input id="link_diploma" type="url" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label for="link_historico" data-i18n="admin_field_historico">Link do histórico escolar</label>
+            <input id="link_historico" type="url" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label for="link_ata" data-i18n="admin_field_ata">Link da ata de defesa</label>
+            <input id="link_ata" type="url" placeholder="https://..." />
+          </div>
+
+          <button class="btn-submit" id="submitBtn" type="submit" data-i18n="admin_submit">Depositar trabalho</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== Lista ===== -->
+    <section class="section-card">
+      <div class="section-card__top">
+        <h2 data-i18n="admin_list">Trabalhos depositados</h2>
+        <p>Acesse, copie o link ou remova depósitos</p>
+      </div>
+      <div class="section-card__body">
+        <div class="records-list" id="recordsList">
+          <div class="loading-state" data-i18n="loading">Carregando</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p data-i18n="footer">
+    © Saint Alcuin of York Anglican College — Todos os direitos reservados.<br/>
+    Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
+  </p>
+</footer>
+
+<script type="module">
+  import { supabase, t, getLang, setLang, slugify, recordId } from '/assets/repositorio-config.js';
+
+  // ===== Guard de sessão =====
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    location.replace('/admin-repositorio/');
+    throw new Error('redirecting');
+  }
+
+  // ===== i18n =====
+  function applyI18n() {
+    document.documentElement.lang = getLang() === 'en' ? 'en' : 'pt-BR';
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-opt]').forEach(el => { el.textContent = t(el.dataset.i18nOpt); });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === getLang());
+    });
+  }
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => { setLang(b.dataset.lang); applyI18n(); renderList(); });
+  });
+  applyI18n();
+
+  document.getElementById('userEmail').textContent = session.user.email;
+
+  // ===== Logout =====
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    location.replace('/admin-repositorio/');
+  });
+
+  // ===== Submit =====
+  const form = document.getElementById('depositForm');
+  const alertEl = document.getElementById('formAlert');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showAlert(msg, ok = false) {
+    alertEl.textContent = msg;
+    alertEl.classList.toggle('alert--ok', ok);
+    alertEl.hidden = false;
+    if (ok) setTimeout(() => { alertEl.hidden = true; }, 5000);
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = t('admin_submitting');
+
+    try {
+      const titulo     = document.getElementById('titulo').value.trim();
+      const titulo_en  = document.getElementById('titulo_en').value.trim() || null;
+      const ano        = parseInt(document.getElementById('ano').value, 10);
+      const tipo       = document.getElementById('tipo').value;
+      const autor      = document.getElementById('autor').value.trim();
+      const orientador = document.getElementById('orientador').value.trim();
+      const banca      = document.getElementById('banca').value
+                          .split('\n').map(s => s.trim()).filter(Boolean);
+      const resumo     = document.getElementById('resumo').value.trim() || null;
+      const link_diploma   = document.getElementById('link_diploma').value.trim() || null;
+      const link_historico = document.getElementById('link_historico').value.trim() || null;
+      const link_ata       = document.getElementById('link_ata').value.trim() || null;
+      const pdf        = document.getElementById('pdf').files[0];
+
+      if (!pdf) throw new Error('PDF obrigatório');
+
+      // Slug único
+      let baseSlug = slugify(titulo) || 'trabalho';
+      let slug = `${baseSlug}-${ano}`;
+      const { data: exists } = await supabase
+        .from('dissertacoes').select('id').eq('slug', slug).maybeSingle();
+      if (exists) slug = `${slug}-${Date.now().toString(36)}`;
+
+      // Upload PDF
+      const path = `${slug}.pdf`;
+      const { error: upErr } = await supabase.storage
+        .from('dissertacoes')
+        .upload(path, pdf, { contentType: 'application/pdf', upsert: false });
+      if (upErr) throw upErr;
+
+      const { data: pub } = supabase.storage.from('dissertacoes').getPublicUrl(path);
+      const pdf_url = pub.publicUrl;
+
+      // Insert
+      const { error: insErr } = await supabase.from('dissertacoes').insert({
+        slug, titulo, titulo_en, ano, tipo, autor, orientador, banca, resumo,
+        link_diploma, link_historico, link_ata,
+        pdf_url, pdf_path: path,
+      });
+      if (insErr) {
+        await supabase.storage.from('dissertacoes').remove([path]);
+        throw insErr;
+      }
+
+      showAlert(t('admin_success'), true);
+      form.reset();
+      renderList();
+    } catch (err) {
+      showAlert(`${t('admin_error')} ${err.message || err}`);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = t('admin_submit');
+    }
+  });
+
+  // ===== Lista =====
+  async function renderList() {
+    const container = document.getElementById('recordsList');
+    const { data, error } = await supabase
+      .from('dissertacoes')
+      .select('id, slug, titulo, ano, autor, tipo, pdf_path')
+      .order('criado_em', { ascending: false });
+
+    if (error) {
+      container.innerHTML = `<div class="alert">${error.message}</div>`;
+      return;
+    }
+    if (!data?.length) {
+      container.innerHTML = `<div class="admin-empty">${t('admin_no_records')}</div>`;
+      return;
+    }
+
+    container.innerHTML = data.map(w => {
+      const tipoLabel = w.tipo === 'tese' ? t('type_tese') : t('type_dissertacao');
+      return `
+        <div class="record-item ${w.tipo}" data-id="${w.id}" data-path="${w.pdf_path}">
+          <div class="record-item__year">
+            ${w.ano}
+            <small>${tipoLabel.split(' ')[0]}</small>
+          </div>
+          <div>
+            <div class="record-item__title">${escapeHtml(w.titulo)}</div>
+            <div class="record-item__meta">
+              ${recordId(w.id)} · ${escapeHtml(w.autor)} ·
+              <a href="/repositorio/ficha.html?slug=${encodeURIComponent(w.slug)}" target="_blank">${t('open_pdf')} ↗</a>
+            </div>
+          </div>
+          <button class="record-item__delete" data-action="delete">remover</button>
+        </div>`;
+    }).join('');
+
+    container.querySelectorAll('[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const item = e.target.closest('.record-item');
+        const id = item.dataset.id;
+        const path = item.dataset.path;
+        if (!confirm(t('admin_confirm_delete'))) return;
+        await supabase.storage.from('dissertacoes').remove([path]);
+        const { error } = await supabase.from('dissertacoes').delete().eq('id', id);
+        if (error) { showAlert(error.message); return; }
+        renderList();
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  renderList();
+</script>
+
+</body>
+</html>

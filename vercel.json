@@ -9,6 +9,37 @@
     {
       "source": "/programas/",
       "destination": "/programas/index.html"
+    },
+    {
+      "source": "/repositorio",
+      "destination": "/repositorio/index.html"
+    },
+    {
+      "source": "/repositorio/",
+      "destination": "/repositorio/index.html"
+    },
+    {
+      "source": "/admin-repositorio",
+      "destination": "/admin-repositorio/index.html"
+    },
+    {
+      "source": "/admin-repositorio/",
+      "destination": "/admin-repositorio/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/admin-repositorio/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
+    },
+    {
+      "source": "/repositorio/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }
+      ]
     }
   ]
 }

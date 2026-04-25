@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Painel Administrativo | Saint Alcuin of York</title>
+  <link rel="stylesheet" href="/assets/repositorio.css" />
+</head>
+<body class="admin-shell">
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="header-logo-name">Saint Alcuin of York Anglican College</div>
+      <div class="header-logo-sub">Administração — Repositório</div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="nav-link" data-i18n="nav_home">Início</a>
+      <div class="lang-pill">
+        <button class="lang-btn" data-lang="pt">PT</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="admin-login-wrap">
+  <div class="admin-login-card">
+    <div class="admin-login-card__top">
+      <h2 data-i18n="admin_title">Painel Administrativo</h2>
+      <p data-i18n="admin_subtitle">Repositório Acadêmico</p>
+    </div>
+    <div class="admin-login-card__body">
+      <form id="loginForm" autocomplete="on">
+        <div id="alert" class="alert" hidden></div>
+        <div class="form-group">
+          <label for="email" data-i18n="admin_email">E-mail</label>
+          <input id="email" type="email" autocomplete="username" required placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="password" data-i18n="admin_password">Senha</label>
+          <input id="password" type="password" autocomplete="current-password" required placeholder="••••••••" />
+        </div>
+        <button class="btn-submit" id="submitBtn" type="submit" data-i18n="admin_login">Entrar</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p data-i18n="footer">
+    © Saint Alcuin of York Anglican College — Todos os direitos reservados.<br/>
+    Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
+  </p>
+</footer>
+
+<script type="module">
+  import { supabase, t, getLang, setLang } from '/assets/repositorio-config.js';
+
+  function applyI18n() {
+    document.documentElement.lang = getLang() === 'en' ? 'en' : 'pt-BR';
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === getLang());
+    });
+  }
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => { setLang(b.dataset.lang); applyI18n(); });
+  });
+  applyI18n();
+
+  // Se já tem sessão, vai direto pro painel
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) location.replace('/admin-repositorio/painel.html');
+
+  const form = document.getElementById('loginForm');
+  const alertEl = document.getElementById('alert');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertEl.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '...';
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      alertEl.textContent = t('admin_invalid');
+      alertEl.classList.remove('alert--ok');
+      alertEl.hidden = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = t('admin_login');
+      return;
+    }
+    location.replace('/admin-repositorio/painel.html');
+  });
+</script>
+
+</body>
+</html>

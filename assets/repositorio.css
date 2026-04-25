@@ -1,0 +1,618 @@
+/* ============================================================================
+   Saint Alcuin — Repositório Acadêmico
+   Estética alinhada à identidade oficial do site (azul institucional)
+   ============================================================================ */
+
+:root {
+  --primary:   #0b2a4a;
+  --secondary: #145da0;
+  --text:      #2b2b2b;
+  --light:     #f5f7fa;
+  --white:     #ffffff;
+  --gray:      #6b7280;
+  --border:    #dde3ea;
+  --green:     #166534;
+  --green-bg:  #dcfce7;
+  --red:       #c1121f;
+  --red-bg:    #fee2e2;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--light);
+  color: var(--text);
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* ============================================================================
+   HEADER (cópia fiel do site oficial + toggle PT/EN)
+   ============================================================================ */
+header.site-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #fff; position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  height: 68px; display: flex; align-items: center;
+  justify-content: space-between; gap: 20px;
+}
+.header-logo { display: flex; flex-direction: column; text-decoration: none; color: #fff; }
+.header-logo-name { font-size: 1rem; font-weight: 700; letter-spacing: 0.01em; }
+.header-logo-sub { font-size: 0.58rem; opacity: 0.72; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+
+.header-nav { display: flex; align-items: center; gap: 4px; }
+.nav-link {
+  color: rgba(255,255,255,.88); text-decoration: none;
+  font-size: 0.84rem; font-weight: 500; padding: 8px 16px;
+  border-radius: 6px; transition: all .15s;
+}
+.nav-link:hover, .nav-link.active { background: rgba(255,255,255,.12); color: #fff; }
+
+.lang-pill {
+  display: inline-flex;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 6px; overflow: hidden;
+  margin: 0 6px;
+}
+.lang-btn {
+  background: transparent; border: 0;
+  color: rgba(255,255,255,.7);
+  font: 600 0.72rem "Segoe UI", sans-serif;
+  letter-spacing: .08em;
+  padding: 6px 10px;
+  cursor: pointer; transition: all .15s;
+}
+.lang-btn:hover { color: #fff; }
+.lang-btn.active { background: rgba(255,255,255,.22); color: #fff; }
+
+.btn-area-aluno {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.13); color: #fff;
+  border: 1.5px solid rgba(255,255,255,.38);
+  padding: 9px 20px; border-radius: 6px;
+  font-size: 0.84rem; font-weight: 600;
+  text-decoration: none; transition: all .2s; white-space: nowrap;
+  margin-left: 6px;
+}
+.btn-area-aluno:hover {
+  background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.65);
+  transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+.btn-aa-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+
+/* ============================================================================
+   HERO da página de repositório
+   ============================================================================ */
+.hero {
+  background: linear-gradient(160deg, var(--primary) 0%, #1a4f8a 55%, var(--secondary) 100%);
+  color: #fff; padding: 56px 32px 64px; text-align: center;
+}
+.hero-eyebrow { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.75; margin-bottom: 14px; }
+.hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 12px; line-height: 1.2; }
+.hero p { font-size: 0.98rem; opacity: .9; max-width: 620px; margin: 0 auto; line-height: 1.7; }
+
+/* ============================================================================
+   CONTEÚDO PRINCIPAL
+   ============================================================================ */
+section.content {
+  max-width: 1100px; margin: 0 auto; padding: 36px 28px 52px;
+}
+
+/* Toolbar (busca + filtros) */
+.toolbar {
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  padding: 18px 22px;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+}
+.search {
+  flex: 1; min-width: 280px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--light);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  transition: border-color .15s, background .15s;
+}
+.search:focus-within { border-color: var(--secondary); background: #fff; box-shadow: 0 0 0 3px rgba(20,93,160,.1); }
+.search__icon { color: var(--secondary); font-size: .95rem; flex-shrink: 0; }
+.search input {
+  flex: 1; border: 0; outline: 0; background: transparent;
+  font-family: inherit; font-size: .9rem; color: var(--text);
+}
+.search input::placeholder { color: #aab0ba; }
+
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn {
+  background: var(--light); border: 1.5px solid var(--border);
+  color: var(--gray);
+  font: 600 .72rem "Segoe UI", sans-serif;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 8px 14px; border-radius: 6px; cursor: pointer;
+  transition: all .15s;
+}
+.filter-btn:hover { color: var(--primary); border-color: var(--secondary); }
+.filter-btn.active {
+  background: var(--secondary); color: #fff;
+  border-color: var(--secondary);
+}
+
+/* ============================================================================
+   LISTAGEM DE OBRAS (cards)
+   ============================================================================ */
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.work-card {
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  border: 1.5px solid transparent;
+  padding: 22px 24px;
+  text-decoration: none; color: var(--text);
+  display: flex; flex-direction: column;
+  transition: all .2s;
+}
+.work-card:hover {
+  border-color: var(--secondary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.1);
+}
+
+.work-card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.work-card__type {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--secondary);
+}
+.work-card__type.tese { color: var(--red); }
+.work-card__year {
+  font-size: .8rem; font-weight: 700;
+  color: var(--gray);
+  background: var(--light);
+  padding: 3px 10px; border-radius: 20px;
+}
+.work-card__title {
+  font-size: 1.05rem; font-weight: 700;
+  color: var(--primary); line-height: 1.35;
+  margin-bottom: 12px;
+}
+.work-card__meta {
+  font-size: .82rem;
+  color: var(--gray);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: auto;
+  display: grid; gap: 4px;
+}
+.work-card__meta b { color: var(--primary); font-weight: 600; }
+.work-card__cta {
+  margin-top: 14px;
+  font-size: .78rem; font-weight: 600; color: var(--secondary);
+  border-bottom: 1px solid transparent;
+  align-self: flex-start;
+  transition: border-color .15s;
+}
+.work-card:hover .work-card__cta { border-bottom-color: var(--secondary); }
+.work-card__id {
+  font-size: .62rem; color: var(--gray);
+  font-family: "SF Mono", Consolas, monospace;
+  letter-spacing: .05em; margin-top: 6px;
+}
+
+.empty-state {
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  padding: 60px 30px; text-align: center;
+  color: var(--gray);
+}
+.empty-state h3 { color: var(--primary); margin-bottom: 8px; font-size: 1.1rem; }
+
+.loading-state {
+  text-align: center; padding: 60px 20px; color: var(--gray);
+  font-size: .9rem;
+}
+.loading-state::after {
+  content: '...';
+  animation: dots 1.4s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+/* ============================================================================
+   FICHA INDIVIDUAL
+   ============================================================================ */
+.ficha-page { max-width: 1100px; margin: 0 auto; padding: 36px 28px 52px; }
+
+.breadcrumb {
+  font-size: .82rem; color: var(--gray); margin-bottom: 22px;
+}
+.breadcrumb a {
+  color: var(--secondary); text-decoration: none; font-weight: 600;
+}
+.breadcrumb a:hover { text-decoration: underline; }
+
+.ficha-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .ficha-grid { grid-template-columns: 1fr; gap: 22px; }
+}
+
+.ficha-sidebar {
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  overflow: hidden;
+  position: sticky; top: 88px;
+}
+@media (max-width: 900px) {
+  .ficha-sidebar { position: static; }
+}
+.ficha-sidebar__top {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 22px 26px; color: #fff;
+}
+.ficha-type {
+  display: inline-block;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; padding: 3px 10px;
+  background: rgba(255,255,255,.2); border-radius: 20px;
+  margin-bottom: 10px;
+}
+.ficha-title {
+  font-size: 1.2rem; font-weight: 700;
+  line-height: 1.3; margin-bottom: 10px;
+}
+.ficha-record-id {
+  font-size: .68rem; opacity: .7;
+  font-family: "SF Mono", Consolas, monospace;
+  letter-spacing: .08em;
+}
+
+.ficha-meta {
+  padding: 8px 26px 22px;
+}
+.meta-row {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.meta-row:last-child { border-bottom: 0; }
+.meta-label {
+  font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--secondary); margin-bottom: 5px;
+}
+.meta-value { font-size: .92rem; color: var(--text); line-height: 1.5; }
+.meta-value ul { padding-left: 18px; margin-top: 3px; }
+.meta-value li { padding: 2px 0; font-size: .88rem; }
+
+.docs-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.docs-list a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-size: .85rem; font-weight: 600;
+  color: var(--primary); text-decoration: none;
+  transition: all .15s;
+}
+.docs-list a:hover {
+  border-color: var(--secondary);
+  background: #eef4fb;
+  transform: translateX(2px);
+}
+.docs-list .docs-ext {
+  color: var(--secondary);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.ficha-actions {
+  padding: 16px 26px 22px;
+  border-top: 1px solid var(--border);
+  background: var(--light);
+}
+.btn-download {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: var(--secondary); color: #fff;
+  font: 700 .9rem "Segoe UI", sans-serif;
+  padding: 13px; border-radius: 6px;
+  text-decoration: none; transition: all .2s;
+  border: 0; cursor: pointer;
+}
+.btn-download:hover {
+  background: #1068b5; transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(20,93,160,.3);
+}
+.btn-back {
+  display: block; text-align: center;
+  margin-top: 10px;
+  font-size: .8rem; color: var(--gray);
+  text-decoration: none; font-weight: 600;
+}
+.btn-back:hover { color: var(--secondary); }
+
+.ficha-main {
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  overflow: hidden;
+}
+.ficha-viewer {
+  width: 100%;
+  height: 760px;
+  background: var(--light);
+  border: 0;
+  display: block;
+}
+.ficha-abstract {
+  padding: 26px 28px;
+  border-top: 1px solid var(--border);
+}
+.ficha-abstract h3 {
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--secondary); margin-bottom: 10px;
+}
+.ficha-abstract p {
+  font-size: .92rem; color: var(--text); line-height: 1.7;
+}
+.ficha-note {
+  padding: 14px 28px 22px;
+  font-size: .78rem; color: var(--gray);
+  font-style: italic;
+  border-top: 1px solid var(--border);
+}
+
+/* ============================================================================
+   FOOTER + WHATSAPP (cópia fiel do site oficial)
+   ============================================================================ */
+footer.site-footer {
+  background: var(--primary); color: #fff;
+  padding: 36px 28px; font-size: .84rem;
+  margin-top: 32px;
+}
+footer.site-footer p {
+  max-width: 1000px; margin: 0 auto;
+  opacity: .85; text-align: center; line-height: 1.7;
+}
+
+.whatsapp-float {
+  position: fixed; bottom: 22px; right: 22px;
+  background: #25D366;
+  width: 54px; height: 54px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,.22); z-index: 999;
+  transition: transform .2s;
+}
+.whatsapp-float:hover { transform: scale(1.08); }
+
+@media (max-width: 600px) {
+  .header-inner { padding: 0 16px; }
+  .nav-link { display: none; }
+  .lang-pill { margin-left: auto; }
+  .hero { padding: 40px 20px 48px; }
+  .hero h1 { font-size: 1.6rem; }
+  section.content, .ficha-page { padding: 24px 18px 36px; }
+  .works-grid { grid-template-columns: 1fr; }
+  .toolbar { padding: 14px; }
+}
+
+/* ============================================================================
+   ADMIN — login
+   ============================================================================ */
+.admin-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+.admin-login-wrap {
+  flex: 1;
+  display: grid; place-items: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #eef4fb 0%, var(--light) 100%);
+}
+
+.admin-login-card {
+  width: 100%; max-width: 420px;
+  background: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.1);
+  overflow: hidden;
+}
+.admin-login-card__top {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 22px 28px; color: #fff;
+}
+.admin-login-card__top h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 3px; }
+.admin-login-card__top p { font-size: .72rem; opacity: .82; letter-spacing: .08em; text-transform: uppercase; }
+
+.admin-login-card__body { padding: 28px; }
+
+.form-group { margin-bottom: 14px; }
+.form-group label {
+  display: block; font-size: .76rem; font-weight: 600;
+  color: var(--primary); margin-bottom: 6px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%; background: var(--light);
+  border: 1.5px solid var(--border); border-radius: 6px;
+  color: var(--text);
+  font: .87rem "Segoe UI", sans-serif;
+  padding: 10px 12px; outline: none;
+  transition: border-color .15s, background .15s;
+  appearance: none; -webkit-appearance: none;
+}
+.form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23145da0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 34px; cursor: pointer;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  border-color: var(--secondary); background: #fff;
+  box-shadow: 0 0 0 3px rgba(20,93,160,.1);
+}
+.form-group input::placeholder, .form-group textarea::placeholder { color: #aab0ba; }
+.form-group textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+.btn-submit {
+  width: 100%; background: var(--secondary); color: #fff;
+  font: 700 .9rem "Segoe UI", sans-serif;
+  padding: 13px; border: none; border-radius: 6px;
+  cursor: pointer; transition: all .2s;
+}
+.btn-submit:hover {
+  background: #1068b5; transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(20,93,160,.3);
+}
+.btn-submit:disabled {
+  background: var(--gray); cursor: wait; transform: none; box-shadow: none;
+}
+
+.alert {
+  padding: 12px 14px; border-radius: 6px; margin-bottom: 14px;
+  font-size: .85rem;
+  background: var(--red-bg); color: var(--red);
+  border-left: 3px solid var(--red);
+}
+.alert--ok {
+  background: var(--green-bg); color: var(--green);
+  border-left-color: var(--green);
+}
+
+/* ============================================================================
+   ADMIN — painel
+   ============================================================================ */
+.admin-page {
+  max-width: 1200px; margin: 0 auto;
+  padding: 36px 28px 52px;
+}
+
+.admin-head {
+  display: flex; justify-content: space-between; align-items: end;
+  flex-wrap: wrap; gap: 16px;
+  padding-bottom: 18px; margin-bottom: 28px;
+  border-bottom: 2px solid var(--secondary);
+}
+.admin-head h1 {
+  color: var(--primary); font-size: 1.65rem; font-weight: 700;
+}
+.admin-head h1 small {
+  display: block;
+  font-size: .68rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--secondary);
+  margin-bottom: 4px;
+}
+.admin-head__user {
+  font-size: .82rem; color: var(--gray);
+  display: flex; align-items: center; gap: 12px;
+}
+.admin-head__user b { color: var(--primary); font-weight: 600; }
+
+.btn-logout {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--gray);
+  font: 600 .76rem "Segoe UI", sans-serif;
+  padding: 8px 14px; border-radius: 6px;
+  cursor: pointer; transition: all .15s;
+}
+.btn-logout:hover {
+  border-color: var(--red); color: var(--red);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 480px 1fr;
+  gap: 28px;
+}
+@media (max-width: 980px) { .admin-grid { grid-template-columns: 1fr; } }
+
+.section-card {
+  background: var(--white);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  overflow: hidden;
+}
+.section-card__top {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 16px 22px; color: #fff;
+}
+.section-card__top h2 { font-size: 1rem; font-weight: 700; }
+.section-card__top p { font-size: .7rem; opacity: .82; margin-top: 2px; }
+.section-card__body { padding: 22px; }
+
+.records-list { display: flex; flex-direction: column; gap: 12px; }
+.record-item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 14px; align-items: center;
+  padding: 14px 16px;
+  background: var(--light);
+  border-radius: 8px;
+  border-left: 3px solid var(--secondary);
+  transition: all .15s;
+}
+.record-item.tese { border-left-color: var(--red); }
+.record-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.record-item__year {
+  font-size: 1.4rem; font-weight: 700;
+  color: var(--primary); line-height: 1;
+  text-align: center;
+}
+.record-item__year small {
+  display: block;
+  font-size: .55rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--secondary); margin-top: 4px;
+}
+.record-item.tese .record-item__year small { color: var(--red); }
+.record-item__title {
+  font-size: .95rem; font-weight: 700;
+  color: var(--primary); line-height: 1.35;
+  margin-bottom: 4px;
+}
+.record-item__meta {
+  font-size: .78rem; color: var(--gray); line-height: 1.4;
+}
+.record-item__meta a { color: var(--secondary); text-decoration: none; font-weight: 600; }
+.record-item__meta a:hover { text-decoration: underline; }
+.record-item__delete {
+  background: transparent; border: 1.5px solid var(--border);
+  color: var(--gray);
+  font: 600 .68rem "Segoe UI", sans-serif;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 10px; border-radius: 6px;
+  cursor: pointer; transition: all .15s;
+}
+.record-item__delete:hover {
+  border-color: var(--red); color: var(--red);
+  background: var(--red-bg);
+}
+
+.admin-empty {
+  text-align: center; padding: 36px 20px;
+  color: var(--gray); font-size: .88rem; font-style: italic;
+}

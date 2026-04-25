@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositório Acadêmico | Saint Alcuin of York Anglican College</title>
+  <meta name="description" content="Repositório institucional de dissertações de mestrado e teses de doutorado do Saint Alcuin of York Anglican College." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.universidadsaintalcuin.com/repositorio/" />
+  <link rel="stylesheet" href="/assets/repositorio.css" />
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="header-logo-name">Saint Alcuin of York Anglican College</div>
+      <div class="header-logo-sub">Instituição de Ensino Superior Internacional</div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="nav-link" data-i18n="nav_home">Início</a>
+      <a href="/programas/index.html" class="nav-link" data-i18n="nav_programs">Programas</a>
+      <a href="/repositorio/" class="nav-link active" data-i18n="nav_repository">Repositório</a>
+      <div class="lang-pill">
+        <button class="lang-btn" data-lang="pt">PT</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <a href="/area-do-aluno.html" class="btn-area-aluno">
+        <span class="btn-aa-dot"></span>
+        <span data-i18n="nav_student_area">Área do Aluno</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-eyebrow" data-i18n="nav_repository">Repositório</div>
+  <h1 data-i18n="repo_title">Repositório Acadêmico</h1>
+  <p data-i18n="repo_subtitle">Dissertações de mestrado e teses de doutorado defendidas, depositadas para fins de avaliação acadêmica.</p>
+</div>
+
+<!-- ── CONTEÚDO ── -->
+<section class="content">
+
+  <div class="toolbar">
+    <div class="search">
+      <span class="search__icon">🔍</span>
+      <input id="search" type="text" placeholder="Buscar por título, autor ou orientador…" />
+    </div>
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="all" data-i18n="filter_all">Todos</button>
+      <button class="filter-btn" data-filter="dissertacao" data-i18n="filter_dissertacao">Dissertações</button>
+      <button class="filter-btn" data-filter="tese" data-i18n="filter_tese">Teses</button>
+    </div>
+  </div>
+
+  <div id="works" class="works-grid">
+    <div class="loading-state" data-i18n="loading">Carregando</div>
+  </div>
+
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <p data-i18n="footer">
+    © Saint Alcuin of York Anglican College — Todos os direitos reservados.<br/>
+    Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
+    O reconhecimento dos títulos no Brasil depende de processo próprio conforme normas do MEC.
+  </p>
+</footer>
+
+<!-- ── WHATSAPP ── -->
+<a href="https://wa.me/75998403658" target="_blank" aria-label="WhatsApp" class="whatsapp-float">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff">
+    <path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/>
+  </svg>
+</a>
+
+<script type="module">
+  import { supabase, t, getLang, setLang, recordId } from '/assets/repositorio-config.js';
+
+  // ===== i18n =====
+  function applyI18n() {
+    document.documentElement.lang = getLang() === 'en' ? 'en' : 'pt-BR';
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.getElementById('search').placeholder = t('search_placeholder');
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === getLang());
+    });
+  }
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => { setLang(b.dataset.lang); applyI18n(); render(); });
+  });
+  applyI18n();
+
+  // ===== Estado =====
+  let allWorks = [];
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  async function load() {
+    const { data, error } = await supabase
+      .from('dissertacoes')
+      .select('id, slug, titulo, titulo_en, ano, autor, orientador, banca, tipo, criado_em')
+      .order('ano', { ascending: false })
+      .order('criado_em', { ascending: false });
+    if (error) {
+      document.getElementById('works').innerHTML =
+        `<div class="empty-state"><h3>Erro ao carregar</h3><p>${error.message}</p></div>`;
+      return;
+    }
+    allWorks = data || [];
+    render();
+  }
+
+  function render() {
+    const lang = getLang();
+    const container = document.getElementById('works');
+    const q = currentSearch.trim().toLowerCase();
+
+    const filtered = allWorks.filter(w => {
+      if (currentFilter !== 'all' && w.tipo !== currentFilter) return false;
+      if (!q) return true;
+      const hay = [w.titulo, w.titulo_en, w.autor, w.orientador, ...(w.banca || [])]
+        .filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+
+    if (!filtered.length) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <h3>${t('no_results')}</h3>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(w => {
+      const titulo = (lang === 'en' && w.titulo_en) ? w.titulo_en : w.titulo;
+      const tipoLabel = w.tipo === 'tese' ? t('type_tese') : t('type_dissertacao');
+      return `
+        <a class="work-card" href="/repositorio/ficha.html?slug=${encodeURIComponent(w.slug)}">
+          <div class="work-card__head">
+            <span class="work-card__type ${w.tipo}">${tipoLabel}</span>
+            <span class="work-card__year">${w.ano}</span>
+          </div>
+          <h2 class="work-card__title">${escapeHtml(titulo)}</h2>
+          <div class="work-card__meta">
+            <div><b>${t('label_author')}:</b> ${escapeHtml(w.autor)}</div>
+            <div><b>${t('label_advisor')}:</b> ${escapeHtml(w.orientador)}</div>
+            <div class="work-card__id">${recordId(w.id)}</div>
+          </div>
+          <span class="work-card__cta">${t('open_pdf')} →</span>
+        </a>`;
+    }).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  document.getElementById('search').addEventListener('input', e => {
+    currentSearch = e.target.value; render();
+  });
+  document.getElementById('filters').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-filter]');
+    if (!btn) return;
+    document.querySelectorAll('#filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter; render();
+  });
+
+  load();
+</script>
+
+</body>
+</html>

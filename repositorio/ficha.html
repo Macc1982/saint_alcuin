@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ficha de Trabalho | Saint Alcuin of York Anglican College</title>
+  <link rel="stylesheet" href="/assets/repositorio.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="header-logo">
+      <div class="header-logo-name">Saint Alcuin of York Anglican College</div>
+      <div class="header-logo-sub">Instituição de Ensino Superior Internacional</div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="nav-link" data-i18n="nav_home">Início</a>
+      <a href="/programas/index.html" class="nav-link" data-i18n="nav_programs">Programas</a>
+      <a href="/repositorio/" class="nav-link active" data-i18n="nav_repository">Repositório</a>
+      <div class="lang-pill">
+        <button class="lang-btn" data-lang="pt">PT</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <a href="/area-do-aluno.html" class="btn-area-aluno">
+        <span class="btn-aa-dot"></span>
+        <span data-i18n="nav_student_area">Área do Aluno</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<section class="ficha-page">
+  <div class="breadcrumb">
+    <a href="/repositorio/" data-i18n="nav_repository">Repositório</a>
+    <span> / </span>
+    <span id="bc-title">…</span>
+  </div>
+
+  <div id="ficha-container">
+    <div class="loading-state" data-i18n="loading">Carregando</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p data-i18n="footer">
+    © Saint Alcuin of York Anglican College — Todos os direitos reservados.<br/>
+    Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
+    O reconhecimento dos títulos no Brasil depende de processo próprio conforme normas do MEC.
+  </p>
+</footer>
+
+<a href="https://wa.me/75998403658" target="_blank" aria-label="WhatsApp" class="whatsapp-float">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff">
+    <path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/>
+  </svg>
+</a>
+
+<script type="module">
+  import { supabase, t, getLang, setLang, recordId, formatDate } from '/assets/repositorio-config.js';
+
+  function applyI18n() {
+    document.documentElement.lang = getLang() === 'en' ? 'en' : 'pt-BR';
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === getLang());
+    });
+  }
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.addEventListener('click', () => { setLang(b.dataset.lang); applyI18n(); render(); });
+  });
+  applyI18n();
+
+  const slug = new URLSearchParams(location.search).get('slug');
+  let work = null;
+
+  async function load() {
+    if (!slug) { renderNotFound(); return; }
+    const { data, error } = await supabase
+      .from('dissertacoes').select('*').eq('slug', slug).maybeSingle();
+    if (error || !data) { renderNotFound(); return; }
+    work = data; render();
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderNotFound() {
+    document.title = `${t('not_found')} | Saint Alcuin of York`;
+    document.getElementById('bc-title').textContent = t('not_found');
+    document.getElementById('ficha-container').innerHTML = `
+      <div class="empty-state" style="background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.07); padding: 60px 30px; text-align: center;">
+        <h3 style="color: var(--primary); font-size: 1.3rem; margin-bottom: 10px;">${t('not_found')}</h3>
+        <p style="color: var(--gray); margin-bottom: 22px;">${t('not_found_msg')}</p>
+        <a href="/repositorio/" style="display:inline-block; background: var(--secondary); color: #fff; font-weight: 700; font-size: .9rem; padding: 11px 26px; border-radius: 6px; text-decoration: none;">← ${t('back_to_list')}</a>
+      </div>`;
+  }
+
+  function render() {
+    const lang = getLang();
+    const titulo = (lang === 'en' && work.titulo_en) ? work.titulo_en : work.titulo;
+    const resumo = (lang === 'en' && work.resumo_en) ? work.resumo_en : work.resumo;
+    const tipoLabel = work.tipo === 'tese' ? t('type_tese') : t('type_dissertacao');
+    const banca = (work.banca || []).filter(Boolean);
+    const docs = [
+      { url: work.link_diploma,   label: t('doc_diploma') },
+      { url: work.link_historico, label: t('doc_historico') },
+      { url: work.link_ata,       label: t('doc_ata') },
+    ].filter(d => d.url);
+
+    document.title = `${titulo} | Saint Alcuin of York`;
+    document.getElementById('bc-title').textContent = titulo.length > 70 ? titulo.slice(0, 70) + '…' : titulo;
+
+    document.getElementById('ficha-container').innerHTML = `
+      <div class="ficha-grid">
+
+        <aside class="ficha-sidebar">
+          <div class="ficha-sidebar__top">
+            <div class="ficha-type">${tipoLabel}</div>
+            <h1 class="ficha-title">${escapeHtml(titulo)}</h1>
+            <div class="ficha-record-id">${t('record_id')}: ${recordId(work.id)}</div>
+          </div>
+
+          <div class="ficha-meta">
+            <div class="meta-row">
+              <div class="meta-label">${t('label_author')}</div>
+              <div class="meta-value">${escapeHtml(work.autor)}</div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-label">${t('label_year')}</div>
+              <div class="meta-value">${work.ano}</div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-label">${t('label_advisor')}</div>
+              <div class="meta-value">${escapeHtml(work.orientador)}</div>
+            </div>
+            ${banca.length ? `
+              <div class="meta-row">
+                <div class="meta-label">${t('label_committee')}</div>
+                <div class="meta-value">
+                  <ul>${banca.map(n => `<li>${escapeHtml(n)}</li>`).join('')}</ul>
+                </div>
+              </div>` : ''}
+            ${docs.length ? `
+              <div class="meta-row">
+                <div class="meta-label">${t('documents_section')}</div>
+                <div class="meta-value">
+                  <div class="docs-list">
+                    ${docs.map(d => `
+                      <a href="${escapeHtml(d.url)}" target="_blank" rel="noopener">
+                        <span>${d.label}</span>
+                        <span class="docs-ext">↗</span>
+                      </a>`).join('')}
+                  </div>
+                </div>
+              </div>` : ''}
+            <div class="meta-row">
+              <div class="meta-label">${t('deposited_on')}</div>
+              <div class="meta-value">${formatDate(work.criado_em)}</div>
+            </div>
+          </div>
+
+          <div class="ficha-actions">
+            <a class="btn-download" href="${work.pdf_url}" download target="_blank" rel="noopener">
+              ↓ ${t('download')}
+            </a>
+            <a class="btn-back" href="/repositorio/">← ${t('back_to_list')}</a>
+          </div>
+        </aside>
+
+        <main class="ficha-main">
+          <iframe class="ficha-viewer" src="${work.pdf_url}#toolbar=1&navpanes=0&view=FitH" title="${escapeHtml(titulo)}"></iframe>
+          ${resumo ? `
+            <div class="ficha-abstract">
+              <h3>${t('label_abstract')}</h3>
+              <p>${escapeHtml(resumo).replace(/\n/g,'<br>')}</p>
+            </div>` : ''}
+          <div class="ficha-note">${t('institutional_note')}</div>
+        </main>
+
+      </div>`;
+  }
+
+  load();
+</script>
+
+</body>
+</html>
