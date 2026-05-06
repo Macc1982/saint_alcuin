@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — Saint Alcuin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --primary: #0b2a4a; --secondary: #145da0; --accent: #c1121f;
+    --text: #2b2b2b; --light: #f5f7fa; --white: #fff;
+    --gray: #6b7280; --border: #dde3ea;
+    --green: #166534; --green-bg: #dcfce7;
+    --red-bg: #fee2e2; --red-text: #991b1b;
+    --yellow-bg: #fef9c3; --yellow-txt: #854d0e;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--light); color: var(--text); font-family: "Segoe UI", sans-serif; }
+
+  /* LOGIN */
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--light); }
+  .login-box { background: var(--white); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.1); overflow: hidden; width: 380px; }
+  .login-top { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 28px 32px; color: #fff; text-align: center; }
+  .login-top h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 3px; }
+  .login-top p  { font-size: .7rem; opacity: .82; }
+  .login-body { padding: 28px 32px; }
+  .login-err { background: var(--red-bg); color: var(--red-text); font-size: .78rem; padding: 10px; border-radius: 6px; margin-bottom: 14px; display: none; text-align: center; }
+
+  /* LAYOUT */
+  .app { display: none; min-height: 100vh; }
+  .app.active { display: flex; flex-direction: column; }
+  .topbar { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 0 28px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar-brand { font-size: .95rem; font-weight: 700; }
+  .topbar-sub   { font-size: .6rem; opacity: .72; text-transform: uppercase; letter-spacing: .1em; }
+  .body { display: flex; flex: 1; }
+  .sidebar { width: 200px; background: var(--white); border-right: 1px solid var(--border); padding: 20px 0; flex-shrink: 0; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 10px 18px; font-size: .82rem; cursor: pointer; color: var(--text); border-left: 3px solid transparent; transition: all .15s; }
+  .nav-item:hover { background: #eef4fb; color: var(--secondary); }
+  .nav-item.active { background: #eef4fb; color: var(--secondary); border-left-color: var(--secondary); font-weight: 600; }
+  .nav-label { font-size: .58rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gray); padding: 12px 18px 4px; }
+  .main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+
+  /* TABS */
+  .tab { display: none; }
+  .tab.active { display: block; }
+  .page-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+  .page-sub   { font-size: .8rem; color: var(--gray); margin-bottom: 24px; }
+
+  /* FORM ELEMENTS */
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: .74rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--light); border: 1.5px solid var(--border);
+    border-radius: 6px; color: var(--text); font-family: "Segoe UI", sans-serif;
+    font-size: .86rem; padding: 9px 12px; outline: none; transition: border-color .15s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--secondary); background: #fff; }
+  .form-group select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23145da0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; background-color: var(--light); cursor: pointer; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* BUTTONS */
+  .btn { font-family: "Segoe UI", sans-serif; font-size: .82rem; font-weight: 600; padding: 9px 20px; border-radius: 6px; cursor: pointer; border: none; transition: all .15s; }
+  .btn-primary { background: var(--secondary); color: #fff; }
+  .btn-primary:hover { background: #1068b5; }
+  .btn-danger  { background: transparent; color: var(--accent); border: 1.5px solid var(--accent); font-size: .75rem; padding: 6px 14px; }
+  .btn-danger:hover { background: var(--red-bg); }
+  .btn-sm { padding: 5px 12px; font-size: .72rem; }
+  .btn-outline { background: transparent; color: var(--secondary); border: 1.5px solid var(--secondary); }
+  .btn-outline:hover { background: #eef4fb; }
+  .btn-full { width: 100%; padding: 11px; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* CARDS */
+  .card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.07); padding: 22px; margin-bottom: 18px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .card-title { font-size: 1rem; font-weight: 700; color: var(--primary); }
+  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 18px 20px; border-top: 3px solid var(--secondary); }
+  .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; margin-bottom: 3px; }
+  .stat-label { font-size: .68rem; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; }
+
+  /* TABLE */
+  .table-wrap { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 18px; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { text-align: left; font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--gray); padding: 11px 14px; background: var(--light); border-bottom: 1px solid var(--border); }
+  .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: .82rem; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:hover td { background: #f8fafc; }
+  .badge { display: inline-block; font-size: .65rem; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-blue  { background: #dbeafe; color: #1e40af; }
+  .badge-red   { background: var(--red-bg); color: var(--red-text); }
+  .badge-gray  { background: #f3f4f6; color: var(--gray); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: .82rem; box-shadow: 0 4px 16px rgba(0,0,0,.2); transform: translateY(80px); opacity: 0; transition: all .3s; z-index: 999; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error   { background: var(--accent); }
+
+  /* UPLOAD */
+  .upload-area { border: 2px dashed var(--border); border-radius: 8px; padding: 28px; text-align: center; cursor: pointer; transition: all .15s; }
+  .upload-area:hover { border-color: var(--secondary); background: #eef4fb; }
+  .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+  .upload-text { font-size: .82rem; color: var(--gray); }
+  .upload-text strong { color: var(--secondary); }
+  #fileInput { display: none; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 10px; padding: 28px; width: 100%; max-width: 480px; box-shadow: 0 16px 48px rgba(0,0,0,.2); }
+  .modal-title { font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 18px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  .loading { color: var(--gray); font-size: .82rem; padding: 20px; text-align: center; }
+  .empty   { color: var(--gray); font-size: .82rem; padding: 20px; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-top">
+      <h2>Saint Alcuin of York</h2>
+      <p>Painel Administrativo</p>
+    </div>
+    <div class="login-body">
+      <div class="login-err" id="loginErr">E-mail ou senha incorretos.</div>
+      <div class="form-group"><label>E-mail admin</label><input type="email" id="adminEmail" placeholder="admin@saintalcuin.com"/></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="adminSenha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()"/></div>
+      <button class="btn btn-primary btn-full" onclick="fazerLogin()">Entrar no painel</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar-brand">Saint Alcuin — Painel Admin</div>
+      <div class="topbar-sub">Portal de Gestão Acadêmica</div>
+    </div>
+    <button class="btn btn-danger" style="color:#fca5a5;border-color:rgba(252,165,165,.4);" onclick="fazerLogout()">Sair</button>
+  </div>
+
+  <div class="body">
+    <nav class="sidebar">
+      <div class="nav-label">Gestão</div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)">📊 Dashboard</div>
+      <div class="nav-item" onclick="showTab('alunos',this)">👤 Alunos</div>
+      <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
+      <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
+      <div class="nav-label">Cursos</div>
+      <div class="nav-item" onclick="showTab('disciplinas',this)">◈ Disciplinas</div>
+    </nav>
+
+    <div class="main">
+
+      <!-- DASHBOARD -->
+      <div class="tab active" id="tab-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Visão geral da instituição</div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-value" id="st-alunos">—</div><div class="stat-label">Alunos ativos</div></div>
+          <div class="stat-card"><div class="stat-value" id="st-materiais">—</div><div class="stat-label">Materiais</div></div>
+          <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Cursos ativos</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Alunos por Curso</div></div>
+          <div id="dashboard-cursos"><div class="loading">Carregando...</div></div>
+        </div>
+      </div>
+
+      <!-- ALUNOS -->
+      <div class="tab" id="tab-alunos">
+        <div class="page-title">Alunos</div>
+        <div class="page-sub">Cadastro e gestão de alunos</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Cadastrar novo aluno</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Nome completo *</label><input type="text" id="a-nome" placeholder="Nome do aluno"/></div>
+            <div class="form-group"><label>E-mail *</label><input type="email" id="a-email" placeholder="email@dominio.com"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Senha temporária *</label><input type="text" id="a-senha" placeholder="Senha inicial"/></div>
+            <div class="form-group">
+              <label>Curso *</label>
+              <select id="a-curso"><option value="">Selecione o curso</option></select>
+            </div>
+          </div>
+          <div class="form-group" style="max-width:220px;">
+            <label>Matrícula</label><input type="text" id="a-matricula" placeholder="SAY-2024-0001"/>
+          </div>
+          <button class="btn btn-primary" onclick="cadastrarAluno()" id="btnCadastrar">Cadastrar Aluno</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Nome</th><th>E-mail</th><th>Curso</th><th>Matrícula</th><th>Status</th><th></th></tr></thead>
+            <tbody id="tabela-alunos"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MATERIAIS -->
+      <div class="tab" id="tab-materiais">
+        <div class="page-title">Materiais</div>
+        <div class="page-sub">PDFs e vídeos por curso</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Adicionar material</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Título *</label><input type="text" id="m-titulo" placeholder="Ex: Módulo 1 — Introdução"/></div>
+            <div class="form-group">
+              <label>Curso *</label>
+              <select id="m-curso"><option value="">Selecione o curso</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo *</label>
+              <select id="m-tipo" onchange="toggleUrlField()">
+                <option value="pdf">PDF</option>
+                <option value="video">Vídeo (YouTube/Vimeo)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Descrição</label><input type="text" id="m-desc" placeholder="Descrição opcional"/></div>
+          </div>
+
+          <!-- PDF UPLOAD -->
+          <div id="campo-pdf" class="form-group">
+            <label>Arquivo PDF *</label>
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">Clique para selecionar o PDF<br/><strong>ou arraste aqui</strong></div>
+              <div id="fileName" style="margin-top:8px;font-size:.75rem;color:var(--secondary);display:none;"></div>
+            </div>
+            <input type="file" id="fileInput" accept=".pdf" onchange="onFileSelected(event)"/>
+          </div>
+
+          <!-- VIDEO URL -->
+          <div id="campo-video" class="form-group" style="display:none;">
+            <label>URL do vídeo (YouTube/Vimeo) *</label>
+            <input type="url" id="m-url" placeholder="https://youtube.com/watch?v=..."/>
+          </div>
+
+          <button class="btn btn-primary" onclick="adicionarMaterial()" id="btnMaterial">Adicionar Material</button>
+        </div>
+
+        <div class="form-group" style="max-width:280px;margin-bottom:16px;">
+          <label>Filtrar por curso</label>
+          <select id="filtro-curso-mat" onchange="carregarMateriais()"><option value="">Todos</option></select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Título</th><th>Curso</th><th>Tipo</th><th>Data</th><th></th></tr></thead>
+            <tbody id="tabela-materiais"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- NOTAS -->
+      <div class="tab" id="tab-notas">
+        <div class="page-title">Notas</div>
+        <div class="page-sub">Lançamento de notas por aluno e disciplina</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Lançar / editar nota</div></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Aluno *</label>
+              <select id="n-aluno"><option value="">Selecione o aluno</option></select>
+            </div>
+            <div class="form-group">
+              <label>Disciplina *</label>
+              <select id="n-disc"><option value="">Selecione a disciplina</option></select>
+            </div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group"><label>Nota 1</label><input type="number" id="n-1" min="0" max="10" step="0.1" placeholder="0.0"/></div>
+            <div class="form-group"><label>Nota 2</label><input type="number" id="n-2" min="0" max="10" step="0.1" placeholder="0.0"/></div>
+            <div class="form-group"><label>Trabalho</label><input type="number" id="n-t" min="0" max="10" step="0.1" placeholder="0.0"/></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <button class="btn btn-primary" onclick="lancarNota()">Salvar nota</button>
+            <span id="media-preview" style="font-size:.82rem;color:var(--gray);"></span>
+          </div>
+        </div>
+
+        <div class="form-group" style="max-width:280px;margin-bottom:16px;">
+          <label>Filtrar por aluno</label>
+          <select id="filtro-aluno-nota" onchange="carregarNotas()"><option value="">Todos</option></select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Aluno</th><th>Disciplina</th><th>N1</th><th>N2</th><th>Trab.</th><th>Média</th><th>Situação</th></tr></thead>
+            <tbody id="tabela-notas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DISCIPLINAS -->
+      <div class="tab" id="tab-disciplinas">
+        <div class="page-title">Disciplinas</div>
+        <div class="page-sub">Disciplinas por curso</div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Adicionar disciplina</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>Nome *</label><input type="text" id="d-nome" placeholder="Nome da disciplina"/></div>
+            <div class="form-group"><label>Curso *</label><select id="d-curso"><option value="">Selecione</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Professor</label><input type="text" id="d-prof" placeholder="Nome do professor"/></div>
+            <div class="form-group"><label>Carga Horária</label><input type="number" id="d-ch" placeholder="Ex: 60"/></div>
+          </div>
+          <button class="btn btn-primary" onclick="adicionarDisciplina()">Adicionar Disciplina</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Disciplina</th><th>Curso</th><th>Professor</th><th>Carga</th></tr></thead>
+            <tbody id="tabela-disciplinas"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_VUa914gJ5JmZH8uEWiBgTw_Z4YroDiA';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let cursosCache = [];
+let alunosCache = [];
+let discCache   = [];
+let selectedFile = null;
+
+// ── TOAST
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── LOGIN
+async function fazerLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const senha = document.getElementById('adminSenha').value;
+  const err   = document.getElementById('loginErr');
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
+  if (error || !data.user) { err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  iniciarApp();
+}
+
+async function fazerLogout() {
+  await sb.auth.signOut();
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('loginWrap').style.display = 'flex';
+}
+
+// ── INIT
+async function iniciarApp() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  await carregarCursos();
+  await Promise.all([carregarDashboard(), carregarAlunos(), carregarMateriais(), carregarDisciplinas(), carregarNotas()]);
+}
+
+// ── TAB
+function showTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+// ── CURSOS
+async function carregarCursos() {
+  const { data } = await sb.from('cursos').select('*').order('nome');
+  if (!data) return;
+  cursosCache = data;
+  const selects = ['a-curso','m-curso','d-curso','filtro-curso-mat'];
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const val = el.value;
+    el.innerHTML = id.startsWith('filtro') ? '<option value="">Todos</option>' : '<option value="">Selecione o curso</option>';
+    data.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.nome;
+      el.appendChild(o);
+    });
+    if (val) el.value = val;
+  });
+}
+
+// ── DASHBOARD
+async function carregarDashboard() {
+  const { data: al } = await sb.from('alunos').select('*');
+  const { data: mat } = await sb.from('materiais').select('*');
+  document.getElementById('st-alunos').textContent    = al?.length || 0;
+  document.getElementById('st-materiais').textContent = mat?.length || 0;
+
+  const el = document.getElementById('dashboard-cursos');
+  if (!cursosCache.length) { el.innerHTML = '<div class="empty">Nenhum curso.</div>'; return; }
+  let html = '<table class="data-table"><thead><tr><th>Curso</th><th>Nível</th><th>Alunos</th></tr></thead><tbody>';
+  cursosCache.forEach(c => {
+    const qtd = al?.filter(a => a.curso_id === c.id).length || 0;
+    html += `<tr><td>${c.nome}</td><td><span class="badge badge-blue">${c.nivel}</span></td><td>${qtd}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ── ALUNOS
+async function carregarAlunos() {
+  const { data } = await sb.from('alunos').select('*, cursos(nome)').order('nome');
+  alunosCache = data || [];
+  const tbody = document.getElementById('tabela-alunos');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum aluno cadastrado.</td></tr>'; return; }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td>${a.nome}</td>
+      <td>${a.email}</td>
+      <td>${a.cursos?.nome || '—'}</td>
+      <td>${a.matricula || '—'}</td>
+      <td><span class="badge badge-${a.status==='ativo'?'green':'gray'}">${a.status}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="excluirAluno('${a.id}')">Remover</button></td>
+    </tr>`).join('');
+
+  // Popula selects de notas
+  const selAluno = document.getElementById('n-aluno');
+  const selFiltro = document.getElementById('filtro-aluno-nota');
+  [selAluno, selFiltro].forEach(s => {
+    s.innerHTML = s === selFiltro ? '<option value="">Todos</option>' : '<option value="">Selecione o aluno</option>';
+    data.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.id; o.textContent = a.nome;
+      s.appendChild(o);
+    });
+  });
+}
+
+async function cadastrarAluno() {
+  const nome      = document.getElementById('a-nome').value.trim();
+  const email     = document.getElementById('a-email').value.trim();
+  const senha     = document.getElementById('a-senha').value.trim();
+  const curso_id  = document.getElementById('a-curso').value;
+  const matricula = document.getElementById('a-matricula').value.trim();
+  if (!nome || !email || !senha || !curso_id) { toast('Preencha todos os campos obrigatórios.','error'); return; }
+
+  const btn = document.getElementById('btnCadastrar');
+  btn.disabled = true; btn.textContent = 'Cadastrando...';
+
+  const { data, error } = await sb.auth.signUp({ email, password: senha });
+  if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
+
+  const userId = data.user?.id;
+  if (!userId) { toast('Erro ao obter ID do usuário.','error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
+
+  await sb.from('alunos').insert({ id: userId, nome, email, curso_id, matricula: matricula || null, status: 'ativo' });
+
+  toast('Aluno cadastrado com sucesso!', 'success');
+  ['a-nome','a-email','a-senha','a-matricula'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('a-curso').value = '';
+  btn.disabled = false; btn.textContent = 'Cadastrar Aluno';
+  await Promise.all([carregarAlunos(), carregarDashboard()]);
+}
+
+async function excluirAluno(id) {
+  if (!confirm('Remover este aluno?')) return;
+  await sb.from('alunos').delete().eq('id', id);
+  toast('Aluno removido.', 'success');
+  await Promise.all([carregarAlunos(), carregarDashboard()]);
+}
+
+// ── MATERIAIS
+function toggleUrlField() {
+  const tipo = document.getElementById('m-tipo').value;
+  document.getElementById('campo-pdf').style.display   = tipo === 'pdf' ? 'block' : 'none';
+  document.getElementById('campo-video').style.display = tipo === 'video' ? 'block' : 'none';
+}
+
+function onFileSelected(e) {
+  selectedFile = e.target.files[0];
+  if (selectedFile) {
+    document.getElementById('fileName').textContent = selectedFile.name;
+    document.getElementById('fileName').style.display = 'block';
+  }
+}
+
+async function adicionarMaterial() {
+  const titulo   = document.getElementById('m-titulo').value.trim();
+  const curso_id = document.getElementById('m-curso').value;
+  const tipo     = document.getElementById('m-tipo').value;
+  const desc     = document.getElementById('m-desc').value.trim();
+  if (!titulo || !curso_id) { toast('Título e curso são obrigatórios.','error'); return; }
+
+  const btn = document.getElementById('btnMaterial');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  let url = '';
+
+  if (tipo === 'pdf') {
+    if (!selectedFile) { toast('Selecione um arquivo PDF.','error'); btn.disabled=false; btn.textContent='Adicionar Material'; return; }
+    const path = `${curso_id}/${Date.now()}_${selectedFile.name}`;
+    const { data: up, error: upErr } = await sb.storage.from('materiais').upload(path, selectedFile, { upsert: true });
+    if (upErr) { toast('Erro no upload: ' + upErr.message, 'error'); btn.disabled=false; btn.textContent='Adicionar Material'; return; }
+    const { data: pub } = sb.storage.from('materiais').getPublicUrl(path);
+    url = pub.publicUrl;
+  } else {
+    url = document.getElementById('m-url').value.trim();
+    if (!url) { toast('Informe a URL do vídeo.','error'); btn.disabled=false; btn.textContent='Adicionar Material'; return; }
+  }
+
+  await sb.from('materiais').insert({ titulo, curso_id, tipo, url, descricao: desc || null });
+  toast('Material adicionado!', 'success');
+  document.getElementById('m-titulo').value = '';
+  document.getElementById('m-desc').value = '';
+  document.getElementById('m-url').value = '';
+  document.getElementById('m-curso').value = '';
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileName').style.display = 'none';
+  selectedFile = null;
+  btn.disabled = false; btn.textContent = 'Adicionar Material';
+  await Promise.all([carregarMateriais(), carregarDashboard()]);
+}
+
+async function carregarMateriais() {
+  const filtro = document.getElementById('filtro-curso-mat')?.value;
+  let query = sb.from('materiais').select('*, cursos(nome)').order('created_at', { ascending: false });
+  if (filtro) query = query.eq('curso_id', filtro);
+  const { data } = await query;
+  const tbody = document.getElementById('tabela-materiais');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum material.</td></tr>'; return; }
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td>${m.titulo}</td>
+      <td>${m.cursos?.nome || '—'}</td>
+      <td><span class="badge badge-${m.tipo==='pdf'?'blue':'green'}">${m.tipo.toUpperCase()}</span></td>
+      <td>${new Date(m.created_at).toLocaleDateString('pt-BR')}</td>
+      <td>
+        <a href="${m.url}" target="_blank" class="btn btn-outline btn-sm">Ver</a>
+        <button class="btn btn-danger btn-sm" onclick="excluirMaterial('${m.id}')">Excluir</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function excluirMaterial(id) {
+  if (!confirm('Excluir este material?')) return;
+  await sb.from('materiais').delete().eq('id', id);
+  toast('Material excluído.', 'success');
+  await carregarMateriais();
+}
+
+// ── DISCIPLINAS
+async function carregarDisciplinas() {
+  const { data } = await sb.from('disciplinas').select('*, cursos(nome)').order('nome');
+  discCache = data || [];
+  const tbody = document.getElementById('tabela-disciplinas');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">Nenhuma disciplina.</td></tr>'; return; }
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td>${d.nome}</td>
+      <td>${d.cursos?.nome || '—'}</td>
+      <td>${d.professor || '—'}</td>
+      <td>${d.carga_horaria ? d.carga_horaria + 'h' : '—'}</td>
+    </tr>`).join('');
+
+  // Popula select disciplinas em Notas (baseado no aluno selecionado)
+  popularDiscSelect();
+}
+
+function popularDiscSelect(cursoId) {
+  const sel = document.getElementById('n-disc');
+  sel.innerHTML = '<option value="">Selecione a disciplina</option>';
+  const lista = cursoId ? discCache.filter(d => d.curso_id === cursoId) : discCache;
+  lista.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.id; o.textContent = d.nome;
+    sel.appendChild(o);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('n-aluno').addEventListener('change', function() {
+    const aluno = alunosCache.find(a => a.id === this.value);
+    popularDiscSelect(aluno?.curso_id);
+    calcMedia();
+  });
+  ['n-1','n-2','n-t'].forEach(id => document.getElementById(id).addEventListener('input', calcMedia));
+});
+
+async function adicionarDisciplina() {
+  const nome     = document.getElementById('d-nome').value.trim();
+  const curso_id = document.getElementById('d-curso').value;
+  const prof     = document.getElementById('d-prof').value.trim();
+  const ch       = document.getElementById('d-ch').value;
+  if (!nome || !curso_id) { toast('Nome e curso obrigatórios.','error'); return; }
+  await sb.from('disciplinas').insert({ nome, curso_id, professor: prof || null, carga_horaria: ch || null, semestre: '2024/2' });
+  toast('Disciplina adicionada!', 'success');
+  ['d-nome','d-prof','d-ch'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('d-curso').value = '';
+  await carregarDisciplinas();
+}
+
+// ── NOTAS
+function calcMedia() {
+  const n1 = parseFloat(document.getElementById('n-1').value) || 0;
+  const n2 = parseFloat(document.getElementById('n-2').value) || 0;
+  const nt = parseFloat(document.getElementById('n-t').value) || 0;
+  if (n1 || n2 || nt) {
+    const media = ((n1 + n2 + nt) / 3).toFixed(1);
+    document.getElementById('media-preview').textContent = 'Média: ' + media;
+  }
+}
+
+async function lancarNota() {
+  const aluno_id     = document.getElementById('n-aluno').value;
+  const disciplina_id = document.getElementById('n-disc').value;
+  const nota1  = parseFloat(document.getElementById('n-1').value) || null;
+  const nota2  = parseFloat(document.getElementById('n-2').value) || null;
+  const trabalho = parseFloat(document.getElementById('n-t').value) || null;
+  if (!aluno_id || !disciplina_id) { toast('Selecione aluno e disciplina.','error'); return; }
+  const media = nota1 && nota2 && trabalho ? +((nota1+nota2+trabalho)/3).toFixed(1) : null;
+  await sb.from('notas').upsert({ aluno_id, disciplina_id, nota1, nota2, trabalho, media }, { onConflict: 'aluno_id,disciplina_id' });
+  toast('Nota salva!', 'success');
+  ['n-1','n-2','n-t'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('media-preview').textContent = '';
+  await carregarNotas();
+}
+
+async function carregarNotas() {
+  const filtro = document.getElementById('filtro-aluno-nota')?.value;
+  let query = sb.from('notas').select('*, alunos(nome), disciplinas(nome)').order('created_at', { ascending: false });
+  if (filtro) query = query.eq('aluno_id', filtro);
+  const { data } = await query;
+  const tbody = document.getElementById('tabela-notas');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhuma nota lançada.</td></tr>'; return; }
+  tbody.innerHTML = data.map(n => {
+    const media = n.media || 0;
+    const sit = media >= 7 ? ['badge-green','Aprovado'] : media >= 5 ? ['badge-blue','Recuperação'] : ['badge-red','Reprovado'];
+    return `<tr>
+      <td>${n.alunos?.nome || '—'}</td>
+      <td>${n.disciplinas?.nome || '—'}</td>
+      <td>${n.nota1 ?? '—'}</td>
+      <td>${n.nota2 ?? '—'}</td>
+      <td>${n.trabalho ?? '—'}</td>
+      <td><strong>${n.media ?? '—'}</strong></td>
+      <td><span class="badge ${sit[0]}">${sit[1]}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── VERIFICAR SESSÃO
+sb.auth.onAuthStateChange((event, session) => {
+  if (session?.user) iniciarApp();
+});
+</script>
+</body>
+</html>
