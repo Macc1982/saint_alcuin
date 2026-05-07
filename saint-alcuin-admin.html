@@ -338,13 +338,15 @@
 
 <script>
 const SUPABASE_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VUa914gJ5JmZH8uEWiBgTw_Z4YroDiA';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbGVwbHlkaHd4anlmbGVqZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTE2MDIsImV4cCI6MjA5MjcyNzYwMn0.AzBzKl3lEEEt9eOdqJ_xRezohbW1qglPjOvhGSxwpUs';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let cursosCache = [];
 let alunosCache = [];
 let discCache   = [];
 let selectedFile = null;
+let adminEmail = '';
+let adminSenha = '';
 
 // ── TOAST
 function toast(msg, type = '') {
@@ -362,6 +364,8 @@ async function fazerLogin() {
   const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
   if (error || !data.user) { err.style.display = 'block'; return; }
   err.style.display = 'none';
+  adminEmail = email;
+  adminSenha = senha;
   iniciarApp();
 }
 
@@ -465,13 +469,19 @@ async function cadastrarAluno() {
   const btn = document.getElementById('btnCadastrar');
   btn.disabled = true; btn.textContent = 'Cadastrando...';
 
-  const { data, error } = await sb.auth.signUp({ email, password: senha });
-  if (error) { toast('Erro: ' + error.message, 'error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
-
-  const userId = data.user?.id;
+  // 1. Cria o usuário auth (isso derruba a sessão do admin)
+  const { data: signUpData, error: signUpError } = await sb.auth.signUp({ email, password: senha });
+  if (signUpError) { toast('Erro: ' + signUpError.message, 'error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
+  const userId = signUpData.user?.id;
   if (!userId) { toast('Erro ao obter ID do usuário.','error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
 
-  await sb.from('alunos').insert({ id: userId, nome, email, curso_id, matricula: matricula || null, status: 'ativo' });
+  // 2. Reconecta o admin imediatamente
+  const { error: reLoginError } = await sb.auth.signInWithPassword({ email: adminEmail, password: adminSenha });
+  if (reLoginError) { toast('Erro ao reconectar admin.','error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
+
+  // 3. Agora como admin, insere o registro do aluno
+  const { error: insertError } = await sb.from('alunos').insert({ id: userId, nome, email, curso_id, matricula: matricula || null, status: 'ativo' });
+  if (insertError) { toast('Erro ao salvar aluno: ' + insertError.message, 'error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
 
   toast('Aluno cadastrado com sucesso!', 'success');
   ['a-nome','a-email','a-senha','a-matricula'].forEach(id => document.getElementById(id).value = '');
