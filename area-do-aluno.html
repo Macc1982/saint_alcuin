@@ -6,100 +6,90 @@
 <title>Saint Alcuin of York — Área do Aluno</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --primary: #0b2a4a; --secondary: #145da0; --text: #2b2b2b;
-    --light: #f5f7fa; --white: #fff; --gray: #6b7280; --border: #dde3ea;
-    --green: #166534; --green-bg: #dcfce7;
-    --red-bg: #fee2e2; --red-text: #991b1b;
-    --yellow-bg: #fef9c3; --yellow-txt: #854d0e;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--light); color: var(--text); font-family: "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; }
-  .screen { display: none; min-height: 100vh; flex-direction: column; }
-  .screen.active { display: flex; }
-  .site-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.2); }
-  .header-brand-name { font-size: 1rem; font-weight: 700; }
-  .header-brand-sub  { font-size: .58rem; opacity: .72; letter-spacing: .1em; text-transform: uppercase; }
-  .btn { font-family: "Segoe UI", sans-serif; font-size: .82rem; font-weight: 600; padding: 9px 22px; border-radius: 6px; cursor: pointer; border: none; transition: all .18s; }
-  .btn-secondary { background: var(--secondary); color: #fff; }
-  .btn-secondary:hover { background: #1068b5; }
-  .btn-outline { background: transparent; color: var(--secondary); border: 1.5px solid var(--secondary); }
-  .btn-outline:hover { background: #eef4fb; }
-  .btn-danger { background: transparent; color: #e74c3c; border: 1.5px solid rgba(231,76,60,.35); font-size: .72rem; padding: 7px 14px; }
-  .btn-full { width: 100%; padding: 12px; }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: .76rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
-  .form-group input { width: 100%; background: var(--light); border: 1.5px solid var(--border); border-radius: 6px; color: var(--text); font-family: "Segoe UI", sans-serif; font-size: .87rem; padding: 10px 13px; outline: none; transition: border-color .15s; }
-  .form-group input:focus { border-color: var(--secondary); background: #fff; box-shadow: 0 0 0 3px rgba(20,93,160,.1); }
-  .form-group input::placeholder { color: #aab0ba; }
-  #screen-login { align-items: center; justify-content: center; background: var(--light); padding: 40px 20px; }
-  #screen-reset { align-items: center; justify-content: center; background: var(--light); padding: 40px 20px; }
-  .login-box, .reset-box { width: 100%; max-width: 420px; background: var(--white); border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.1); overflow: hidden; }
-  .login-top { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 32px 36px; text-align: center; color: #fff; }
-  .login-top h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-  .login-top p  { font-size: .72rem; opacity: .85; }
-  .login-body { padding: 32px 36px; }
-  .login-error { background: var(--red-bg); border: 1px solid #fca5a5; color: var(--red-text); font-size: .78rem; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; display: none; text-align: center; }
-  #screen-dashboard { background: var(--light); }
-  .dash-body { display: grid; grid-template-columns: 210px 1fr; flex: 1; }
-  .sidebar { background: var(--white); border-right: 1px solid var(--border); padding: 20px 0; }
-  .nav-label { font-size: .6rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gray); padding: 8px 20px 4px; }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; font-size: .82rem; color: var(--text); transition: all .15s; border-left: 3px solid transparent; }
-  .nav-item:hover { background: #eef4fb; color: var(--secondary); }
-  .nav-item.active { background: #eef4fb; color: var(--secondary); border-left-color: var(--secondary); font-weight: 600; }
-  .nav-badge { margin-left: auto; font-size: .6rem; background: var(--secondary); color: #fff; padding: 2px 7px; border-radius: 20px; font-weight: 600; }
-  .dash-main { padding: 32px 36px; overflow-y: auto; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-  .page-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-  .page-sub   { font-size: .8rem; color: var(--gray); margin-bottom: 24px; }
-  .card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.07); padding: 24px; margin-bottom: 20px; }
-  .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 28px; }
-  .stat-card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 18px 22px; border-top: 3px solid var(--secondary); }
-  .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; margin-bottom: 4px; }
-  .stat-label { font-size: .7rem; color: var(--gray); text-transform: uppercase; letter-spacing: .08em; }
-  .welcome-card { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; border-radius: 8px; padding: 24px 28px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
-  .welcome-card h2 { font-size: 1.2rem; margin-bottom: 4px; }
-  .welcome-card p  { font-size: .8rem; opacity: .88; }
-  .welcome-badge { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35); padding: 6px 16px; border-radius: 20px; font-size: .72rem; font-weight: 600; white-space: nowrap; }
-  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; }
-  .quick-card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 20px; cursor: pointer; border: 1.5px solid transparent; transition: all .2s; }
-  .quick-card:hover { border-color: var(--secondary); transform: translateY(-2px); }
-  .quick-icon  { font-size: 1.6rem; margin-bottom: 10px; }
-  .quick-label { font-size: .62rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--secondary); margin-bottom: 3px; }
-  .quick-title { font-size: .86rem; font-weight: 600; color: var(--primary); margin-bottom: 3px; }
-  .quick-link  { display: inline-block; margin-top: 10px; font-size: .72rem; font-weight: 600; color: var(--secondary); }
-  .mat-card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); padding: 18px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 10px; transition: all .2s; }
-  .mat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
-  .mat-icon { font-size: 1.8rem; flex-shrink: 0; }
-  .mat-info { flex: 1; }
-  .mat-title { font-size: .88rem; font-weight: 600; color: var(--primary); margin-bottom: 2px; }
-  .mat-meta  { font-size: .72rem; color: var(--gray); }
-  .table-wrap { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); overflow: hidden; }
-  .data-table { width: 100%; border-collapse: collapse; }
-  .data-table th { text-align: left; font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--gray); padding: 12px 16px; background: var(--light); border-bottom: 1px solid var(--border); }
-  .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: .82rem; }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table tbody tr:hover td { background: #f8fafc; }
-  .badge { display: inline-block; font-size: .65rem; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
-  .badge-green  { background: var(--green-bg); color: var(--green); }
-  .badge-yellow { background: var(--yellow-bg); color: var(--yellow-txt); }
-  .badge-red    { background: var(--red-bg); color: var(--red-text); }
-  .nota-header { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
-  .nota-ring { width: 86px; height: 86px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(var(--secondary) 0% 80%, var(--border) 80% 100%); display: flex; align-items: center; justify-content: center; position: relative; }
-  .nota-ring::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--white); }
-  .nota-ring-val { position: relative; z-index: 1; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
-  .decl-item { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-bottom: 1px solid var(--border); transition: background .15s; }
-  .decl-item:last-child { border-bottom: none; }
-  .decl-item:hover { background: #f8fafc; }
-  .decl-icon  { font-size: 1.5rem; flex-shrink: 0; }
-  .decl-title { font-size: .86rem; font-weight: 600; color: var(--primary); }
-  .decl-sub   { font-size: .7rem; color: var(--gray); margin-top: 2px; }
-  .loading { color: var(--gray); font-size: .82rem; padding: 20px; text-align: center; }
-  .empty   { color: var(--gray); font-size: .82rem; padding: 20px; text-align: center; }
-  .whatsapp-float { position: fixed; bottom: 22px; right: 22px; background: #25D366; width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,.22); z-index: 999; transition: transform .2s; }
-  .whatsapp-float:hover { transform: scale(1.08); }
-  @media (max-width: 860px) { .dash-body { grid-template-columns: 1fr; } .sidebar { display: none; } .dash-main { padding: 20px 16px; } .stats-row { grid-template-columns: 1fr 1fr; } .welcome-card { flex-direction: column; gap: 12px; align-items: flex-start; } }
+  :root{--primary:#0b2a4a;--secondary:#145da0;--text:#2b2b2b;--light:#f5f7fa;--white:#fff;--gray:#6b7280;--border:#dde3ea;--green:#166534;--green-bg:#dcfce7;--red-bg:#fee2e2;--red-text:#991b1b;--yellow-bg:#fef9c3;--yellow-txt:#854d0e;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--light);color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;}
+  .screen{display:none;min-height:100vh;flex-direction:column;}
+  .screen.active{display:flex;}
+  .site-header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  .header-brand-name{font-size:1rem;font-weight:700;}
+  .header-brand-sub{font-size:.58rem;opacity:.72;letter-spacing:.1em;text-transform:uppercase;}
+  .btn{font-family:"Segoe UI",sans-serif;font-size:.82rem;font-weight:600;padding:9px 22px;border-radius:6px;cursor:pointer;border:none;transition:all .18s;}
+  .btn-secondary{background:var(--secondary);color:#fff;}.btn-secondary:hover{background:#1068b5;}
+  .btn-outline{background:transparent;color:var(--secondary);border:1.5px solid var(--secondary);}.btn-outline:hover{background:#eef4fb;}
+  .btn-danger{background:transparent;color:#e74c3c;border:1.5px solid rgba(231,76,60,.35);font-size:.72rem;padding:7px 14px;}
+  .btn-full{width:100%;padding:12px;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:.76rem;font-weight:600;color:var(--primary);margin-bottom:5px;}
+  .form-group input{width:100%;background:var(--light);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:"Segoe UI",sans-serif;font-size:.87rem;padding:10px 13px;outline:none;transition:border-color .15s;}
+  .form-group input:focus{border-color:var(--secondary);background:#fff;box-shadow:0 0 0 3px rgba(20,93,160,.1);}
+  .form-group input::placeholder{color:#aab0ba;}
+  #screen-login{align-items:center;justify-content:center;background:var(--light);padding:40px 20px;}
+  .login-box{width:100%;max-width:420px;background:var(--white);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.1);overflow:hidden;}
+  .login-top{background:linear-gradient(135deg,var(--primary),var(--secondary));padding:32px 36px;text-align:center;color:#fff;}
+  .login-top h2{font-size:1.1rem;font-weight:700;margin-bottom:4px;}
+  .login-top p{font-size:.72rem;opacity:.85;}
+  .login-body{padding:32px 36px;}
+  .login-error{background:var(--red-bg);border:1px solid #fca5a5;color:var(--red-text);font-size:.78rem;padding:10px 14px;border-radius:6px;margin-bottom:14px;display:none;text-align:center;}
+  #screen-dashboard{background:var(--light);}
+  .dash-body{display:grid;grid-template-columns:210px 1fr;flex:1;}
+  .sidebar{background:var(--white);border-right:1px solid var(--border);padding:20px 0;}
+  .nav-label{font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gray);padding:8px 20px 4px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:.82rem;color:var(--text);transition:all .15s;border-left:3px solid transparent;}
+  .nav-item:hover{background:#eef4fb;color:var(--secondary);}
+  .nav-item.active{background:#eef4fb;color:var(--secondary);border-left-color:var(--secondary);font-weight:600;}
+  .nav-badge{margin-left:auto;font-size:.6rem;background:var(--secondary);color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;}
+  .dash-main{padding:32px 36px;overflow-y:auto;}
+  .tab-content{display:none;}.tab-content.active{display:block;}
+  .page-title{font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:4px;}
+  .page-sub{font-size:.8rem;color:var(--gray);margin-bottom:24px;}
+  .card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:24px;margin-bottom:20px;}
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+  .stat-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:18px 22px;border-top:3px solid var(--secondary);}
+  .stat-value{font-size:1.8rem;font-weight:700;color:var(--primary);line-height:1;margin-bottom:4px;}
+  .stat-label{font-size:.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;}
+  .welcome-card{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:8px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;}
+  .welcome-card h2{font-size:1.2rem;margin-bottom:4px;}
+  .welcome-card p{font-size:.8rem;opacity:.88;}
+  .welcome-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);padding:6px 16px;border-radius:20px;font-size:.72rem;font-weight:600;white-space:nowrap;}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+  .quick-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:20px;cursor:pointer;border:1.5px solid transparent;transition:all .2s;}
+  .quick-card:hover{border-color:var(--secondary);transform:translateY(-2px);}
+  .quick-icon{font-size:1.6rem;margin-bottom:10px;}
+  .quick-label{font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--secondary);margin-bottom:3px;}
+  .quick-title{font-size:.86rem;font-weight:600;color:var(--primary);margin-bottom:3px;}
+  .quick-link{display:inline-block;margin-top:10px;font-size:.72rem;font-weight:600;color:var(--secondary);}
+  .mat-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:18px 20px;display:flex;align-items:center;gap:16px;margin-bottom:10px;transition:all .2s;}
+  .mat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);}
+  .mat-icon{font-size:1.8rem;flex-shrink:0;}
+  .mat-info{flex:1;}
+  .mat-title{font-size:.88rem;font-weight:600;color:var(--primary);margin-bottom:2px;}
+  .mat-meta{font-size:.72rem;color:var(--gray);}
+  .table-wrap{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;}
+  .data-table{width:100%;border-collapse:collapse;}
+  .data-table th{text-align:left;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);padding:12px 16px;background:var(--light);border-bottom:1px solid var(--border);}
+  .data-table td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:.82rem;}
+  .data-table tr:last-child td{border-bottom:none;}
+  .data-table tbody tr:hover td{background:#f8fafc;}
+  .badge{display:inline-block;font-size:.65rem;font-weight:600;padding:2px 9px;border-radius:20px;}
+  .badge-green{background:var(--green-bg);color:var(--green);}
+  .badge-yellow{background:var(--yellow-bg);color:var(--yellow-txt);}
+  .badge-red{background:var(--red-bg);color:var(--red-text);}
+  .nota-header{display:flex;align-items:center;gap:24px;margin-bottom:24px;}
+  .nota-ring{width:86px;height:86px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--secondary) 0% 80%,var(--border) 80% 100%);display:flex;align-items:center;justify-content:center;position:relative;}
+  .nota-ring::before{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--white);}
+  .nota-ring-val{position:relative;z-index:1;font-size:1.4rem;font-weight:700;color:var(--primary);}
+  .decl-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid var(--border);transition:background .15s;}
+  .decl-item:last-child{border-bottom:none;}
+  .decl-item:hover{background:#f8fafc;}
+  .decl-icon{font-size:1.5rem;flex-shrink:0;}
+  .decl-title{font-size:.86rem;font-weight:600;color:var(--primary);}
+  .decl-sub{font-size:.7rem;color:var(--gray);margin-top:2px;}
+  .loading{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
+  .empty{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
+  .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:999;transition:transform .2s;}
+  .whatsapp-float:hover{transform:scale(1.08);}
+  @media(max-width:860px){.dash-body{grid-template-columns:1fr;}.sidebar{display:none;}.dash-main{padding:20px 16px;}.stats-row{grid-template-columns:1fr 1fr;}.welcome-card{flex-direction:column;gap:12px;align-items:flex-start;}}
 </style>
 </head>
 <body>
@@ -107,35 +97,14 @@
 <!-- LOGIN -->
 <div id="screen-login" class="screen active">
   <div class="login-box">
-    <div class="login-top">
-      <h2>Saint Alcuin of York</h2>
-      <p>Portal do Aluno — Acesso Institucional</p>
-    </div>
+    <div class="login-top"><h2>Saint Alcuin of York</h2><p>Portal do Aluno — Acesso Institucional</p></div>
     <div class="login-body">
       <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
       <div class="form-group"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com"/></div>
       <div class="form-group"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()"/></div>
-      <div style="text-align:right;margin-top:-8px;margin-bottom:18px;">
-        <a onclick="showScreen('screen-reset')" style="font-size:.72rem;color:var(--secondary);cursor:pointer;">Esqueci minha senha</a>
-      </div>
       <button class="btn btn-secondary btn-full" id="btnLogin" onclick="fazerLogin()">Entrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- RESET SENHA -->
-<div id="screen-reset" class="screen">
-  <div class="reset-box">
-    <div class="login-top">
-      <h2>Recuperar senha</h2>
-      <p>Enviaremos um link para seu e-mail</p>
-    </div>
-    <div class="login-body">
-      <div id="reset-ok" style="display:none;background:var(--green-bg);color:var(--green);font-size:.82rem;padding:10px;border-radius:6px;margin-bottom:14px;text-align:center;">Link enviado! Verifique seu e-mail.</div>
-      <div class="form-group"><label>E-mail</label><input type="email" id="r-email" placeholder="seu@email.com"/></div>
-      <button class="btn btn-secondary btn-full" onclick="enviarReset()">Enviar link</button>
-      <div style="text-align:center;margin-top:16px;font-size:.75rem;">
-        <a onclick="showScreen('screen-login')" style="color:var(--secondary);cursor:pointer;">← Voltar ao login</a>
+      <div style="text-align:center;margin-top:16px;font-size:.75rem;color:var(--gray);">
+        Problemas de acesso? <a href="https://wa.me/75998403658" target="_blank" style="color:var(--secondary);">Entre em contato</a>
       </div>
     </div>
   </div>
@@ -206,7 +175,7 @@
       <!-- DISCIPLINAS -->
       <div class="tab-content" id="tab-disciplinas">
         <div class="page-title">Disciplinas</div>
-        <div class="page-sub">Disciplinas do semestre atual</div>
+        <div class="page-sub">Semestre atual</div>
         <div class="table-wrap">
           <table class="data-table">
             <thead><tr><th>Disciplina</th><th>Professor</th><th>Carga</th><th>Semestre</th></tr></thead>
@@ -223,7 +192,7 @@
           <div class="nota-header">
             <div class="nota-ring"><div class="nota-ring-val" id="media-geral">—</div></div>
             <div>
-              <div style="font-size:1.05rem;font-weight:600;color:var(--primary);">Média Geral do Semestre</div>
+              <div style="font-size:1.05rem;font-weight:600;color:var(--primary);">Média Geral</div>
               <div style="font-size:.78rem;color:var(--gray);" id="notas-resumo">Aguardando lançamento</div>
             </div>
           </div>
@@ -242,7 +211,7 @@
         <div class="page-sub">Emissão instantânea em PDF</div>
         <div class="card" style="padding:0;">
           <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Declaração de Matrícula</div><div class="decl-sub">Comprova vínculo ativo com a instituição</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('matricula')">Emitir PDF</button></div>
-          <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Declaração de Frequência</div><div class="decl-sub">Frequência por disciplina no semestre</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('frequencia')">Emitir PDF</button></div>
+          <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Declaração de Frequência</div><div class="decl-sub">Frequência por disciplina</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('frequencia')">Emitir PDF</button></div>
           <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Histórico Escolar</div><div class="decl-sub">Notas e disciplinas cursadas</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('historico')">Emitir PDF</button></div>
           <div class="decl-item" style="opacity:.5;"><div class="decl-icon">🎓</div><div style="flex:1;"><div class="decl-title">Certificado de Conclusão</div><div class="decl-sub">Disponível após conclusão do curso</div></div><button class="btn" style="font-size:.78rem;background:#f3f4f6;color:var(--gray);" disabled>Indisponível</button></div>
         </div>
@@ -257,107 +226,122 @@
 </a>
 
 <script>
-const SUPABASE_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbGVwbHlkaHd4anlmbGVqZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTE2MDIsImV4cCI6MjA5MjcyNzYwMn0.AzBzKl3lEEEt9eOdqJ_xRezohbW1qglPjOvhGSxwpUs';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let alunoData = null;
+const SUPA_URL='https://foleplydhwxjyflejfjq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbGVwbHlkaHd4anlmbGVqZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTE2MDIsImV4cCI6MjA5MjcyNzYwMn0.AzBzKl3lEEEt9eOdqJ_xRezohbW1qglPjOvhGSxwpUs';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let estudante=null;
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
 
-function showTab(name, navEl) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (navEl) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); navEl.classList.add('active'); }
+function showTab(name,navEl){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(navEl){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));navEl.classList.add('active');}
 }
 
-async function fazerLogin() {
-  const email = document.getElementById('l-email').value.trim();
-  const senha = document.getElementById('l-senha').value;
-  const err   = document.getElementById('login-error');
-  const btn   = document.getElementById('btnLogin');
-  btn.disabled = true; btn.textContent = 'Entrando...';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
-  if (error) { err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Entrar'; return; }
-  err.style.display = 'none';
-  await iniciarDashboard(data.user);
-  btn.disabled = false; btn.textContent = 'Entrar';
+async function fazerLogin(){
+  const email=document.getElementById('l-email').value.trim().toLowerCase();
+  const senha=document.getElementById('l-senha').value;
+  const err=document.getElementById('login-error');
+  const btn=document.getElementById('btnLogin');
+  btn.disabled=true;btn.textContent='Entrando...';
+
+  const hash=await sha256(senha);
+  const{data,error}=await sb.from('estudantes')
+    .select('*,cursos(nome)')
+    .eq('email',email)
+    .eq('senha_hash',hash)
+    .eq('status','ativo')
+    .single();
+
+  if(error||!data){
+    err.style.display='block';
+    btn.disabled=false;btn.textContent='Entrar';
+    return;
+  }
+  err.style.display='none';
+  estudante=data;
+  sessionStorage.setItem('estudante',JSON.stringify(data));
+  iniciarDashboard();
+  btn.disabled=false;btn.textContent='Entrar';
 }
 
-async function fazerLogout() {
-  await sb.auth.signOut();
-  alunoData = null;
+function fazerLogout(){
+  estudante=null;
+  sessionStorage.removeItem('estudante');
   showScreen('screen-login');
 }
 
-async function enviarReset() {
-  const email = document.getElementById('r-email').value.trim();
-  if (!email) return;
-  await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
-  document.getElementById('reset-ok').style.display = 'block';
-}
-
-async function iniciarDashboard(user) {
-  const { data: aluno } = await sb.from('estudantes').select('*, cursos(nome)').eq('id', user.id).single();
-  if (!aluno) { alert('Cadastro não encontrado. Contate a secretaria.'); return; }
-  alunoData = aluno;
-  document.getElementById('dash-name').textContent    = aluno.nome;
-  document.getElementById('dash-course').textContent  = aluno.cursos?.nome || '—';
-  document.getElementById('dash-avatar').textContent  = aluno.nome.charAt(0).toUpperCase();
-  document.getElementById('welcome-name').textContent = aluno.nome.split(' ')[0];
-  document.getElementById('welcome-info').textContent = 'Matrícula: ' + (aluno.matricula || '—') + ' · ' + (aluno.cursos?.nome || '—') + ' · Status: Ativo';
+function iniciarDashboard(){
+  if(!estudante)return;
+  document.getElementById('dash-name').textContent=estudante.nome;
+  document.getElementById('dash-course').textContent=estudante.cursos?.nome||'—';
+  document.getElementById('dash-avatar').textContent=estudante.nome.charAt(0).toUpperCase();
+  document.getElementById('welcome-name').textContent=estudante.nome.split(' ')[0];
+  document.getElementById('welcome-info').textContent='Matrícula: '+(estudante.matricula||'—')+' · '+(estudante.cursos?.nome||'—')+' · Status: Ativo';
   showScreen('screen-dashboard');
-  showTab('home', document.querySelector('.nav-item'));
-  await Promise.all([carregarMateriais(), carregarDisciplinas(), carregarNotas()]);
+  showTab('home',document.querySelector('.nav-item'));
+  Promise.all([carregarMateriais(),carregarDisciplinas(),carregarNotas()]);
 }
 
-async function carregarMateriais() {
-  if (!alunoData) return;
-  const { data } = await sb.from('materiais').select('*').eq('curso_id', alunoData.curso_id).order('ordem').order('created_at');
-  const pdfs   = (data||[]).filter(m => m.tipo === 'pdf');
-  const videos = (data||[]).filter(m => m.tipo === 'video');
-  document.getElementById('st-mat').textContent = (data||[]).length;
-  document.getElementById('nav-mat').innerHTML   = '📄 &nbsp;Materiais <span class="nav-badge">' + pdfs.length + '</span>';
-  document.getElementById('nav-aulas').innerHTML = '▶ &nbsp;Videoaulas <span class="nav-badge">' + videos.length + '</span>';
-  document.getElementById('lista-pdfs').innerHTML   = pdfs.length   ? pdfs.map(m   => `<div class="mat-card"><div class="mat-icon">📄</div><div class="mat-info"><div class="mat-title">${m.titulo}</div><div class="mat-meta">${m.descricao||'Material do curso'}</div></div><a href="${m.url}" target="_blank" class="btn btn-outline" style="font-size:.78rem;white-space:nowrap;">Abrir PDF</a></div>`).join('') : '<div class="empty">Nenhum material disponível ainda.</div>';
-  document.getElementById('lista-videos').innerHTML = videos.length ? videos.map(m => `<div class="mat-card"><div class="mat-icon">▶</div><div class="mat-info"><div class="mat-title">${m.titulo}</div><div class="mat-meta">${m.descricao||'Videoaula do curso'}</div></div><a href="${m.url}" target="_blank" class="btn btn-secondary" style="font-size:.78rem;white-space:nowrap;">Assistir</a></div>`).join('') : '<div class="empty">Nenhuma videoaula disponível ainda.</div>';
+async function carregarMateriais(){
+  if(!estudante)return;
+  const{data}=await sb.from('materiais').select('*').eq('curso_id',estudante.curso_id).order('ordem').order('created_at');
+  const pdfs=(data||[]).filter(m=>m.tipo==='pdf');
+  const videos=(data||[]).filter(m=>m.tipo==='video');
+  document.getElementById('st-mat').textContent=(data||[]).length;
+  document.getElementById('nav-mat').innerHTML='📄 &nbsp;Materiais <span class="nav-badge">'+pdfs.length+'</span>';
+  document.getElementById('nav-aulas').innerHTML='▶ &nbsp;Videoaulas <span class="nav-badge">'+videos.length+'</span>';
+  document.getElementById('lista-pdfs').innerHTML=pdfs.length?pdfs.map(m=>`<div class="mat-card"><div class="mat-icon">📄</div><div class="mat-info"><div class="mat-title">${m.titulo}</div><div class="mat-meta">${m.descricao||'Material do curso'}</div></div><a href="${m.url}" target="_blank" class="btn btn-outline" style="font-size:.78rem;white-space:nowrap;">Abrir PDF</a></div>`).join(''):'<div class="empty">Nenhum material disponível ainda.</div>';
+  document.getElementById('lista-videos').innerHTML=videos.length?videos.map(m=>`<div class="mat-card"><div class="mat-icon">▶</div><div class="mat-info"><div class="mat-title">${m.titulo}</div><div class="mat-meta">${m.descricao||'Videoaula do curso'}</div></div><a href="${m.url}" target="_blank" class="btn btn-secondary" style="font-size:.78rem;white-space:nowrap;">Assistir</a></div>`).join(''):'<div class="empty">Nenhuma videoaula disponível ainda.</div>';
 }
 
-async function carregarDisciplinas() {
-  if (!alunoData) return;
-  const { data } = await sb.from('disciplinas').select('*').eq('curso_id', alunoData.curso_id).order('nome');
-  document.getElementById('st-disc').textContent = (data||[]).length;
-  document.getElementById('lista-disciplinas').innerHTML = data?.length ? data.map(d => `<tr><td>${d.nome}</td><td>${d.professor||'A definir'}</td><td>${d.carga_horaria?d.carga_horaria+'h':'—'}</td><td>${d.semestre||'—'}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">Sem disciplinas.</td></tr>';
+async function carregarDisciplinas(){
+  if(!estudante)return;
+  const{data}=await sb.from('disciplinas').select('*').eq('curso_id',estudante.curso_id).order('nome');
+  document.getElementById('st-disc').textContent=(data||[]).length;
+  document.getElementById('lista-disciplinas').innerHTML=data?.length?data.map(d=>`<tr><td>${d.nome}</td><td>${d.professor||'A definir'}</td><td>${d.carga_horaria?d.carga_horaria+'h':'—'}</td><td>${d.semestre||'—'}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">Sem disciplinas.</td></tr>';
 }
 
-async function carregarNotas() {
-  if (!alunoData) return;
-  const { data } = await sb.from('notas').select('*, disciplinas(nome)').eq('aluno_id', alunoData.id);
-  if (!data?.length) { document.getElementById('lista-notas').innerHTML = '<tr><td colspan="6" class="empty">Nenhuma nota lançada ainda.</td></tr>'; return; }
-  const medias = data.filter(n => n.media !== null).map(n => n.media);
-  const mg = medias.length ? (medias.reduce((a,b)=>a+b,0)/medias.length).toFixed(1) : '—';
-  document.getElementById('media-geral').textContent = mg;
-  document.getElementById('st-media').textContent    = mg;
-  document.getElementById('notas-resumo').textContent = data.length + ' disciplinas · Aprovado em ' + data.filter(n=>(n.media||0)>=7).length + ' de ' + data.length;
-  document.getElementById('lista-notas').innerHTML = data.map(n => {
-    const m = n.media||0;
-    const [cls,sit] = m>=7?['badge-green','Aprovado']:m>=5?['badge-yellow','Recuperação']:['badge-red','Reprovado'];
-    return `<tr><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+async function carregarNotas(){
+  if(!estudante)return;
+  const{data}=await sb.from('notas').select('*,disciplinas(nome)').eq('aluno_id',estudante.id);
+  if(!data?.length){
+    document.getElementById('lista-notas').innerHTML='<tr><td colspan="6" class="empty">Nenhuma nota lançada ainda.</td></tr>';
+    document.getElementById('media-geral').textContent='—';
+    document.getElementById('st-media').textContent='—';
+    return;
+  }
+  const medias=data.filter(n=>n.media!==null).map(n=>n.media);
+  const mg=medias.length?(medias.reduce((a,b)=>a+b,0)/medias.length).toFixed(1):'—';
+  document.getElementById('media-geral').textContent=mg;
+  document.getElementById('st-media').textContent=mg;
+  document.getElementById('notas-resumo').textContent=data.length+' disciplinas · Aprovado em '+data.filter(n=>(n.media||0)>=7).length+' de '+data.length;
+  document.getElementById('lista-notas').innerHTML=data.map(n=>{
+    const m=n.media||0;
+    const[cls,sit]=m>=7?['badge-green','Aprovado']:m>=5?['badge-yellow','Recuperação']:['badge-red','Reprovado'];
+    return`<tr><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
   }).join('');
 }
 
-function emitirDeclaracao(tipo) {
-  if (!alunoData) return;
-  const t = {matricula:'Declaração de Matrícula',frequencia:'Declaração de Frequência',historico:'Histórico Escolar'};
-  alert('Emitindo ' + t[tipo] + ' para ' + alunoData.nome + '.\n\nEsta função gerará um PDF em breve.');
+function emitirDeclaracao(tipo){
+  if(!estudante)return;
+  const t={matricula:'Declaração de Matrícula',frequencia:'Declaração de Frequência',historico:'Histórico Escolar'};
+  alert('Emitindo '+t[tipo]+' para '+estudante.nome+'.\n\nEsta função gerará um PDF em breve.');
 }
 
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (session?.user) await iniciarDashboard(session.user);
-});
+// Restaura sessão se existir
+const saved=sessionStorage.getItem('estudante');
+if(saved){estudante=JSON.parse(saved);iniciarDashboard();}
 </script>
 </body>
 </html>
