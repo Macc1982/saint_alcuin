@@ -413,7 +413,7 @@ async function carregarCursos() {
 
 // ── DASHBOARD
 async function carregarDashboard() {
-  const { data: al } = await sb.from('alunos').select('*');
+  const { data: al } = await sb.from('estudantes').select('*');
   const { data: mat } = await sb.from('materiais').select('*');
   document.getElementById('st-alunos').textContent    = al?.length || 0;
   document.getElementById('st-materiais').textContent = mat?.length || 0;
@@ -431,7 +431,7 @@ async function carregarDashboard() {
 
 // ── ALUNOS
 async function carregarAlunos() {
-  const { data } = await sb.from('alunos').select('*, cursos(nome)').order('nome');
+  const { data } = await sb.from('estudantes').select('*, cursos(nome)').order('nome');
   alunosCache = data || [];
   const tbody = document.getElementById('tabela-alunos');
   if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum aluno cadastrado.</td></tr>'; return; }
@@ -480,7 +480,7 @@ async function cadastrarAluno() {
   if (reLoginError) { toast('Erro ao reconectar admin.','error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
 
   // 3. Agora como admin, insere o registro do aluno
-  const { error: insertError } = await sb.from('alunos').insert({ id: userId, nome, email, curso_id, matricula: matricula || null, status: 'ativo' });
+  const { error: insertError } = await sb.from('estudantes').insert({ id: userId, nome, email, curso_id, matricula: matricula || null, status: 'ativo' });
   if (insertError) { toast('Erro ao salvar aluno: ' + insertError.message, 'error'); btn.disabled=false; btn.textContent='Cadastrar Aluno'; return; }
 
   toast('Aluno cadastrado com sucesso!', 'success');
@@ -492,7 +492,7 @@ async function cadastrarAluno() {
 
 async function excluirAluno(id) {
   if (!confirm('Remover este aluno?')) return;
-  await sb.from('alunos').delete().eq('id', id);
+  await sb.from('estudantes').delete().eq('id', id);
   toast('Aluno removido.', 'success');
   await Promise.all([carregarAlunos(), carregarDashboard()]);
 }
