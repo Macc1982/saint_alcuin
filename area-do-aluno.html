@@ -301,7 +301,7 @@ async function enviarReset() {
 }
 
 async function iniciarDashboard(user) {
-  const { data: aluno } = await sb.from('alunos').select('*, cursos(nome)').eq('id', user.id).single();
+  const { data: aluno } = await sb.from('estudantes').select('*, cursos(nome)').eq('id', user.id).single();
   if (!aluno) { alert('Cadastro não encontrado. Contate a secretaria.'); return; }
   alunoData = aluno;
   document.getElementById('dash-name').textContent    = aluno.nome;
