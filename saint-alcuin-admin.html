@@ -320,13 +320,16 @@ async function carregarAlunos(){
   alunosCache=data||[];
   const tbody=document.getElementById('tabela-alunos');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhum aluno cadastrado.</td></tr>';return;}
-  tbody.innerHTML=data.map(a=>`
+  tbody.innerHTML=data.map((a,i)=>`
     <tr>
       <td>${a.nome}</td><td>${a.email}</td>
       <td>${a.cursos?.nome||'—'}</td>
       <td>${a.matricula||'—'}</td>
       <td><span class="badge badge-${a.status==='ativo'?'green':'gray'}">${a.status}</span></td>
-      <td><button class="btn btn-danger btn-sm" onclick="excluirAluno('${a.id}')">Remover</button></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="abrirEdicao(${i})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirAluno('${a.id}')">Remover</button>
+      </td>
     </tr>`).join('');
   ['n-aluno','filtro-aluno-nota'].forEach(id=>{
     const s=document.getElementById(id);
@@ -496,7 +499,71 @@ async function adicionarDisciplina(){
   await carregarDisciplinas();
 }
 
+
+function abrirEdicao(idx){
+  const a=alunosCache[idx];
+  document.getElementById('edit-id').value=a.id;
+  document.getElementById('edit-nome').value=a.nome;
+  document.getElementById('edit-email').value=a.email;
+  document.getElementById('edit-senha').value='';
+  document.getElementById('edit-matricula').value=a.matricula||'';
+  document.getElementById('edit-status').value=a.status||'ativo';
+  // Popula select de cursos
+  const sel=document.getElementById('edit-curso');
+  sel.innerHTML='';
+  cursosCache.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.nome;sel.appendChild(o);});
+  sel.value=a.curso_id;
+  document.getElementById('modal-edicao').style.display='flex';
+}
+
+function fecharEdicao(){
+  document.getElementById('modal-edicao').style.display='none';
+}
+
+async function salvarEdicao(){
+  const id=document.getElementById('edit-id').value;
+  const nome=document.getElementById('edit-nome').value.trim();
+  const email=document.getElementById('edit-email').value.trim();
+  const senhaRaw=document.getElementById('edit-senha').value.trim();
+  const curso_id=document.getElementById('edit-curso').value;
+  const matricula=document.getElementById('edit-matricula').value.trim();
+  const status=document.getElementById('edit-status').value;
+  if(!nome||!email||!curso_id){toast('Preencha nome, e-mail e curso.','error');return;}
+  const updates={nome,email,curso_id,matricula:matricula||null,status};
+  if(senhaRaw){updates.senha_hash=await sha256(senhaRaw);}
+  const{error}=await sb.from('estudantes').update(updates).eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Aluno atualizado!','success');
+  fecharEdicao();
+  await Promise.all([carregarAlunos(),carregarDashboard()]);
+}
+
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
 </script>
+
+<!-- MODAL EDIÇÃO -->
+<div id="modal-edicao" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:10px;padding:28px;width:100%;max-width:480px;box-shadow:0 16px 48px rgba(0,0,0,.2);">
+    <div style="font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:18px;">Editar Aluno</div>
+    <input type="hidden" id="edit-id"/>
+    <div class="form-row">
+      <div class="form-group"><label>Nome completo *</label><input type="text" id="edit-nome" placeholder="Nome do aluno"/></div>
+      <div class="form-group"><label>E-mail *</label><input type="email" id="edit-email" placeholder="email@dominio.com"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Nova senha (deixe vazio para manter)</label><input type="text" id="edit-senha" placeholder="Nova senha (opcional)"/></div>
+      <div class="form-group"><label>Curso *</label><select id="edit-curso"></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Matrícula</label><input type="text" id="edit-matricula" placeholder="SAY-2024-0001"/></div>
+      <div class="form-group"><label>Status</label><select id="edit-status"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-outline" onclick="fecharEdicao()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
