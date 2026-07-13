@@ -27,6 +27,8 @@
   .nav-item:hover{background:#eef4fb;color:var(--secondary);}
   .nav-item.active{background:#eef4fb;color:var(--secondary);border-left-color:var(--secondary);font-weight:600;}
   .nav-label{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);padding:12px 18px 4px;}
+  .nav-badge{margin-left:auto;font-size:.6rem;background:var(--secondary);color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;}
+  .nav-badge.alerta{background:#c1121f;}
   .main{flex:1;padding:28px 32px;overflow-y:auto;}
   .tab{display:none;}.tab.active{display:block;}
   .page-title{font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:4px;}
@@ -119,11 +121,13 @@
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
       <div class="nav-item active" onclick="showTab('dashboard',this)">📊 Dashboard</div>
+      <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas">📝 Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)">👤 Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)">💰 Financeiro</div>
       <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
       <div class="nav-label">Cursos</div>
+      <div class="nav-item" onclick="showTab('cursos',this)">🎓 Cursos</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)">◈ Disciplinas</div>
     </nav>
     <div class="main">
@@ -137,6 +141,83 @@
           <div class="stat-card"><div class="stat-value" id="st-cursos">—</div><div class="stat-label">Cursos</div></div>
         </div>
         <div class="card"><div class="card-header"><div class="card-title">Alunos por Curso</div></div><div id="dash-cursos"><div class="loading">Carregando...</div></div></div>
+      </div>
+
+      <!-- ============ MATRÍCULAS (NOVO) ============ -->
+      <div class="tab" id="tab-matriculas">
+        <div class="page-title">Matrículas</div>
+        <div class="page-sub">Inscrições recebidas · aprovação · documentos · efetivação</div>
+
+        <div class="stats-row-4">
+          <div class="stat-card yellow"><div class="stat-value" id="mt-inscritos">—</div><div class="stat-label">Aguardando análise</div></div>
+          <div class="stat-card"><div class="stat-value" id="mt-aprovados">—</div><div class="stat-label">Aprovados (aguardando docs)</div></div>
+          <div class="stat-card green"><div class="stat-value" id="mt-docsok">—</div><div class="stat-label">Docs OK (efetivar)</div></div>
+          <div class="stat-card"><div class="stat-value" id="mt-matriculados">—</div><div class="stat-label">Matriculados</div></div>
+        </div>
+
+        <div class="form-group" style="max-width:280px;margin-bottom:16px;">
+          <label>Filtrar por status</label>
+          <select id="filtro-matricula" onchange="carregarMatriculas()">
+            <option value="">Todas</option>
+            <option value="inscrito">Aguardando análise</option>
+            <option value="aprovado">Aprovadas (aguardando docs)</option>
+            <option value="documentos_ok">Documentos OK</option>
+            <option value="matriculado">Matriculadas</option>
+            <option value="recusado">Recusadas</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Candidato</th><th>Curso</th><th>Contato</th><th>Inscrição</th><th>Docs</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="tabela-matriculas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ CURSOS (NOVO) ============ -->
+      <div class="tab" id="tab-cursos">
+        <div class="page-title">Cursos</div>
+        <div class="page-sub">Criar, editar e ativar/desativar cursos</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title" id="curso-form-title">Novo curso</div></div>
+          <input type="hidden" id="c-id"/>
+          <div class="form-row">
+            <div class="form-group"><label>Nome do curso *</label><input type="text" id="c-nome" placeholder="Ex: Mestrado em Teologia"/></div>
+            <div class="form-group"><label>Nível *</label>
+              <select id="c-nivel" onchange="onNivelChange()">
+                <option value="Mestrado">Mestrado</option>
+                <option value="Doutorado">Doutorado</option>
+                <option value="Especialização">Especialização</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Duração</label><input type="text" id="c-duracao" placeholder="Ex: 24 meses"/></div>
+            <div class="form-group"><label>Vagas</label><input type="number" id="c-vagas" min="0" placeholder="Ex: 30"/></div>
+          </div>
+          <div class="form-group"><label>Descrição</label><textarea id="c-desc" rows="2" placeholder="Breve descrição exibida na página de inscrição"></textarea></div>
+          <div class="fin-hint">Valores <strong>sugeridos</strong> — o valor real de cada aluno é definido na aba Financeiro (negociado individualmente).</div>
+          <div class="form-row-3">
+            <div class="form-group"><label>Matrícula sugerida (R$)</label><input type="number" id="c-vmat" step="0.01" min="0" placeholder="0,00"/></div>
+            <div class="form-group"><label>Mensalidade sugerida (R$)</label><input type="number" id="c-vmen" step="0.01" min="0" placeholder="0,00"/></div>
+            <div class="form-group"><label>Qtd. mensalidades</label><input type="number" id="c-qtd" min="1" value="26"/></div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-primary" onclick="salvarCurso()" id="btnCurso">Criar curso</button>
+            <button class="btn btn-outline" onclick="limparFormCurso()" id="btnCancelarCurso" style="display:none;">Cancelar edição</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Curso</th><th>Nível</th><th>Duração</th><th>Alunos</th><th>Situação</th><th></th></tr></thead>
+            <tbody id="tabela-cursos"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- ALUNOS -->
@@ -322,6 +403,72 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MODAL: DETALHE DA MATRÍCULA + DOCUMENTOS -->
+<div class="modal-bg" id="modal-matricula">
+  <div class="modal-box" style="max-width:720px;max-height:88vh;overflow-y:auto;">
+    <div class="modal-title" id="mm-nome">—</div>
+    <div class="modal-sub" id="mm-sub">—</div>
+
+    <div class="card" style="box-shadow:none;border:1px solid var(--border);padding:16px;margin-bottom:14px;">
+      <div style="font-size:.8rem;line-height:1.9;" id="mm-dados">—</div>
+    </div>
+
+    <div style="font-size:.86rem;font-weight:700;color:var(--primary);margin:16px 0 8px;">Documentos</div>
+    <div id="mm-docs"><div class="empty">Nenhum documento enviado ainda.</div></div>
+
+    <div class="form-group" style="margin-top:16px;">
+      <label>Observação interna (não aparece pro candidato)</label>
+      <textarea id="mm-obs" rows="2" placeholder="Anotações da coordenação"></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-danger" onclick="recusarMatricula()" id="btnRecusar">Recusar</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="fecharModal('modal-matricula')">Fechar</button>
+        <button class="btn btn-primary" onclick="aprovarMatricula()" id="btnAprovar">Aprovar inscrição</button>
+        <button class="btn btn-success" onclick="abrirEfetivar()" id="btnEfetivarAbrir" style="display:none;">Efetivar matrícula</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CÓDIGO GERADO -->
+<div class="modal-bg" id="modal-codigo">
+  <div class="modal-box" style="max-width:440px;text-align:center;">
+    <div class="modal-title">Inscrição aprovada ✓</div>
+    <div class="modal-sub">Envie este código ao candidato. Com ele (e o e-mail), ele acessa a página de documentos.</div>
+    <div style="background:var(--light);border:2px dashed var(--secondary);border-radius:8px;padding:18px;margin:16px 0;">
+      <div style="font-size:1.6rem;font-weight:800;letter-spacing:.1em;color:var(--primary);" id="cod-valor">—</div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-outline" onclick="copiarCodigo()">Copiar código</button>
+      <button class="btn btn-primary" id="btnWhats" onclick="enviarWhats()">Enviar por WhatsApp</button>
+    </div>
+    <div style="margin-top:14px;">
+      <button class="btn btn-outline btn-sm" onclick="fecharModal('modal-codigo')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EFETIVAR MATRÍCULA (cria o aluno) -->
+<div class="modal-bg" id="modal-efetivar">
+  <div class="modal-box">
+    <div class="modal-title">Efetivar matrícula</div>
+    <div class="modal-sub">Isto cria o <strong>aluno</strong> no portal, com login e senha. Depois, gere o plano na aba Financeiro.</div>
+    <div class="form-row">
+      <div class="form-group"><label>Nº de matrícula *</label><input type="text" id="ef-matricula" placeholder="SAY-2026-0001"/></div>
+      <div class="form-group"><label>Senha inicial *</label><input type="text" id="ef-senha" placeholder="Senha de acesso do aluno"/></div>
+    </div>
+    <div class="fin-hint">O aluno usará o <strong>e-mail da inscrição</strong> + esta senha para entrar no portal.</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-outline" onclick="fecharModal('modal-efetivar')">Cancelar</button>
+      <button class="btn btn-success" onclick="efetivarMatricula()" id="btnEfetivar">Criar aluno</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: LANÇAR PAGAMENTO -->
 <div class="modal-bg" id="modal-pagamento">
   <div class="modal-box">
@@ -444,7 +591,11 @@ async function iniciarApp(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('app').classList.add('active');
   await carregarCursos();
-  await Promise.all([carregarDashboard(),carregarAlunos(),carregarMateriais(),carregarDisciplinas(),carregarNotas()]);
+  await Promise.all([
+    carregarDashboard(), carregarAlunos(), carregarMateriais(),
+    carregarDisciplinas(), carregarNotas(),
+    carregarMatriculas(), carregarCursosTabela()
+  ]);
 }
 
 function showTab(name,el){
@@ -897,6 +1048,326 @@ async function salvarEdicao(){
   toast('Aluno atualizado!','success');
   fecharModal('modal-edicao');
   await Promise.all([carregarAlunos(),carregarDashboard()]);
+}
+
+/* ==========================================================================
+   MATRÍCULAS
+   ========================================================================== */
+let matriculasCache=[], matAtual=null;
+
+const DOC_LABELS = {
+  rg:'RG', cpf:'CPF', diploma:'Diploma', historico:'Histórico',
+  comprovante_residencia:'Comprovante de residência', foto:'Foto', outro:'Outro'
+};
+
+async function carregarMatriculas(){
+  const filtro=document.getElementById('filtro-matricula')?.value;
+  let q=sb.from('vw_matriculas').select('*').order('criado_em',{ascending:false});
+  if(filtro) q=q.eq('status',filtro);
+  const {data}=await q;
+  matriculasCache=data||[];
+
+  // Contadores (sempre do total, não do filtro)
+  const {data:todas}=await sb.from('matriculas').select('status');
+  const cnt=(s)=>(todas||[]).filter(m=>m.status===s).length;
+  document.getElementById('mt-inscritos').textContent    = cnt('inscrito');
+  document.getElementById('mt-aprovados').textContent    = cnt('aprovado');
+  document.getElementById('mt-docsok').textContent       = cnt('documentos_ok');
+  document.getElementById('mt-matriculados').textContent = cnt('matriculado');
+
+  // Badge no menu (inscrições aguardando)
+  const pend=cnt('inscrito');
+  document.getElementById('nav-matriculas').innerHTML =
+    '📝 Matrículas' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
+
+  const tbody=document.getElementById('tabela-matriculas');
+  if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma inscrição.</td></tr>';return;}
+
+  tbody.innerHTML=data.map((m,i)=>{
+    const st=m.status;
+    const [cls,lbl] =
+      st==='inscrito'      ? ['badge-yellow','Aguardando'] :
+      st==='aprovado'      ? ['badge-blue','Aguardando docs'] :
+      st==='documentos_ok' ? ['badge-green','Docs OK'] :
+      st==='matriculado'   ? ['badge-green','Matriculado'] :
+                             ['badge-red','Recusado'];
+    return `<tr>
+      <td><strong>${m.nome}</strong><div style="font-size:.72rem;color:var(--gray);">${m.email}</div></td>
+      <td>${m.curso_nome||'—'}</td>
+      <td>${m.telefone||'—'}</td>
+      <td>${dataBR(m.criado_em)}</td>
+      <td>${m.docs_enviados||0} enviado(s)</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="abrirMatricula(${i})">Analisar</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function abrirMatricula(idx){
+  const m=matriculasCache[idx];
+  matAtual=m;
+
+  document.getElementById('mm-nome').textContent=m.nome;
+  document.getElementById('mm-sub').textContent=
+    `${m.curso_nome||'Sem curso'} · inscrito em ${dataBR(m.criado_em)}` + (m.codigo_acesso?` · código: ${m.codigo_acesso}`:'');
+
+  document.getElementById('mm-dados').innerHTML=`
+    <strong>E-mail:</strong> ${m.email}<br/>
+    <strong>Telefone:</strong> ${m.telefone||'—'}<br/>
+    <strong>CPF:</strong> ${m.cpf||'—'} &nbsp;·&nbsp; <strong>Nascimento:</strong> ${dataBR(m.data_nascimento)}<br/>
+    <strong>Endereço:</strong> ${[m.endereco,m.cidade,m.estado,m.cep].filter(Boolean).join(', ')||'—'}<br/>
+    <strong>Formação:</strong> ${m.formacao||'—'} ${m.instituicao?'— '+m.instituicao:''} ${m.ano_formacao?'('+m.ano_formacao+')':''}
+  `;
+  document.getElementById('mm-obs').value=m.observacao_admin||'';
+
+  // Botões conforme o status
+  const st=m.status;
+  document.getElementById('btnAprovar').style.display       = st==='inscrito' ? 'inline-block':'none';
+  document.getElementById('btnRecusar').style.display       = (st==='inscrito'||st==='aprovado') ? 'inline-block':'none';
+  document.getElementById('btnEfetivarAbrir').style.display = (st==='documentos_ok'||st==='aprovado') ? 'inline-block':'none';
+
+  // Documentos
+  await carregarDocsMatricula(m.id);
+  abrirModal('modal-matricula');
+}
+
+async function carregarDocsMatricula(matriculaId){
+  const {data}=await sb.from('matricula_documentos').select('*').eq('matricula_id',matriculaId).order('enviado_em');
+  const el=document.getElementById('mm-docs');
+  if(!data?.length){el.innerHTML='<div class="empty">Nenhum documento enviado ainda.</div>';return;}
+
+  el.innerHTML='<div class="table-wrap"><table class="data-table"><thead><tr><th>Documento</th><th>Enviado</th><th>Status</th><th></th></tr></thead><tbody>'+
+    data.map(d=>{
+      const [cls,lbl]= d.status==='aprovado'?['badge-green','Aprovado']:d.status==='recusado'?['badge-red','Recusado']:['badge-yellow','Enviado'];
+      return `<tr>
+        <td><strong>${DOC_LABELS[d.tipo]||d.tipo}</strong><div style="font-size:.7rem;color:var(--gray);">${d.nome_arquivo}</div></td>
+        <td>${dataBR(d.enviado_em)}</td>
+        <td><span class="badge ${cls}">${lbl}</span></td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-outline btn-sm" onclick="verDoc('${d.path}')">Ver</button>
+          ${d.status!=='aprovado'?`<button class="btn btn-primary btn-sm" onclick="avaliarDoc('${d.id}','aprovado')">Aprovar</button>`:''}
+          ${d.status!=='recusado'?`<button class="btn btn-danger btn-sm" onclick="avaliarDoc('${d.id}','recusado')">Recusar</button>`:''}
+        </td>
+      </tr>`;
+    }).join('')+'</tbody></table></div>';
+}
+
+// Bucket é privado → gera URL assinada temporária
+async function verDoc(path){
+  const {data,error}=await sb.storage.from('matriculas').createSignedUrl(path,300);
+  if(error||!data?.signedUrl){toast('Não foi possível abrir o documento.','error');return;}
+  window.open(data.signedUrl,'_blank');
+}
+
+async function avaliarDoc(docId,novoStatus){
+  const {error}=await sb.from('matricula_documentos')
+    .update({status:novoStatus,avaliado_em:new Date().toISOString()})
+    .eq('id',docId);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast(novoStatus==='aprovado'?'Documento aprovado.':'Documento recusado.','success');
+  await carregarDocsMatricula(matAtual.id);
+
+  // Se todos aprovados → marca a matrícula como documentos_ok
+  const {data:docs}=await sb.from('matricula_documentos').select('status').eq('matricula_id',matAtual.id);
+  const todosOk = docs?.length && docs.every(d=>d.status==='aprovado');
+  if(todosOk && matAtual.status==='aprovado'){
+    await sb.from('matriculas').update({status:'documentos_ok'}).eq('id',matAtual.id);
+    toast('Todos os documentos aprovados. Pronto para efetivar!','success');
+    await carregarMatriculas();
+    matAtual.status='documentos_ok';
+    document.getElementById('btnEfetivarAbrir').style.display='inline-block';
+  }
+}
+
+async function aprovarMatricula(){
+  if(!matAtual)return;
+  const btn=document.getElementById('btnAprovar');
+  btn.disabled=true;btn.textContent='Aprovando...';
+
+  // salva observação junto
+  const obs=document.getElementById('mm-obs').value.trim();
+  if(obs) await sb.from('matriculas').update({observacao_admin:obs}).eq('id',matAtual.id);
+
+  const {data,error}=await sb.rpc('aprovar_matricula',{p_matricula_id:matAtual.id});
+  btn.disabled=false;btn.textContent='Aprovar inscrição';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  document.getElementById('cod-valor').textContent=data;
+  fecharModal('modal-matricula');
+  abrirModal('modal-codigo');
+  await carregarMatriculas();
+}
+
+function copiarCodigo(){
+  const cod=document.getElementById('cod-valor').textContent;
+  navigator.clipboard.writeText(cod).then(()=>toast('Código copiado!','success'));
+}
+
+function enviarWhats(){
+  if(!matAtual)return;
+  const cod=document.getElementById('cod-valor').textContent;
+  const tel=(matAtual.telefone||'').replace(/\D/g,'');
+  const msg=encodeURIComponent(
+    `Olá, ${matAtual.nome}! Sua inscrição na Saint Alcuin of York foi APROVADA.\n\n`+
+    `Código de acesso: ${cod}\n\n`+
+    `Acesse a página de documentos e envie: RG, CPF, diploma e comprovante de residência.`
+  );
+  const url = tel ? `https://wa.me/55${tel}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url,'_blank');
+}
+
+async function recusarMatricula(){
+  if(!matAtual)return;
+  const motivo=prompt('Motivo da recusa (opcional):')||null;
+  if(motivo===null && !confirm('Recusar esta inscrição?'))return;
+  const {error}=await sb.from('matriculas')
+    .update({status:'recusado',motivo_recusa:motivo,observacao_admin:document.getElementById('mm-obs').value.trim()||null})
+    .eq('id',matAtual.id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Inscrição recusada.','success');
+  fecharModal('modal-matricula');
+  await carregarMatriculas();
+}
+
+function abrirEfetivar(){
+  if(!matAtual)return;
+  const ano=new Date().getFullYear();
+  document.getElementById('ef-matricula').value=`SAY-${ano}-`;
+  document.getElementById('ef-senha').value='';
+  abrirModal('modal-efetivar');
+}
+
+async function efetivarMatricula(){
+  if(!matAtual)return;
+  const mat=document.getElementById('ef-matricula').value.trim();
+  const senha=document.getElementById('ef-senha').value.trim();
+  if(!mat||!senha){toast('Informe o nº de matrícula e a senha inicial.','error');return;}
+
+  const btn=document.getElementById('btnEfetivar');
+  btn.disabled=true;btn.textContent='Criando aluno...';
+
+  const {error}=await sb.rpc('efetivar_matricula',{
+    p_matricula_id:matAtual.id, p_matricula_cod:mat, p_senha:senha
+  });
+
+  btn.disabled=false;btn.textContent='Criar aluno';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast('Aluno criado! Agora gere o plano na aba Financeiro.','success');
+  fecharModal('modal-efetivar');
+  fecharModal('modal-matricula');
+  await Promise.all([carregarMatriculas(),carregarAlunos(),carregarDashboard()]);
+}
+
+/* ==========================================================================
+   CURSOS (CRUD)
+   ========================================================================== */
+function onNivelChange(){
+  const n=document.getElementById('c-nivel').value;
+  document.getElementById('c-qtd').value = n==='Doutorado' ? 36 : 26;
+}
+
+function limparFormCurso(){
+  ['c-id','c-nome','c-duracao','c-vagas','c-desc','c-vmat','c-vmen'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('c-nivel').value='Mestrado';
+  document.getElementById('c-qtd').value=26;
+  document.getElementById('curso-form-title').textContent='Novo curso';
+  document.getElementById('btnCurso').textContent='Criar curso';
+  document.getElementById('btnCancelarCurso').style.display='none';
+}
+
+async function salvarCurso(){
+  const id=document.getElementById('c-id').value;
+  const nome=document.getElementById('c-nome').value.trim();
+  const nivel=document.getElementById('c-nivel').value;
+  if(!nome){toast('Informe o nome do curso.','error');return;}
+
+  const payload={
+    nome, nivel,
+    duracao:  document.getElementById('c-duracao').value.trim()||null,
+    vagas:    parseInt(document.getElementById('c-vagas').value,10)||null,
+    descricao:document.getElementById('c-desc').value.trim()||null,
+    valor_matricula_sugerido:   parseFloat(document.getElementById('c-vmat').value)||null,
+    valor_mensalidade_sugerido: parseFloat(document.getElementById('c-vmen').value)||null,
+    qtd_mensalidades:           parseInt(document.getElementById('c-qtd').value,10)||26,
+  };
+
+  const btn=document.getElementById('btnCurso');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const {error} = id
+    ? await sb.from('cursos').update(payload).eq('id',id)
+    : await sb.from('cursos').insert(payload);
+
+  btn.disabled=false;btn.textContent=id?'Salvar alterações':'Criar curso';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast(id?'Curso atualizado!':'Curso criado!','success');
+  limparFormCurso();
+  await Promise.all([carregarCursos(),carregarCursosTabela(),carregarDashboard()]);
+}
+
+async function carregarCursosTabela(){
+  const [{data:cursos},{data:alunos}] = await Promise.all([
+    sb.from('cursos').select('*').order('nome'),
+    sb.from('estudantes').select('curso_id')
+  ]);
+  const tbody=document.getElementById('tabela-cursos');
+  if(!cursos?.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhum curso cadastrado.</td></tr>';return;}
+
+  tbody.innerHTML=cursos.map((c,i)=>{
+    const qtd=(alunos||[]).filter(a=>a.curso_id===c.id).length;
+    const ativo = c.ativo!==false;
+    return `<tr>
+      <td><strong>${c.nome}</strong>${c.descricao?`<div style="font-size:.72rem;color:var(--gray);">${c.descricao}</div>`:''}</td>
+      <td><span class="badge badge-blue">${c.nivel||'—'}</span></td>
+      <td>${c.duracao||'—'}</td>
+      <td>${qtd}</td>
+      <td><span class="badge badge-${ativo?'green':'gray'}">${ativo?'Ativo':'Inativo'}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-outline btn-sm" onclick="editarCurso(${i})">Editar</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleCurso('${c.id}',${ativo})">${ativo?'Desativar':'Ativar'}</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCurso('${c.id}',${qtd})">Excluir</button>
+      </td>
+    </tr>`;
+  }).join('');
+  cursosCache=cursos;
+}
+
+function editarCurso(idx){
+  const c=cursosCache[idx];
+  document.getElementById('c-id').value=c.id;
+  document.getElementById('c-nome').value=c.nome||'';
+  document.getElementById('c-nivel').value=c.nivel||'Mestrado';
+  document.getElementById('c-duracao').value=c.duracao||'';
+  document.getElementById('c-vagas').value=c.vagas||'';
+  document.getElementById('c-desc').value=c.descricao||'';
+  document.getElementById('c-vmat').value=c.valor_matricula_sugerido||'';
+  document.getElementById('c-vmen').value=c.valor_mensalidade_sugerido||'';
+  document.getElementById('c-qtd').value=c.qtd_mensalidades||26;
+  document.getElementById('curso-form-title').textContent='Editar curso';
+  document.getElementById('btnCurso').textContent='Salvar alterações';
+  document.getElementById('btnCancelarCurso').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function toggleCurso(id,ativoAtual){
+  const {error}=await sb.from('cursos').update({ativo:!ativoAtual}).eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast(ativoAtual?'Curso desativado (some da inscrição).':'Curso ativado.','success');
+  await Promise.all([carregarCursos(),carregarCursosTabela()]);
+}
+
+async function excluirCurso(id,qtdAlunos){
+  if(qtdAlunos>0){
+    toast(`Não é possível excluir: há ${qtdAlunos} aluno(s) neste curso. Desative-o.`,'error');
+    return;
+  }
+  if(!confirm('Excluir este curso? Esta ação não pode ser desfeita.'))return;
+  const {error}=await sb.from('cursos').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Curso excluído.','success');
+  await Promise.all([carregarCursos(),carregarCursosTabela(),carregarDashboard()]);
 }
 
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
