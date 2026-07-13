@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Envio de Documentos — Saint Alcuin of York</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--primary:#0b2a4a;--secondary:#145da0;--text:#2b2b2b;--light:#f5f7fa;--white:#fff;--gray:#6b7280;--border:#dde3ea;--green:#166534;--green-bg:#dcfce7;--red-bg:#fee2e2;--red-text:#991b1b;--yellow-bg:#fef9c3;--yellow-txt:#854d0e;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--light);color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;min-height:100vh;}
+
+    header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+    .header-inner{max-width:1000px;margin:0 auto;padding:0 28px;height:68px;display:flex;align-items:center;justify-content:space-between;}
+    .logo-name{font-size:1rem;font-weight:700;}
+    .logo-sub{font-size:.58rem;opacity:.72;letter-spacing:.12em;text-transform:uppercase;}
+    .link-home{color:rgba(255,255,255,.9);text-decoration:none;font-size:.84rem;font-weight:600;padding:8px 16px;border-radius:6px;border:1.5px solid rgba(255,255,255,.35);transition:all .2s;}
+    .link-home:hover{background:rgba(255,255,255,.15);}
+
+    .wrap{max-width:760px;margin:0 auto;padding:40px 24px 60px;}
+    .card{background:var(--white);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.08);overflow:hidden;margin-bottom:20px;}
+    .card-top{background:linear-gradient(135deg,var(--primary),var(--secondary));padding:22px 28px;color:#fff;}
+    .card-top h1{font-size:1.15rem;font-weight:700;margin-bottom:3px;}
+    .card-top p{font-size:.76rem;opacity:.85;}
+    .card-body{padding:28px;}
+
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;font-size:.76rem;font-weight:600;color:var(--primary);margin-bottom:5px;}
+    .form-group input{width:100%;background:var(--light);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:"Segoe UI",sans-serif;font-size:.88rem;padding:11px 13px;outline:none;transition:all .15s;}
+    .form-group input:focus{border-color:var(--secondary);background:#fff;box-shadow:0 0 0 3px rgba(20,93,160,.1);}
+    .form-group input::placeholder{color:#aab0ba;}
+    #d-codigo{text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+
+    .btn{font-family:"Segoe UI",sans-serif;font-size:.88rem;font-weight:700;padding:12px 24px;border-radius:6px;cursor:pointer;border:none;transition:all .2s;}
+    .btn-primary{background:var(--secondary);color:#fff;width:100%;}
+    .btn-primary:hover{background:#1068b5;}
+    .btn-primary:disabled{opacity:.55;cursor:not-allowed;}
+    .btn-sm{font-size:.76rem;padding:7px 14px;}
+    .btn-outline{background:transparent;color:var(--secondary);border:1.5px solid var(--secondary);}
+    .btn-outline:hover{background:#eef4fb;}
+
+    .erro{display:none;background:var(--red-bg);border:1px solid #fca5a5;color:var(--red-text);font-size:.82rem;padding:11px 14px;border-radius:6px;margin-bottom:14px;}
+    .aviso{background:#eef4fb;border-left:3px solid var(--secondary);padding:14px 16px;border-radius:0 6px 6px 0;font-size:.82rem;color:var(--text);margin-bottom:20px;}
+
+    /* Boas-vindas */
+    .bem-vindo{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:10px;padding:22px 26px;margin-bottom:20px;}
+    .bem-vindo h2{font-size:1.1rem;margin-bottom:3px;}
+    .bem-vindo p{font-size:.82rem;opacity:.9;}
+
+    /* Progresso */
+    .prog-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+    .prog-label{font-size:.82rem;font-weight:600;color:var(--primary);}
+    .prog-pct{font-size:.8rem;color:var(--gray);}
+    .prog-bar{height:8px;background:var(--border);border-radius:6px;overflow:hidden;}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--secondary),var(--green));border-radius:6px;transition:width .5s ease;}
+
+    /* Documentos */
+    .doc{display:flex;align-items:center;gap:16px;padding:16px 18px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:10px;transition:all .2s;background:#fff;}
+    .doc.ok{border-color:#86efac;background:#f7fdf9;}
+    .doc.recusado{border-color:#fca5a5;background:#fffafa;}
+    .doc-icon{font-size:1.6rem;flex-shrink:0;}
+    .doc-info{flex:1;min-width:0;}
+    .doc-nome{font-size:.9rem;font-weight:600;color:var(--primary);}
+    .doc-sub{font-size:.74rem;color:var(--gray);margin-top:1px;}
+    .doc-acao{flex-shrink:0;}
+    .badge{display:inline-block;font-size:.66rem;font-weight:700;padding:3px 10px;border-radius:20px;}
+    .badge-green{background:var(--green-bg);color:var(--green);}
+    .badge-yellow{background:var(--yellow-bg);color:var(--yellow-txt);}
+    .badge-red{background:var(--red-bg);color:var(--red-text);}
+    .badge-gray{background:#f3f4f6;color:var(--gray);}
+    input[type=file]{display:none;}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--primary);color:#fff;padding:12px 22px;border-radius:8px;font-size:.84rem;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:all .3s;z-index:999;}
+    .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+    .toast.success{background:var(--green);}
+    .toast.error{background:#c1121f;}
+
+    .tudo-ok{display:none;text-align:center;padding:26px;background:var(--green-bg);border-radius:10px;margin-top:20px;}
+    .tudo-ok-icon{width:52px;height:52px;border-radius:50%;background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;margin:0 auto 12px;}
+    .tudo-ok h3{color:var(--green);font-size:1.05rem;margin-bottom:5px;}
+    .tudo-ok p{font-size:.84rem;color:#15803d;}
+
+    .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:998;}
+    @media(max-width:600px){.wrap{padding:24px 16px 48px;}.card-body{padding:20px;}.doc{flex-wrap:wrap;}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="logo-name">Saint Alcuin of York</div>
+      <div class="logo-sub">Envio de Documentos</div>
+    </div>
+    <a href="/" class="link-home">← Voltar ao site</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ETAPA 1: ACESSO -->
+  <div id="etapa-acesso">
+    <div class="card">
+      <div class="card-top">
+        <h1>Envio de Documentos</h1>
+        <p>Acesse com o código que você recebeu</p>
+      </div>
+      <div class="card-body">
+        <div class="aviso">
+          Após a aprovação da sua inscrição, enviamos um <strong>código de acesso</strong> pelo WhatsApp.
+          Informe-o abaixo junto com o e-mail que você usou na inscrição.
+        </div>
+        <div class="erro" id="acesso-erro">—</div>
+        <div class="form-group">
+          <label>E-mail da inscrição</label>
+          <input type="email" id="d-email" placeholder="seu@email.com"/>
+        </div>
+        <div class="form-group">
+          <label>Código de acesso</label>
+          <input type="text" id="d-codigo" placeholder="SAY-XXXXXX" onkeydown="if(event.key==='Enter')acessar()"/>
+        </div>
+        <button class="btn btn-primary" id="btn-acessar" onclick="acessar()">Acessar</button>
+        <div style="text-align:center;margin-top:16px;font-size:.78rem;color:var(--gray);">
+          Não recebeu o código? <a href="https://wa.me/75998403658" target="_blank" style="color:var(--secondary);font-weight:600;">Fale conosco</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ETAPA 2: DOCUMENTOS -->
+  <div id="etapa-docs" style="display:none;">
+    <div class="bem-vindo">
+      <h2>Olá, <span id="cand-nome">—</span></h2>
+      <p id="cand-curso">—</p>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="prog-wrap">
+          <div class="prog-label">Documentos enviados</div>
+          <div class="prog-pct" id="prog-pct">0 de 4</div>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+
+        <div class="aviso" style="margin-top:18px;margin-bottom:0;">
+          Envie os documentos abaixo em <strong>PDF, JPG ou PNG</strong> (até 10 MB cada).
+          Você pode reenviar um documento a qualquer momento — o novo substitui o anterior.
+        </div>
+      </div>
+    </div>
+
+    <div id="lista-docs"></div>
+
+    <div class="tudo-ok" id="tudo-ok">
+      <div class="tudo-ok-icon">✓</div>
+      <h3>Documentos enviados!</h3>
+      <p>Nossa equipe vai analisar e entrar em contato pelo WhatsApp.</p>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn btn-outline btn-sm" onclick="sair()">Sair</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<a href="https://wa.me/75998403658" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff"><path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/></svg>
+</a>
+
+<script>
+const SUPA_URL='https://foleplydhwxjyflejfjq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbGVwbHlkaHd4anlmbGVqZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTE2MDIsImV4cCI6MjA5MjcyNzYwMn0.AzBzKl3lEEEt9eOdqJ_xRezohbW1qglPjOvhGSxwpUs';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+// Documentos exigidos
+const DOCS = [
+  { tipo:'rg',                     nome:'RG ou CNH',                icon:'🪪', desc:'Documento de identidade com foto' },
+  { tipo:'cpf',                    nome:'CPF',                      icon:'📇', desc:'Pode estar no mesmo arquivo do RG' },
+  { tipo:'diploma',                nome:'Diploma de Graduação',     icon:'🎓', desc:'Frente e verso' },
+  { tipo:'comprovante_residencia', nome:'Comprovante de Residência',icon:'🏠', desc:'Emitido nos últimos 3 meses' },
+];
+
+const MAX_MB = 10;
+let matricula = null;   // a inscrição do candidato
+let docsEnviados = [];  // documentos já no banco
+
+function toast(msg, tipo=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast '+tipo+' show';
+  setTimeout(()=>el.classList.remove('show'), 3500);
+}
+
+function erroAcesso(msg){
+  const el=document.getElementById('acesso-erro');
+  el.textContent=msg; el.style.display='block';
+}
+
+/* ---------- ETAPA 1: acesso com e-mail + código ---------- */
+async function acessar(){
+  document.getElementById('acesso-erro').style.display='none';
+  const email  = document.getElementById('d-email').value.trim().toLowerCase();
+  const codigo = document.getElementById('d-codigo').value.trim().toUpperCase();
+
+  if(!email || !codigo){ erroAcesso('Informe o e-mail e o código de acesso.'); return; }
+
+  const btn=document.getElementById('btn-acessar');
+  btn.disabled=true; btn.textContent='Verificando...';
+
+  const { data, error } = await sb
+    .from('matriculas')
+    .select('*, cursos(nome, nivel)')
+    .eq('email', email)
+    .eq('codigo_acesso', codigo)
+    .maybeSingle();
+
+  btn.disabled=false; btn.textContent='Acessar';
+
+  if(error || !data){
+    erroAcesso('E-mail ou código incorretos. Confira os dados enviados por WhatsApp.');
+    return;
+  }
+  if(data.status === 'recusado'){
+    erroAcesso('Esta inscrição não está ativa. Fale conosco pelo WhatsApp.');
+    return;
+  }
+
+  matricula = data;
+  sessionStorage.setItem('matricula_id', data.id);
+  await iniciarDocs();
+}
+
+async function iniciarDocs(){
+  document.getElementById('etapa-acesso').style.display='none';
+  document.getElementById('etapa-docs').style.display='block';
+  document.getElementById('cand-nome').textContent  = matricula.nome.split(' ')[0];
+  document.getElementById('cand-curso').textContent = matricula.cursos?.nome || 'Sua inscrição foi aprovada';
+  await carregarDocs();
+}
+
+/* ---------- ETAPA 2: documentos ---------- */
+async function carregarDocs(){
+  const { data } = await sb
+    .from('matricula_documentos')
+    .select('*')
+    .eq('matricula_id', matricula.id);
+  docsEnviados = data || [];
+  renderDocs();
+}
+
+function renderDocs(){
+  const el = document.getElementById('lista-docs');
+
+  el.innerHTML = DOCS.map(d => {
+    const enviado = docsEnviados.find(x => x.tipo === d.tipo);
+    let cls='', badge='', sub=d.desc, acao='';
+
+    if(enviado){
+      if(enviado.status === 'aprovado'){
+        cls=' ok';
+        badge='<span class="badge badge-green">Aprovado</span>';
+        sub=`${enviado.nome_arquivo} · aprovado`;
+        acao='';
+      } else if(enviado.status === 'recusado'){
+        cls=' recusado';
+        badge='<span class="badge badge-red">Recusado</span>';
+        sub= enviado.motivo_recusa ? `Motivo: ${enviado.motivo_recusa}` : 'Reenvie este documento';
+        acao=`<button class="btn btn-outline btn-sm" onclick="escolher('${d.tipo}')">Reenviar</button>`;
+      } else {
+        badge='<span class="badge badge-yellow">Em análise</span>';
+        sub=`${enviado.nome_arquivo} · aguardando análise`;
+        acao=`<button class="btn btn-outline btn-sm" onclick="escolher('${d.tipo}')">Trocar</button>`;
+      }
+    } else {
+      badge='<span class="badge badge-gray">Pendente</span>';
+      acao=`<button class="btn btn-primary btn-sm" style="width:auto;" onclick="escolher('${d.tipo}')">Enviar</button>`;
+    }
+
+    return `
+      <div class="doc${cls}">
+        <div class="doc-icon">${d.icon}</div>
+        <div class="doc-info">
+          <div class="doc-nome">${d.nome} ${badge}</div>
+          <div class="doc-sub">${sub}</div>
+        </div>
+        <div class="doc-acao">${acao}</div>
+        <input type="file" id="file-${d.tipo}" accept=".pdf,.jpg,.jpeg,.png" onchange="enviarArquivo('${d.tipo}', event)"/>
+      </div>`;
+  }).join('');
+
+  // Progresso
+  const total = DOCS.length;
+  const ok = DOCS.filter(d => docsEnviados.some(x => x.tipo === d.tipo && x.status !== 'recusado')).length;
+  document.getElementById('prog-pct').textContent = `${ok} de ${total}`;
+  document.getElementById('prog-fill').style.width = Math.round((ok/total)*100) + '%';
+  document.getElementById('tudo-ok').style.display = (ok === total) ? 'block' : 'none';
+}
+
+function escolher(tipo){
+  document.getElementById('file-' + tipo).click();
+}
+
+async function enviarArquivo(tipo, ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+
+  if(file.size > MAX_MB * 1024 * 1024){
+    toast(`Arquivo muito grande (máx. ${MAX_MB} MB).`, 'error');
+    ev.target.value='';
+    return;
+  }
+
+  toast('Enviando documento...');
+
+  // Nome seguro: sem acentos/espaços
+  const ext  = (file.name.split('.').pop() || 'pdf').toLowerCase();
+  const path = `${matricula.id}/${tipo}_${Date.now()}.${ext}`;
+
+  // 1) Sobe pro Storage (bucket privado)
+  const { error: upErr } = await sb.storage
+    .from('matriculas')
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if(upErr){
+    toast('Falha no envio. Tente novamente.', 'error');
+    console.error('[upload]', upErr);
+    ev.target.value='';
+    return;
+  }
+
+  // 2) Registra/atualiza no banco (1 documento por tipo)
+  const { error: dbErr } = await sb.from('matricula_documentos').upsert({
+    matricula_id: matricula.id,
+    tipo:         tipo,
+    nome_arquivo: file.name,
+    url:          path,     // bucket privado → o admin gera URL assinada
+    path:         path,
+    status:       'enviado',
+    motivo_recusa: null,
+    enviado_em:   new Date().toISOString()
+  }, { onConflict: 'matricula_id,tipo' });
+
+  ev.target.value='';
+
+  if(dbErr){
+    toast('Erro ao registrar o documento.', 'error');
+    console.error('[db]', dbErr);
+    return;
+  }
+
+  toast('Documento enviado!', 'success');
+  await carregarDocs();
+}
+
+function sair(){
+  matricula = null;
+  sessionStorage.removeItem('matricula_id');
+  document.getElementById('etapa-docs').style.display='none';
+  document.getElementById('etapa-acesso').style.display='block';
+  ['d-email','d-codigo'].forEach(id => document.getElementById(id).value='');
+}
+
+/* Restaura sessão (se o candidato recarregar a página) */
+(async function restaurar(){
+  const id = sessionStorage.getItem('matricula_id');
+  if(!id) return;
+  const { data } = await sb.from('matriculas').select('*, cursos(nome, nivel)').eq('id', id).maybeSingle();
+  if(data){ matricula = data; await iniciarDocs(); }
+})();
+</script>
+</body>
+</html>
