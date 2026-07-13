@@ -14,6 +14,8 @@
   <meta property="og:url" content="https://www.universidadsaintalcuin.com/">
   <link rel="canonical" href="https://www.universidadsaintalcuin.com/">
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --primary:   #0b2a4a;
@@ -25,6 +27,8 @@
       --border:    #dde3ea;
       --green:     #166534;
       --green-bg:  #dcfce7;
+      --red-bg:    #fee2e2;
+      --red-text:  #991b1b;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--light); color: var(--text); font-family: "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; }
@@ -113,6 +117,12 @@
     .destaque-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
     .destaque strong { display: block; color: var(--primary); font-size: .86rem; margin-bottom: 1px; }
     .destaque span   { color: var(--gray); font-size: .8rem; }
+    .ja-inscrito {
+      margin-top: 20px; padding: 16px; background: #fff; border-radius: 8px;
+      border: 1px dashed var(--border); font-size: .84rem; color: var(--gray);
+    }
+    .ja-inscrito a { color: var(--secondary); font-weight: 700; text-decoration: none; }
+    .ja-inscrito a:hover { text-decoration: underline; }
 
     /* ── FORM CARD ── */
     .form-card { background: var(--white); border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.1); overflow: hidden; }
@@ -148,6 +158,12 @@
       padding: 13px; border: none; border-radius: 6px; cursor: pointer; transition: all .2s;
     }
     .btn-submit:hover { background: #1068b5; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(20,93,160,.3); }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .form-erro {
+      display: none; background: var(--red-bg); border: 1px solid #fca5a5;
+      color: var(--red-text); font-size: .8rem; padding: 10px 12px;
+      border-radius: 6px; margin-bottom: 12px;
+    }
     .success-box { display: none; text-align: center; padding: 30px 12px; animation: fadeIn .4s ease; }
     @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
     .success-icon {
@@ -293,11 +309,17 @@
       </div>
       <div class="destaque">
         <div class="destaque-icon">🎓</div>
-        <div><strong>8 programas disponíveis</strong><span>Mestrado e Doutorado em 4 áreas do conhecimento</span></div>
+        <div><strong>Mestrado e Doutorado</strong><span>Programas acadêmicos em diversas áreas</span></div>
       </div>
       <div class="destaque">
         <div class="destaque-icon">🌐</div>
         <div><strong>Instituição internacional</strong><span>Saint Alcuin of York Anglican College</span></div>
+      </div>
+
+      <div class="ja-inscrito">
+        <strong style="color:var(--primary);display:block;margin-bottom:4px;">Já se inscreveu e foi aprovado?</strong>
+        Envie seus documentos com o código que recebemos por WhatsApp.
+        <br/><a href="/documentos.html">Enviar documentos →</a>
       </div>
     </div>
 
@@ -309,6 +331,8 @@
         </div>
         <div class="form-card-body">
           <div id="form-wrapper">
+            <div class="form-erro" id="form-erro">—</div>
+
             <div class="form-row">
               <div class="form-group">
                 <label>Nome completo *</label>
@@ -319,24 +343,19 @@
                 <input type="tel" id="f-whats" placeholder="(11) 99999-9999" />
               </div>
             </div>
+
+            <div class="form-group">
+              <label>E-mail *</label>
+              <input type="email" id="f-email" placeholder="seu@email.com" />
+            </div>
+
             <div class="form-group">
               <label>Curso desejado *</label>
               <select id="f-curso">
-                <option value="">Selecione o curso</option>
-                <optgroup label="── Mestrados Acadêmicos (26 meses)">
-                  <option>Mestrado em Saúde Pública</option>
-                  <option>Mestrado em Educação</option>
-                  <option>Mestrado em Psicologia</option>
-                  <option>Mestrado em Antropologia</option>
-                </optgroup>
-                <optgroup label="── Doutorados Acadêmicos (36 meses)">
-                  <option>Doutorado em Saúde Pública</option>
-                  <option>Doutorado em Educação</option>
-                  <option>Doutorado em Psicologia</option>
-                  <option>Doutorado em Antropologia</option>
-                </optgroup>
+                <option value="">Carregando cursos...</option>
               </select>
             </div>
+
             <div class="form-group">
               <label>Graduação (formação atual) *</label>
               <select id="f-grad">
@@ -358,16 +377,19 @@
                 <option>Outra</option>
               </select>
             </div>
+
             <div class="form-group">
               <label>Dúvidas ou mensagem (opcional)</label>
               <textarea id="f-msg" placeholder="Conte sobre sua motivação ou faça perguntas..."></textarea>
             </div>
-            <button class="btn-submit" onclick="enviarInscricao()">Enviar Inscrição →</button>
+
+            <button class="btn-submit" id="btn-enviar" onclick="enviarInscricao()">Enviar Inscrição →</button>
           </div>
+
           <div class="success-box" id="success-box">
             <div class="success-icon">✓</div>
             <div class="success-title">Inscrição enviada com sucesso!</div>
-            <p class="success-sub">Recebemos sua solicitação.<br/>Entraremos em contato pelo <strong>WhatsApp</strong> em breve.</p>
+            <p class="success-sub">Recebemos sua solicitação e ela já está em análise.<br/>Entraremos em contato pelo <strong>WhatsApp</strong> em breve.</p>
             <button class="btn-reset" onclick="resetForm()">Fazer nova inscrição</button>
           </div>
         </div>
@@ -403,34 +425,123 @@
 </a>
 
 <script>
-  function enviarInscricao() {
-    const nome  = document.getElementById('f-nome').value.trim();
-    const whats = document.getElementById('f-whats').value.trim();
-    const curso = document.getElementById('f-curso').value;
-    const grad  = document.getElementById('f-grad').value;
-    const msg   = document.getElementById('f-msg').value.trim();
-    if (!nome || !whats || !curso || !grad) {
-      alert('Por favor, preencha todos os campos obrigatórios (*).');
+  const SUPA_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbGVwbHlkaHd4anlmbGVqZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTE2MDIsImV4cCI6MjA5MjcyNzYwMn0.AzBzKl3lEEEt9eOdqJ_xRezohbW1qglPjOvhGSxwpUs';
+  const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  let cursos = [];
+
+  // Carrega os cursos ATIVOS do banco (gerenciados no painel admin)
+  async function carregarCursos() {
+    const sel = document.getElementById('f-curso');
+    const { data, error } = await sb
+      .from('cursos')
+      .select('id, nome, nivel, duracao')
+      .eq('ativo', true)
+      .order('nivel')
+      .order('nome');
+
+    if (error || !data || !data.length) {
+      sel.innerHTML = '<option value="">Nenhum curso disponível no momento</option>';
       return;
     }
+    cursos = data;
+
+    // Agrupa por nível (Mestrado / Doutorado / ...)
+    const niveis = [...new Set(data.map(c => c.nivel || 'Outros'))];
+    let html = '<option value="">Selecione o curso</option>';
+    niveis.forEach(nivel => {
+      const doNivel = data.filter(c => (c.nivel || 'Outros') === nivel);
+      html += `<optgroup label="── ${nivel}">`;
+      doNivel.forEach(c => {
+        const dur = c.duracao ? ` (${c.duracao})` : '';
+        html += `<option value="${c.id}">${c.nome}${dur}</option>`;
+      });
+      html += '</optgroup>';
+    });
+    sel.innerHTML = html;
+  }
+
+  function mostrarErro(msg) {
+    const el = document.getElementById('form-erro');
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function limparErro() {
+    document.getElementById('form-erro').style.display = 'none';
+  }
+
+  async function enviarInscricao() {
+    limparErro();
+
+    const nome    = document.getElementById('f-nome').value.trim();
+    const whats   = document.getElementById('f-whats').value.trim();
+    const email   = document.getElementById('f-email').value.trim().toLowerCase();
+    const cursoId = document.getElementById('f-curso').value;
+    const grad    = document.getElementById('f-grad').value;
+    const msg     = document.getElementById('f-msg').value.trim();
+
+    if (!nome || !whats || !email || !cursoId || !grad) {
+      mostrarErro('Por favor, preencha todos os campos obrigatórios (*).');
+      return;
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      mostrarErro('Informe um e-mail válido.');
+      return;
+    }
+
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    // 1) Registra a inscrição no banco (aparece no painel da coordenação)
+    const { error } = await sb.from('matriculas').insert({
+      nome:      nome,
+      email:     email,
+      telefone:  whats,
+      curso_id:  cursoId,
+      formacao:  grad,
+      observacao_admin: msg || null,
+      status:    'inscrito'
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Enviar Inscrição →';
+
+    if (error) {
+      mostrarErro('Não foi possível enviar agora. Tente novamente ou fale conosco pelo WhatsApp.');
+      console.error('[inscricao]', error);
+      return;
+    }
+
+    // 2) Abre o WhatsApp com a mensagem (fluxo que já funcionava)
+    const curso = cursos.find(c => c.id === cursoId);
     const texto =
       '\u{1F4CB} *Nova Inscri\u00E7\u00E3o \u2014 Saint Alcuin of York*\n\n' +
       '\u{1F464} *Nome:* ' + nome + '\n' +
       '\u{1F4F1} *WhatsApp:* ' + whats + '\n' +
-      '\u{1F393} *Curso:* ' + curso + '\n' +
+      '\u2709\uFE0F *E-mail:* ' + email + '\n' +
+      '\u{1F393} *Curso:* ' + (curso ? curso.nome : '') + '\n' +
       '\u{1F4DA} *Gradua\u00E7\u00E3o:* ' + grad +
       (msg ? '\n\u{1F4AC} *Mensagem:* ' + msg : '');
     const url = 'https://wa.me/75998403658?text=' + encodeURIComponent(texto);
     window.open(url, '_blank');
+
+    // 3) Tela de sucesso
     document.getElementById('form-wrapper').style.display = 'none';
     document.getElementById('success-box').style.display  = 'block';
   }
+
   function resetForm() {
-    ['f-nome','f-whats','f-msg'].forEach(id => document.getElementById(id).value = '');
+    ['f-nome','f-whats','f-email','f-msg'].forEach(id => document.getElementById(id).value = '');
     ['f-curso','f-grad'].forEach(id => document.getElementById(id).value = '');
+    limparErro();
     document.getElementById('form-wrapper').style.display = 'block';
     document.getElementById('success-box').style.display  = 'none';
   }
+
+  carregarCursos();
 </script>
 </body>
 </html>
