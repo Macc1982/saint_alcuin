@@ -39,14 +39,20 @@
   .nav-item:hover{background:#eef4fb;color:var(--secondary);}
   .nav-item.active{background:#eef4fb;color:var(--secondary);border-left-color:var(--secondary);font-weight:600;}
   .nav-badge{margin-left:auto;font-size:.6rem;background:var(--secondary);color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;}
+  .nav-badge.alerta{background:#c1121f;}
   .dash-main{padding:32px 36px;overflow-y:auto;}
   .tab-content{display:none;}.tab-content.active{display:block;}
   .page-title{font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:4px;}
   .page-sub{font-size:.8rem;color:var(--gray);margin-bottom:24px;}
   .card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:24px;margin-bottom:20px;}
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+  .stats-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
   .stat-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:18px 22px;border-top:3px solid var(--secondary);}
+  .stat-card.green{border-top-color:var(--green);}
+  .stat-card.red{border-top-color:#c1121f;}
+  .stat-card.yellow{border-top-color:#d97706;}
   .stat-value{font-size:1.8rem;font-weight:700;color:var(--primary);line-height:1;margin-bottom:4px;}
+  .stat-value.sm{font-size:1.15rem;}
   .stat-label{font-size:.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;}
   .welcome-card{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border-radius:8px;padding:24px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;}
   .welcome-card h2{font-size:1.2rem;margin-bottom:4px;}
@@ -71,10 +77,14 @@
   .data-table td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:.82rem;}
   .data-table tr:last-child td{border-bottom:none;}
   .data-table tbody tr:hover td{background:#f8fafc;}
+  .data-table tr.proxima td{background:#eef4fb;}
+  .data-table tr.proxima td:first-child{border-left:3px solid var(--secondary);}
   .badge{display:inline-block;font-size:.65rem;font-weight:600;padding:2px 9px;border-radius:20px;}
   .badge-green{background:var(--green-bg);color:var(--green);}
   .badge-yellow{background:var(--yellow-bg);color:var(--yellow-txt);}
   .badge-red{background:var(--red-bg);color:var(--red-text);}
+  .badge-blue{background:#dbeafe;color:#1e40af;}
+  .badge-gray{background:#f3f4f6;color:var(--gray);}
   .nota-header{display:flex;align-items:center;gap:24px;margin-bottom:24px;}
   .nota-ring{width:86px;height:86px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--secondary) 0% 80%,var(--border) 80% 100%);display:flex;align-items:center;justify-content:center;position:relative;}
   .nota-ring::before{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--white);}
@@ -87,9 +97,16 @@
   .decl-sub{font-size:.7rem;color:var(--gray);margin-top:2px;}
   .loading{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   .empty{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
+  /* ---- Financeiro ---- */
+  .valor{font-variant-numeric:tabular-nums;font-weight:600;}
+  .valor-pago{color:var(--green);}
+  .fin-progress{height:8px;background:var(--border);border-radius:6px;overflow:hidden;margin-top:10px;}
+  .fin-progress-bar{height:100%;background:linear-gradient(90deg,var(--secondary),var(--green));border-radius:6px;transition:width .6s ease;}
+  .fin-alerta{background:var(--red-bg);border-left:3px solid #c1121f;color:var(--red-text);padding:12px 16px;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:18px;display:none;}
+  .fin-prox{background:#eef4fb;border-left:3px solid var(--secondary);padding:12px 16px;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:18px;display:none;}
   .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:999;transition:transform .2s;}
   .whatsapp-float:hover{transform:scale(1.08);}
-  @media(max-width:860px){.dash-body{grid-template-columns:1fr;}.sidebar{display:none;}.dash-main{padding:20px 16px;}.stats-row{grid-template-columns:1fr 1fr;}.welcome-card{flex-direction:column;gap:12px;align-items:flex-start;}}
+  @media(max-width:860px){.dash-body{grid-template-columns:1fr;}.sidebar{display:none;}.dash-main{padding:20px 16px;}.stats-row,.stats-row-4{grid-template-columns:1fr 1fr;}.welcome-card{flex-direction:column;gap:12px;align-items:flex-start;}}
 </style>
 </head>
 <body>
@@ -133,6 +150,8 @@
       <div class="nav-label">Acadêmico</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)">◈ &nbsp;Disciplinas</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
+      <div class="nav-label">Financeiro</div>
+      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
       <div class="nav-label">Documentos</div>
       <div class="nav-item" onclick="showTab('declaracoes',this)">☰ &nbsp;Declarações</div>
     </nav>
@@ -154,7 +173,7 @@
           <div class="quick-card" onclick="showTab('materiais',null)"><div class="quick-icon">📄</div><div class="quick-label">Biblioteca</div><div class="quick-title">Materiais PDF</div><span class="quick-link">Acessar →</span></div>
           <div class="quick-card" onclick="showTab('aulas',null)"><div class="quick-icon">▶</div><div class="quick-label">Videoaulas</div><div class="quick-title">Aulas gravadas</div><span class="quick-link">Assistir →</span></div>
           <div class="quick-card" onclick="showTab('notas',null)"><div class="quick-icon">◎</div><div class="quick-label">Desempenho</div><div class="quick-title">Minhas notas</div><span class="quick-link">Ver →</span></div>
-          <div class="quick-card" onclick="showTab('declaracoes',null)"><div class="quick-icon">📋</div><div class="quick-label">Documentos</div><div class="quick-title">Declarações</div><span class="quick-link">Emitir →</span></div>
+          <div class="quick-card" onclick="showTab('financeiro',null)"><div class="quick-icon">💰</div><div class="quick-label">Financeiro</div><div class="quick-title">Meus pagamentos</div><span class="quick-link">Ver →</span></div>
         </div>
       </div>
 
@@ -205,6 +224,44 @@
         </div>
       </div>
 
+      <!-- ============ FINANCEIRO (NOVO) ============ -->
+      <div class="tab-content" id="tab-financeiro">
+        <div class="page-title">Meus Pagamentos</div>
+        <div class="page-sub">Matrícula e mensalidades do seu curso</div>
+
+        <div class="fin-alerta" id="fin-alerta">—</div>
+        <div class="fin-prox" id="fin-prox">—</div>
+
+        <div class="stats-row-4">
+          <div class="stat-card"><div class="stat-value sm" id="al-fin-total">—</div><div class="stat-label">Valor total</div></div>
+          <div class="stat-card green"><div class="stat-value sm" id="al-fin-pago">—</div><div class="stat-label">Já pago</div></div>
+          <div class="stat-card yellow"><div class="stat-value sm" id="al-fin-aberto">—</div><div class="stat-label">Em aberto</div></div>
+          <div class="stat-card"><div class="stat-value sm" id="al-fin-parcelas">—</div><div class="stat-label">Parcelas pagas</div></div>
+        </div>
+
+        <div class="card" id="fin-plano-card" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div style="font-size:.86rem;font-weight:600;color:var(--primary);">Progresso do pagamento</div>
+            <div style="font-size:.8rem;color:var(--gray);" id="fin-pct">0%</div>
+          </div>
+          <div style="font-size:.76rem;color:var(--gray);" id="fin-plano-desc">—</div>
+          <div class="fin-progress"><div class="fin-progress-bar" id="fin-bar" style="width:0%"></div></div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>#</th><th>Tipo</th><th>Vencimento</th><th>Valor</th><th>Situação</th><th>Pago em</th></tr>
+            </thead>
+            <tbody id="lista-parcelas"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+
+        <div style="margin-top:16px;font-size:.76rem;color:var(--gray);text-align:center;">
+          Dúvidas sobre pagamentos? <a href="https://wa.me/75998403658" target="_blank" style="color:var(--secondary);font-weight:600;">Fale com a coordenação</a>
+        </div>
+      </div>
+
       <!-- DECLARAÇÕES -->
       <div class="tab-content" id="tab-declaracoes">
         <div class="page-title">Declarações</div>
@@ -246,6 +303,17 @@ function showTab(name,navEl){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   if(navEl){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));navEl.classList.add('active');}
+}
+
+/* utilidades */
+function brl(v){
+  const n=Number(v||0);
+  return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+function dataBR(iso){
+  if(!iso) return '—';
+  const [y,m,d]=String(iso).slice(0,10).split('-');
+  return `${d}/${m}/${y}`;
 }
 
 async function fazerLogin(){
@@ -290,7 +358,7 @@ function iniciarDashboard(){
   document.getElementById('welcome-info').textContent='Matrícula: '+(estudante.matricula||'—')+' · '+(estudante.cursos?.nome||'—')+' · Status: Ativo';
   showScreen('screen-dashboard');
   showTab('home',document.querySelector('.nav-item'));
-  Promise.all([carregarMateriais(),carregarDisciplinas(),carregarNotas()]);
+  Promise.all([carregarMateriais(),carregarDisciplinas(),carregarNotas(),carregarFinanceiro()]);
 }
 
 async function carregarMateriais(){
@@ -330,6 +398,92 @@ async function carregarNotas(){
     const m=n.media||0;
     const[cls,sit]=m>=7?['badge-green','Aprovado']:m>=5?['badge-yellow','Recuperação']:['badge-red','Reprovado'];
     return`<tr><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+  }).join('');
+}
+
+/* ==========================================================================
+   FINANCEIRO — matrícula + mensalidades (pagas e em aberto)
+   ========================================================================== */
+async function carregarFinanceiro(){
+  if(!estudante)return;
+
+  const [{data:parcelas},{data:cfg}] = await Promise.all([
+    sb.from('vw_financeiro_parcelas').select('*').eq('aluno_id',estudante.id).order('vencimento'),
+    sb.from('financeiro_config').select('*').eq('aluno_id',estudante.id).maybeSingle()
+  ]);
+
+  const tbody=document.getElementById('lista-parcelas');
+  const alerta=document.getElementById('fin-alerta');
+  const prox=document.getElementById('fin-prox');
+  const planoCard=document.getElementById('fin-plano-card');
+
+  if(!parcelas || parcelas.length===0){
+    tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhuma parcela cadastrada. Fale com a coordenação.</td></tr>';
+    ['al-fin-total','al-fin-pago','al-fin-aberto','al-fin-parcelas'].forEach(id=>document.getElementById(id).textContent='—');
+    return;
+  }
+
+  // Resumo
+  const total   = parcelas.reduce((s,p)=>s+Number(p.valor||0),0);
+  const pago    = parcelas.filter(p=>p.status==='pago').reduce((s,p)=>s+Number(p.valor_pago||0),0);
+  const aberto  = parcelas.filter(p=>p.status==='aberto').reduce((s,p)=>s+Number(p.valor||0),0);
+  const qtdPagas= parcelas.filter(p=>p.status==='pago').length;
+  const atrasadas = parcelas.filter(p=>p.situacao==='atrasado');
+
+  document.getElementById('al-fin-total').textContent    = brl(total);
+  document.getElementById('al-fin-pago').textContent     = brl(pago);
+  document.getElementById('al-fin-aberto').textContent   = brl(aberto);
+  document.getElementById('al-fin-parcelas').textContent = qtdPagas+' / '+parcelas.length;
+
+  // Progresso
+  const pct = total>0 ? Math.round((pago/total)*100) : 0;
+  document.getElementById('fin-pct').textContent = pct+'%';
+  document.getElementById('fin-bar').style.width = pct+'%';
+  if(cfg){
+    document.getElementById('fin-plano-desc').innerHTML =
+      `Matrícula de <strong>${brl(cfg.valor_matricula)}</strong> + <strong>${cfg.qtd_mensalidades}</strong> mensalidades de <strong>${brl(cfg.valor_mensalidade)}</strong> · vencimento todo dia <strong>${cfg.dia_vencimento}</strong>`;
+    planoCard.style.display='block';
+  }
+
+  // Alerta de atraso
+  if(atrasadas.length){
+    alerta.style.display='block';
+    alerta.innerHTML = `<strong>Atenção:</strong> você tem ${atrasadas.length} parcela${atrasadas.length>1?'s':''} em atraso. Regularize para manter seu acesso ativo.`;
+    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
+  } else {
+    alerta.style.display='none';
+    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos';
+  }
+
+  // Próxima a vencer (em aberto, não atrasada, mais próxima)
+  const proxima = parcelas
+    .filter(p=>p.situacao==='aberto')
+    .sort((a,b)=>a.vencimento.localeCompare(b.vencimento))[0];
+  if(proxima){
+    prox.style.display='block';
+    const dias = proxima.dias_para_vencer;
+    const quando = dias===0 ? 'vence hoje' : dias===1 ? 'vence amanhã' : `vence em ${dias} dias`;
+    prox.innerHTML = `<strong>Próxima parcela:</strong> ${proxima.tipo==='matricula'?'Matrícula':'Mensalidade nº '+proxima.numero} · ${brl(proxima.valor)} · ${dataBR(proxima.vencimento)} (${quando})`;
+  } else {
+    prox.style.display='none';
+  }
+
+  // Tabela
+  tbody.innerHTML = parcelas.map(p=>{
+    const sit=p.situacao;
+    const cls = sit==='pago'?'badge-green':sit==='atrasado'?'badge-red':sit==='cancelado'?'badge-gray':'badge-yellow';
+    const lbl = sit==='pago'?'Pago':sit==='atrasado'?'Atrasado':sit==='cancelado'?'Cancelado':'Em aberto';
+    const tipoLbl = p.tipo==='matricula'?'Matrícula':'Mensalidade';
+    const numLbl  = p.tipo==='matricula'?'—':p.numero;
+    const destaque = (proxima && p.id===proxima.id) ? ' class="proxima"' : '';
+    return `<tr${destaque}>
+      <td>${numLbl}</td>
+      <td><span class="badge badge-${p.tipo==='matricula'?'blue':'gray'}">${tipoLbl}</span></td>
+      <td>${dataBR(p.vencimento)}</td>
+      <td class="valor">${brl(p.valor)}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td class="${p.data_pagamento?'valor-pago':''}">${dataBR(p.data_pagamento)}</td>
+    </tr>`;
   }).join('');
 }
 
