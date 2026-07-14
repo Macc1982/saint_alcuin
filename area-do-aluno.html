@@ -104,6 +104,15 @@
   .fin-progress-bar{height:100%;background:linear-gradient(90deg,var(--secondary),var(--green));border-radius:6px;transition:width .6s ease;}
   .fin-alerta{background:var(--red-bg);border-left:3px solid #c1121f;color:var(--red-text);padding:12px 16px;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:18px;display:none;}
   .fin-prox{background:#eef4fb;border-left:3px solid var(--secondary);padding:12px 16px;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:18px;display:none;}
+  /* ---- Avatar (foto de perfil) ---- */
+  .avatar-wrap{position:relative;width:38px;height:38px;flex-shrink:0;cursor:pointer;}
+  .avatar-img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.5);display:block;}
+  .avatar-ini{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;}
+  .avatar-cam{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;font-size:.85rem;opacity:0;transition:opacity .18s;}
+  .avatar-wrap:hover .avatar-cam{opacity:1;}
+  .avatar-load{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;font-size:.65rem;color:#fff;font-weight:600;}
+  .avatar-load.on{display:flex;}
+
   /* ---- Grupos por disciplina ---- */
   .grupo-card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:16px;overflow:hidden;}
   .grupo-head{background:var(--light);padding:14px 20px;border-bottom:1px solid var(--border);}
@@ -169,7 +178,14 @@
         <div style="font-size:.84rem;font-weight:600;" id="dash-name">—</div>
         <div style="font-size:.65rem;opacity:.78;" id="dash-course">—</div>
       </div>
-      <div id="dash-avatar" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-weight:700;">—</div>
+
+      <div class="avatar-wrap" onclick="escolherAvatar()" title="Clique para trocar sua foto">
+        <div id="dash-avatar" class="avatar-ini">—</div>
+        <div class="avatar-cam">📷</div>
+        <div class="avatar-load" id="avatar-load">…</div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" onchange="enviarAvatar(event)"/>
+
       <button class="btn btn-danger" onclick="fazerLogout()">Sair</button>
     </div>
   </header>
@@ -406,7 +422,7 @@ function iniciarDashboard(){
   if(!estudante)return;
   document.getElementById('dash-name').textContent=estudante.nome;
   document.getElementById('dash-course').textContent=estudante.cursos?.nome||'—';
-  document.getElementById('dash-avatar').textContent=estudante.nome.charAt(0).toUpperCase();
+  renderAvatar();
   document.getElementById('welcome-name').textContent=estudante.nome.split(' ')[0];
   document.getElementById('welcome-info').textContent='Matrícula: '+(estudante.matricula||'—')+' · '+(estudante.cursos?.nome||'—')+' · Status: Ativo';
   showScreen('screen-dashboard');
@@ -415,6 +431,83 @@ function iniciarDashboard(){
     carregarMateriais(), carregarDisciplinas(), carregarNotas(),
     carregarFinanceiro(), carregarAtividades(), carregarProgresso()
   ]);
+}
+
+/* ==========================================================================
+   AVATAR — foto de perfil (o aluno sobe a própria)
+   ========================================================================== */
+const MAX_MB_AVATAR = 5;
+
+function renderAvatar(){
+  const el=document.getElementById('dash-avatar');
+  if(estudante?.avatar_url){
+    el.outerHTML = '<img id="dash-avatar" class="avatar-img" src="'+estudante.avatar_url+'?t='+Date.now()+'" alt="Foto de perfil"/>';
+  } else {
+    el.outerHTML = '<div id="dash-avatar" class="avatar-ini">'+(estudante?.nome?.charAt(0).toUpperCase()||'—')+'</div>';
+  }
+}
+
+function escolherAvatar(){
+  document.getElementById('avatarInput').click();
+}
+
+async function enviarAvatar(ev){
+  const file=ev.target.files[0];
+  if(!file || !estudante) return;
+
+  if(!file.type.startsWith('image/')){
+    toast('Selecione uma imagem (JPG ou PNG).','error');
+    ev.target.value=''; return;
+  }
+  if(file.size > MAX_MB_AVATAR*1024*1024){
+    toast('Imagem muito grande (máx. '+MAX_MB_AVATAR+' MB).','error');
+    ev.target.value=''; return;
+  }
+
+  document.getElementById('avatar-load').classList.add('on');
+
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=estudante.id+'/perfil_'+Date.now()+'.'+ext;
+
+  // 1) sobe a nova imagem
+  const {error:upErr}=await sb.storage.from('avatares')
+    .upload(path,file,{upsert:true,contentType:file.type});
+
+  if(upErr){
+    document.getElementById('avatar-load').classList.remove('on');
+    toast('Não foi possível enviar a foto.','error');
+    console.error('[avatar]',upErr);
+    ev.target.value=''; return;
+  }
+
+  const {data:pub}=sb.storage.from('avatares').getPublicUrl(path);
+
+  // 2) grava no cadastro do aluno
+  const antigo = estudante.avatar_path;
+  const {error:dbErr}=await sb.from('estudantes')
+    .update({avatar_url: pub.publicUrl, avatar_path: path})
+    .eq('id', estudante.id);
+
+  document.getElementById('avatar-load').classList.remove('on');
+  ev.target.value='';
+
+  if(dbErr){
+    toast('Erro ao salvar a foto.','error');
+    console.error('[avatar db]',dbErr);
+    return;
+  }
+
+  // 3) remove a foto antiga do storage (limpeza)
+  if(antigo && antigo !== path){
+    sb.storage.from('avatares').remove([antigo]).catch(()=>{});
+  }
+
+  // 4) atualiza a sessão e a tela
+  estudante.avatar_url  = pub.publicUrl;
+  estudante.avatar_path = path;
+  sessionStorage.setItem('estudante', JSON.stringify(estudante));
+  renderAvatar();
+  toast('Foto atualizada!','success');
 }
 
 function toast(msg,tipo=''){
