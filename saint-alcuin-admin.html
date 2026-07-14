@@ -376,23 +376,36 @@
 
       <!-- DISCIPLINAS -->
       <div class="tab" id="tab-disciplinas">
-        <div class="page-title">Disciplinas</div><div class="page-sub">Por curso</div>
+        <div class="page-title">Disciplinas</div>
+        <div class="page-sub">Criar, editar e lançar notas da turma</div>
+
         <div class="card">
-          <div class="card-header"><div class="card-title">Adicionar disciplina</div></div>
+          <div class="card-header"><div class="card-title" id="disc-form-title">Nova disciplina</div></div>
+          <input type="hidden" id="d-id"/>
           <div class="form-row">
             <div class="form-group"><label>Nome *</label><input type="text" id="d-nome" placeholder="Nome da disciplina"/></div>
             <div class="form-group"><label>Curso *</label><select id="d-curso"><option value="">Selecione</option></select></div>
           </div>
-          <div class="form-row">
+          <div class="form-row-3">
             <div class="form-group"><label>Professor</label><input type="text" id="d-prof" placeholder="Nome do professor"/></div>
-            <div class="form-group"><label>Carga Horária</label><input type="number" id="d-ch" placeholder="Ex: 60"/></div>
+            <div class="form-group"><label>Carga horária</label><input type="number" id="d-ch" placeholder="Ex: 60"/></div>
+            <div class="form-group"><label>Semestre</label><input type="text" id="d-sem" placeholder="Ex: 2026/1"/></div>
           </div>
-          <button class="btn btn-primary" onclick="adicionarDisciplina()">Adicionar Disciplina</button>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-primary" onclick="salvarDisciplina()" id="btnDisc">Adicionar disciplina</button>
+            <button class="btn btn-outline" onclick="limparFormDisc()" id="btnCancelarDisc" style="display:none;">Cancelar edição</button>
+          </div>
         </div>
+
+        <div class="form-group" style="max-width:280px;margin-bottom:16px;">
+          <label>Filtrar por curso</label>
+          <select id="filtro-curso-disc" onchange="carregarDisciplinas()"><option value="">Todos</option></select>
+        </div>
+
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Disciplina</th><th>Curso</th><th>Professor</th><th>Carga</th></tr></thead>
-            <tbody id="tabela-disciplinas"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody>
+            <thead><tr><th>Disciplina</th><th>Curso</th><th>Professor</th><th>Carga</th><th>Semestre</th><th>Notas</th><th></th></tr></thead>
+            <tbody id="tabela-disciplinas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -402,6 +415,37 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MODAL: TURMA — LANÇAR NOTAS DE TODOS OS ALUNOS -->
+<div class="modal-bg" id="modal-turma">
+  <div class="modal-box" style="max-width:860px;max-height:88vh;overflow-y:auto;">
+    <div class="modal-title" id="turma-disc">—</div>
+    <div class="modal-sub" id="turma-sub">—</div>
+
+    <div class="fin-hint">
+      Lance as notas da turma inteira. A <strong>média</strong> é calculada automaticamente
+      (N1 + N2 + Trabalho) ÷ 3 — e só aparece quando as três notas estiverem preenchidas.
+      Alunos sem nota lançada ficam em branco.
+    </div>
+
+    <div class="table-wrap" style="margin-bottom:16px;">
+      <table class="data-table">
+        <thead>
+          <tr><th>Aluno</th><th style="width:90px;">N1</th><th style="width:90px;">N2</th><th style="width:90px;">Trabalho</th><th style="width:80px;">Média</th><th style="width:110px;">Situação</th></tr>
+        </thead>
+        <tbody id="turma-alunos"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;">
+      <div style="font-size:.78rem;color:var(--gray);" id="turma-info">—</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="fecharModal('modal-turma')">Fechar</button>
+        <button class="btn btn-primary" onclick="salvarNotasTurma()" id="btnSalvarTurma">Salvar todas as notas</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL: DETALHE DA MATRÍCULA + DOCUMENTOS -->
 <div class="modal-bg" id="modal-matricula">
@@ -949,15 +993,6 @@ async function excluirMaterial(id){
   await carregarMateriais();
 }
 
-async function carregarDisciplinas(){
-  const{data}=await sb.from('disciplinas').select('*,cursos(nome)').order('nome');
-  discCache=data||[];
-  const tbody=document.getElementById('tabela-disciplinas');
-  if(!data?.length){tbody.innerHTML='<tr><td colspan="4" class="empty">Nenhuma disciplina.</td></tr>';return;}
-  tbody.innerHTML=data.map(d=>`
-    <tr><td>${d.nome}</td><td>${d.cursos?.nome||'—'}</td><td>${d.professor||'—'}</td><td>${d.carga_horaria?d.carga_horaria+'h':'—'}</td></tr>`).join('');
-}
-
 function onAlunoChange(){
   const alunoId=document.getElementById('n-aluno').value;
   const aluno=alunosCache.find(a=>a.id===alunoId);
@@ -1004,17 +1039,217 @@ async function carregarNotas(){
   }).join('');
 }
 
-async function adicionarDisciplina(){
+/* ==========================================================================
+   DISCIPLINAS — CRUD + lançamento de notas da turma
+   ========================================================================== */
+let turmaAtual=null, turmaAlunos=[];
+
+async function carregarDisciplinas(){
+  const filtro=document.getElementById('filtro-curso-disc')?.value;
+  let q=sb.from('disciplinas').select('*,cursos(nome)').order('nome');
+  if(filtro) q=q.eq('curso_id',filtro);
+  const {data}=await q;
+  discCache=data||[];
+
+  // conta quantas notas cada disciplina já tem
+  const {data:notas}=await sb.from('notas').select('disciplina_id,media');
+
+  const tbody=document.getElementById('tabela-disciplinas');
+  if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma disciplina.</td></tr>';return;}
+
+  tbody.innerHTML=data.map((d,i)=>{
+    const doDisc=(notas||[]).filter(n=>n.disciplina_id===d.id);
+    const comMedia=doDisc.filter(n=>n.media!==null).length;
+    return `<tr>
+      <td><strong>${d.nome}</strong></td>
+      <td>${d.cursos?.nome||'—'}</td>
+      <td>${d.professor||'—'}</td>
+      <td>${d.carga_horaria?d.carga_horaria+'h':'—'}</td>
+      <td>${d.semestre||'—'}</td>
+      <td>${doDisc.length? `<span class="badge badge-green">${comMedia}/${doDisc.length} c/ média</span>` : '<span class="badge badge-gray">Sem notas</span>'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-primary btn-sm" onclick="abrirTurma(${i})">Lançar notas</button>
+        <button class="btn btn-outline btn-sm" onclick="editarDisciplina(${i})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirDisciplina('${d.id}','${(d.nome||'').replace(/'/g,'')}')">Excluir</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // popula o filtro de curso
+  const f=document.getElementById('filtro-curso-disc');
+  if(f && f.options.length<=1){
+    cursosCache.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.nome;f.appendChild(o);});
+  }
+}
+
+function limparFormDisc(){
+  ['d-id','d-nome','d-prof','d-ch','d-sem'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('d-curso').value='';
+  document.getElementById('disc-form-title').textContent='Nova disciplina';
+  document.getElementById('btnDisc').textContent='Adicionar disciplina';
+  document.getElementById('btnCancelarDisc').style.display='none';
+}
+
+async function salvarDisciplina(){
+  const id=document.getElementById('d-id').value;
   const nome=document.getElementById('d-nome').value.trim();
   const curso_id=document.getElementById('d-curso').value;
-  const prof=document.getElementById('d-prof').value.trim();
-  const ch=document.getElementById('d-ch').value;
-  if(!nome||!curso_id){toast('Nome e curso obrigatórios.','error');return;}
-  await sb.from('disciplinas').insert({nome,curso_id,professor:prof||null,carga_horaria:ch||null,semestre:'2024/2'});
-  toast('Disciplina adicionada!','success');
-  ['d-nome','d-prof','d-ch'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('d-curso').value='';
+  if(!nome||!curso_id){toast('Nome e curso são obrigatórios.','error');return;}
+
+  const payload={
+    nome, curso_id,
+    professor:     document.getElementById('d-prof').value.trim()||null,
+    carga_horaria: parseInt(document.getElementById('d-ch').value,10)||null,
+    semestre:      document.getElementById('d-sem').value.trim()||null,
+  };
+
+  const btn=document.getElementById('btnDisc');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const {error} = id
+    ? await sb.from('disciplinas').update(payload).eq('id',id)
+    : await sb.from('disciplinas').insert(payload);
+
+  btn.disabled=false;btn.textContent=id?'Salvar alterações':'Adicionar disciplina';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast(id?'Disciplina atualizada!':'Disciplina adicionada!','success');
+  limparFormDisc();
   await carregarDisciplinas();
+}
+
+function editarDisciplina(idx){
+  const d=discCache[idx];
+  document.getElementById('d-id').value=d.id;
+  document.getElementById('d-nome').value=d.nome||'';
+  document.getElementById('d-curso').value=d.curso_id||'';
+  document.getElementById('d-prof').value=d.professor||'';
+  document.getElementById('d-ch').value=d.carga_horaria||'';
+  document.getElementById('d-sem').value=d.semestre||'';
+  document.getElementById('disc-form-title').textContent='Editar disciplina';
+  document.getElementById('btnDisc').textContent='Salvar alterações';
+  document.getElementById('btnCancelarDisc').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function excluirDisciplina(id,nome){
+  if(!confirm(`Excluir a disciplina "${nome}"?\n\nAs notas lançadas nela também serão removidas.`))return;
+  const {error}=await sb.from('disciplinas').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Disciplina excluída.','success');
+  await Promise.all([carregarDisciplinas(),carregarNotas()]);
+}
+
+/* ---------- TURMA: lançar notas de todos os alunos ---------- */
+async function abrirTurma(idx){
+  const d=discCache[idx];
+  turmaAtual=d;
+
+  document.getElementById('turma-disc').textContent=d.nome;
+  document.getElementById('turma-sub').textContent=
+    `${d.cursos?.nome||'—'}${d.professor?' · Prof. '+d.professor:''}${d.semestre?' · '+d.semestre:''}`;
+
+  // Alunos do curso desta disciplina + notas já lançadas
+  const [{data:alunos},{data:notas}] = await Promise.all([
+    sb.from('estudantes').select('id,nome,matricula').eq('curso_id',d.curso_id).eq('status','ativo').order('nome'),
+    sb.from('notas').select('*').eq('disciplina_id',d.id)
+  ]);
+
+  turmaAlunos = (alunos||[]).map(a=>{
+    const n=(notas||[]).find(x=>x.aluno_id===a.id);
+    return {
+      ...a,
+      nota1: n?.nota1 ?? '',
+      nota2: n?.nota2 ?? '',
+      trabalho: n?.trabalho ?? '',
+      media: n?.media ?? null,
+    };
+  });
+
+  renderTurma();
+  abrirModal('modal-turma');
+}
+
+function renderTurma(){
+  const tbody=document.getElementById('turma-alunos');
+  if(!turmaAlunos.length){
+    tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhum aluno ativo neste curso.</td></tr>';
+    document.getElementById('turma-info').textContent='';
+    return;
+  }
+
+  tbody.innerHTML=turmaAlunos.map((a,i)=>{
+    const m=a.media;
+    const [cls,sit] = (m===null||m==='') ? ['badge-gray','—']
+      : m>=7 ? ['badge-green','Aprovado']
+      : m>=5 ? ['badge-yellow','Recuperação']
+      : ['badge-red','Reprovado'];
+    return `<tr>
+      <td><strong>${a.nome}</strong>${a.matricula?`<div style="font-size:.7rem;color:var(--gray);">${a.matricula}</div>`:''}</td>
+      <td><input type="number" min="0" max="10" step="0.1" value="${a.nota1}" oninput="onNotaTurma(${i},'nota1',this.value)" style="padding:6px 8px;font-size:.82rem;"/></td>
+      <td><input type="number" min="0" max="10" step="0.1" value="${a.nota2}" oninput="onNotaTurma(${i},'nota2',this.value)" style="padding:6px 8px;font-size:.82rem;"/></td>
+      <td><input type="number" min="0" max="10" step="0.1" value="${a.trabalho}" oninput="onNotaTurma(${i},'trabalho',this.value)" style="padding:6px 8px;font-size:.82rem;"/></td>
+      <td><strong id="turma-media-${i}">${m ?? '—'}</strong></td>
+      <td><span class="badge ${cls}" id="turma-sit-${i}">${sit}</span></td>
+    </tr>`;
+  }).join('');
+
+  const comNota=turmaAlunos.filter(a=>a.media!==null&&a.media!=='').length;
+  document.getElementById('turma-info').textContent=
+    `${turmaAlunos.length} aluno(s) · ${comNota} com média lançada`;
+}
+
+function onNotaTurma(i,campo,valor){
+  const a=turmaAlunos[i];
+  a[campo] = valor==='' ? '' : parseFloat(valor);
+
+  // média só quando as 3 estão preenchidas
+  const n1=a.nota1, n2=a.nota2, t=a.trabalho;
+  const temTodas = n1!=='' && n2!=='' && t!=='' && !isNaN(n1) && !isNaN(n2) && !isNaN(t);
+  a.media = temTodas ? +(((+n1)+(+n2)+(+t))/3).toFixed(1) : null;
+
+  // atualiza só a linha (sem re-render, pra não perder o foco do input)
+  const mEl=document.getElementById('turma-media-'+i);
+  const sEl=document.getElementById('turma-sit-'+i);
+  if(mEl) mEl.textContent = a.media ?? '—';
+  if(sEl){
+    const m=a.media;
+    const [cls,sit] = (m===null) ? ['badge-gray','—']
+      : m>=7 ? ['badge-green','Aprovado']
+      : m>=5 ? ['badge-yellow','Recuperação']
+      : ['badge-red','Reprovado'];
+    sEl.className='badge '+cls;
+    sEl.textContent=sit;
+  }
+}
+
+async function salvarNotasTurma(){
+  if(!turmaAtual)return;
+
+  // Só envia quem tem ALGUMA nota preenchida
+  const linhas = turmaAlunos
+    .filter(a => a.nota1!=='' || a.nota2!=='' || a.trabalho!=='')
+    .map(a => ({
+      aluno_id:      a.id,
+      disciplina_id: turmaAtual.id,
+      nota1:    a.nota1==='' ? null : +a.nota1,
+      nota2:    a.nota2==='' ? null : +a.nota2,
+      trabalho: a.trabalho==='' ? null : +a.trabalho,
+      media:    a.media,
+    }));
+
+  if(!linhas.length){toast('Nenhuma nota preenchida.','error');return;}
+
+  const btn=document.getElementById('btnSalvarTurma');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const {error}=await sb.from('notas').upsert(linhas,{onConflict:'aluno_id,disciplina_id'});
+
+  btn.disabled=false;btn.textContent='Salvar todas as notas';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast(`${linhas.length} nota(s) salva(s)!`,'success');
+  await Promise.all([carregarDisciplinas(),carregarNotas()]);
 }
 
 function abrirEdicao(idx){
