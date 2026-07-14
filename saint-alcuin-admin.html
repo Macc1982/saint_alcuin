@@ -125,10 +125,12 @@
       <div class="nav-item" onclick="showTab('alunos',this)">👤 Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)">💰 Financeiro</div>
       <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
+      <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">✍️ Para corrigir</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
       <div class="nav-label">Cursos</div>
       <div class="nav-item" onclick="showTab('cursos',this)">🎓 Cursos</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)">◈ Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)">📋 Atividades</div>
     </nav>
     <div class="main">
 
@@ -313,36 +315,110 @@
 
       <!-- MATERIAIS -->
       <div class="tab" id="tab-materiais">
-        <div class="page-title">Materiais</div><div class="page-sub">PDFs e vídeos por curso</div>
+        <div class="page-title">Materiais</div>
+        <div class="page-sub">PDFs e videoaulas — organizados por disciplina</div>
+
         <div class="card">
           <div class="card-header"><div class="card-title">Adicionar material</div></div>
           <div class="form-row">
-            <div class="form-group"><label>Título *</label><input type="text" id="m-titulo" placeholder="Ex: Módulo 1 — Introdução"/></div>
-            <div class="form-group"><label>Curso *</label><select id="m-curso"><option value="">Selecione o curso</option></select></div>
+            <div class="form-group"><label>Curso *</label><select id="m-curso" onchange="onCursoMaterial()"><option value="">Selecione o curso</option></select></div>
+            <div class="form-group"><label>Disciplina</label>
+              <select id="m-disciplina"><option value="">— Material geral do curso —</option></select>
+            </div>
           </div>
           <div class="form-row">
             <div class="form-group"><label>Tipo *</label><select id="m-tipo" onchange="toggleUrlField()"><option value="pdf">PDF</option><option value="video">Vídeo (YouTube/Vimeo)</option></select></div>
-            <div class="form-group"><label>Descrição</label><input type="text" id="m-desc" placeholder="Descrição opcional"/></div>
+            <div class="form-group"><label>Descrição</label><input type="text" id="m-desc" placeholder="Opcional"/></div>
           </div>
-          <div id="campo-pdf" class="form-group">
-            <label>Arquivo PDF *</label>
-            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-              <div class="upload-icon">📄</div>
-              <div class="upload-text">Clique para selecionar o PDF<br/><strong>ou arraste aqui</strong></div>
-              <div id="fileName" style="margin-top:8px;font-size:.75rem;color:var(--secondary);display:none;"></div>
+
+          <div id="campo-pdf">
+            <div class="fin-hint">Você pode selecionar <strong>vários PDFs de uma vez</strong>. O nome de cada arquivo vira o título do material (você pode editar depois).</div>
+            <div class="form-group">
+              <label>Arquivos PDF *</label>
+              <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Clique para selecionar os PDFs<br/><strong>(pode escolher vários)</strong></div>
+                <div id="fileName" style="margin-top:10px;font-size:.78rem;color:var(--secondary);display:none;text-align:left;"></div>
+              </div>
+              <input type="file" id="fileInput" accept=".pdf" multiple onchange="onFileSelected(event)"/>
             </div>
-            <input type="file" id="fileInput" accept=".pdf" onchange="onFileSelected(event)"/>
           </div>
-          <div id="campo-video" class="form-group" style="display:none;">
-            <label>URL do vídeo *</label><input type="url" id="m-url" placeholder="https://youtube.com/watch?v=..."/>
+
+          <div id="campo-video" style="display:none;">
+            <div class="form-row">
+              <div class="form-group"><label>Título *</label><input type="text" id="m-titulo" placeholder="Ex: Aula 1 — Introdução"/></div>
+              <div class="form-group"><label>URL do vídeo *</label><input type="url" id="m-url" placeholder="https://youtube.com/watch?v=..."/></div>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="adicionarMaterial()" id="btnMaterial">Adicionar Material</button>
+
+          <button class="btn btn-primary" onclick="adicionarMaterial()" id="btnMaterial">Adicionar</button>
         </div>
-        <div class="form-group" style="max-width:280px;margin-bottom:16px;"><label>Filtrar por curso</label><select id="filtro-curso-mat" onchange="carregarMateriais()"><option value="">Todos</option></select></div>
+
+        <div class="form-row" style="max-width:600px;margin-bottom:16px;">
+          <div class="form-group"><label>Filtrar por curso</label><select id="filtro-curso-mat" onchange="carregarMateriais()"><option value="">Todos</option></select></div>
+          <div class="form-group"><label>Tipo</label><select id="filtro-tipo-mat" onchange="carregarMateriais()"><option value="">Todos</option><option value="pdf">PDFs</option><option value="video">Videoaulas</option></select></div>
+        </div>
+
+        <div id="lista-materiais"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <!-- ============ PARA CORRIGIR (caixa de entrada) ============ -->
+      <div class="tab" id="tab-corrigir">
+        <div class="page-title">Para corrigir</div>
+        <div class="page-sub">Trabalhos enviados pelos alunos, aguardando correção</div>
+
+        <div class="stats-row">
+          <div class="stat-card yellow"><div class="stat-value" id="cr-pendentes">—</div><div class="stat-label">Aguardando correção</div></div>
+          <div class="stat-card green"><div class="stat-value" id="cr-corrigidas">—</div><div class="stat-label">Corrigidas</div></div>
+          <div class="stat-card"><div class="stat-value" id="cr-total">—</div><div class="stat-label">Total de entregas</div></div>
+        </div>
+
+        <div class="form-group" style="max-width:280px;margin-bottom:16px;">
+          <label>Mostrar</label>
+          <select id="filtro-correcao" onchange="carregarCorrecoes()">
+            <option value="enviado">Aguardando correção</option>
+            <option value="corrigido">Já corrigidas</option>
+            <option value="">Todas</option>
+          </select>
+        </div>
+
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Título</th><th>Curso</th><th>Tipo</th><th>Data</th><th></th></tr></thead>
-            <tbody id="tabela-materiais"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+            <thead>
+              <tr><th>Aluno</th><th>Disciplina</th><th>Atividade</th><th>Enviado em</th><th>Nota</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="tabela-correcoes"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ ATIVIDADES ============ -->
+      <div class="tab" id="tab-atividades">
+        <div class="page-title">Atividades</div>
+        <div class="page-sub">Proponha trabalhos e anexe os arquivos que o aluno vai baixar</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title" id="ativ-form-title">Nova atividade</div></div>
+          <input type="hidden" id="at-id"/>
+          <div class="form-row">
+            <div class="form-group"><label>Curso *</label><select id="at-curso" onchange="onCursoAtividade()"><option value="">Selecione o curso</option></select></div>
+            <div class="form-group"><label>Disciplina *</label><select id="at-disciplina"><option value="">Selecione a disciplina</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Título *</label><input type="text" id="at-titulo" placeholder="Ex: Trabalho 1 — Artigo científico"/></div>
+            <div class="form-group"><label>Prazo de entrega</label><input type="date" id="at-prazo"/></div>
+          </div>
+          <div class="form-group"><label>Enunciado</label><textarea id="at-enunciado" rows="3" placeholder="Descreva o que o aluno deve fazer..."></textarea></div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-primary" onclick="salvarAtividade()" id="btnAtiv">Criar atividade</button>
+            <button class="btn btn-outline" onclick="limparFormAtiv()" id="btnCancelarAtiv" style="display:none;">Cancelar edição</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Atividade</th><th>Disciplina</th><th>Prazo</th><th>Anexos</th><th>Entregas</th><th></th></tr></thead>
+            <tbody id="tabela-atividades"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -416,6 +492,70 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MODAL: ANEXOS DA ATIVIDADE (arquivos que o aluno baixa) -->
+<div class="modal-bg" id="modal-anexos">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-title" id="anx-titulo">—</div>
+    <div class="modal-sub" id="anx-sub">Arquivos que o aluno poderá baixar (enunciado, modelo, material de apoio)</div>
+
+    <div class="form-group">
+      <div class="upload-area" onclick="document.getElementById('anexoInput').click()">
+        <div class="upload-icon">📎</div>
+        <div class="upload-text">Clique para anexar arquivos<br/><strong>(pode escolher vários)</strong></div>
+      </div>
+      <input type="file" id="anexoInput" multiple onchange="subirAnexos(event)"/>
+    </div>
+
+    <div id="lista-anexos"><div class="empty">Nenhum anexo ainda.</div></div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+      <button class="btn btn-outline" onclick="fecharModal('modal-anexos')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CORRIGIR ENTREGA -->
+<div class="modal-bg" id="modal-corrigir">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-title" id="cor-aluno">—</div>
+    <div class="modal-sub" id="cor-sub">—</div>
+
+    <div class="card" style="box-shadow:none;border:1px solid var(--border);padding:16px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <div style="min-width:0;">
+          <div style="font-size:.86rem;font-weight:600;color:var(--primary);" id="cor-arquivo">—</div>
+          <div style="font-size:.74rem;color:var(--gray);" id="cor-enviado">—</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="baixarEntrega()" id="btnBaixarEntrega">Baixar trabalho</button>
+      </div>
+      <div id="cor-comentario" style="margin-top:10px;font-size:.8rem;color:var(--gray);border-top:1px solid var(--border);padding-top:10px;display:none;"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group"><label>Nota (0 a 10) *</label><input type="number" id="cor-nota" min="0" max="10" step="0.1" placeholder="0.0"/></div>
+      <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer;">
+          <input type="checkbox" id="cor-aplicar" checked style="width:auto;"/>
+          Aplicar na média da disciplina
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Feedback para o aluno</label>
+      <textarea id="cor-feedback" rows="4" placeholder="Comentários sobre o trabalho..."></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;">
+      <button class="btn btn-danger" onclick="reabrirEntrega()" id="btnReabrir" style="display:none;">Reabrir para reenvio</button>
+      <div style="display:flex;gap:10px;margin-left:auto;">
+        <button class="btn btn-outline" onclick="fecharModal('modal-corrigir')">Cancelar</button>
+        <button class="btn btn-success" onclick="salvarCorrecao()" id="btnCorrigir">Salvar correção</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL: TURMA — LANÇAR NOTAS DE TODOS OS ALUNOS -->
 <div class="modal-bg" id="modal-turma">
@@ -636,10 +776,11 @@ async function iniciarApp(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('app').classList.add('active');
   await carregarCursos();
+  await carregarDisciplinas();   // discCache precisa estar pronto p/ os selects
   await Promise.all([
     carregarDashboard(), carregarAlunos(), carregarMateriais(),
-    carregarDisciplinas(), carregarNotas(),
-    carregarMatriculas(), carregarCursosTabela()
+    carregarNotas(), carregarMatriculas(), carregarCursosTabela(),
+    carregarAtividades(), carregarCorrecoes()
   ]);
 }
 
@@ -655,7 +796,7 @@ async function carregarCursos(){
   if(!data)return;
   cursosCache=data;
   document.getElementById('st-cursos').textContent=data.length;
-  ['a-curso','m-curso','d-curso','filtro-curso-mat'].forEach(id=>{
+  ['a-curso','m-curso','d-curso','at-curso','filtro-curso-mat','filtro-curso-disc'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
     const val=el.value;
@@ -927,64 +1068,137 @@ async function refazerPlano(){
    MATERIAIS / NOTAS / DISCIPLINAS (inalterado)
    ========================================================================== */
 
+/* ==========================================================================
+   MATERIAIS — por disciplina, upload múltiplo
+   ========================================================================== */
+let selectedFiles = [];
+
 function toggleUrlField(){
   const tipo=document.getElementById('m-tipo').value;
-  document.getElementById('campo-pdf').style.display=tipo==='pdf'?'block':'none';
-  document.getElementById('campo-video').style.display=tipo==='video'?'block':'none';
+  document.getElementById('campo-pdf').style.display   = tipo==='pdf'   ? 'block':'none';
+  document.getElementById('campo-video').style.display = tipo==='video' ? 'block':'none';
+}
+
+function onCursoMaterial(){
+  const cursoId=document.getElementById('m-curso').value;
+  const sel=document.getElementById('m-disciplina');
+  sel.innerHTML='<option value="">— Material geral do curso —</option>';
+  discCache.filter(d=>d.curso_id===cursoId).forEach(d=>{
+    const o=document.createElement('option'); o.value=d.id; o.textContent=d.nome; sel.appendChild(o);
+  });
 }
 
 function onFileSelected(e){
-  selectedFile=e.target.files[0];
-  if(selectedFile){document.getElementById('fileName').textContent=selectedFile.name;document.getElementById('fileName').style.display='block';}
+  selectedFiles = Array.from(e.target.files || []);
+  const el=document.getElementById('fileName');
+  if(selectedFiles.length){
+    el.innerHTML = selectedFiles.map(f=>'📄 '+f.name).join('<br/>');
+    el.style.display='block';
+  } else { el.style.display='none'; }
 }
 
 async function adicionarMaterial(){
-  const titulo=document.getElementById('m-titulo').value.trim();
-  const curso_id=document.getElementById('m-curso').value;
-  const tipo=document.getElementById('m-tipo').value;
-  const desc=document.getElementById('m-desc').value.trim();
-  if(!titulo||!curso_id){toast('Título e curso são obrigatórios.','error');return;}
+  const curso_id      = document.getElementById('m-curso').value;
+  const disciplina_id = document.getElementById('m-disciplina').value || null;
+  const tipo          = document.getElementById('m-tipo').value;
+  const desc          = document.getElementById('m-desc').value.trim();
+
+  if(!curso_id){toast('Selecione o curso.','error');return;}
+
   const btn=document.getElementById('btnMaterial');
-  btn.disabled=true;btn.textContent='Enviando...';
-  let url='';
-  if(tipo==='pdf'){
-    if(!selectedFile){toast('Selecione um arquivo PDF.','error');btn.disabled=false;btn.textContent='Adicionar Material';return;}
-    const path=`${curso_id}/${Date.now()}_${selectedFile.name}`;
-    const{error:upErr}=await sb.storage.from('materiais').upload(path,selectedFile,{upsert:true});
-    if(upErr){toast('Erro no upload: '+upErr.message,'error');btn.disabled=false;btn.textContent='Adicionar Material';return;}
-    const{data:pub}=sb.storage.from('materiais').getPublicUrl(path);
-    url=pub.publicUrl;
-  } else {
-    url=document.getElementById('m-url').value.trim();
-    if(!url){toast('Informe a URL do vídeo.','error');btn.disabled=false;btn.textContent='Adicionar Material';return;}
+  btn.disabled=true;
+
+  if(tipo === 'video'){
+    const titulo = document.getElementById('m-titulo').value.trim();
+    const url    = document.getElementById('m-url').value.trim();
+    if(!titulo || !url){toast('Informe o título e a URL do vídeo.','error');btn.disabled=false;return;}
+    btn.textContent='Salvando...';
+    const {error}=await sb.from('materiais').insert({titulo,curso_id,disciplina_id,tipo:'video',url,descricao:desc||null});
+    btn.disabled=false;btn.textContent='Adicionar';
+    if(error){toast('Erro: '+error.message,'error');return;}
+    toast('Videoaula adicionada!','success');
+    ['m-titulo','m-url','m-desc'].forEach(id=>document.getElementById(id).value='');
+    await carregarMateriais();
+    return;
   }
-  await sb.from('materiais').insert({titulo,curso_id,tipo,url,descricao:desc||null});
-  toast('Material adicionado!','success');
-  ['m-titulo','m-desc','m-url'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('m-curso').value='';
+
+  if(!selectedFiles.length){toast('Selecione ao menos um PDF.','error');btn.disabled=false;return;}
+
+  let ok=0, falhas=0;
+  for(let i=0;i<selectedFiles.length;i++){
+    const file=selectedFiles[i];
+    btn.textContent='Enviando '+(i+1)+'/'+selectedFiles.length+'...';
+    const ext  = (file.name.split('.').pop()||'pdf').toLowerCase();
+    const pasta= disciplina_id ? curso_id+'/'+disciplina_id : curso_id+'/geral';
+    const path = pasta+'/'+Date.now()+'_'+i+'.'+ext;
+
+    const {error:upErr}=await sb.storage.from('materiais').upload(path,file,{upsert:false,contentType:file.type});
+    if(upErr){ falhas++; console.error('[upload]',file.name,upErr); continue; }
+
+    const {data:pub}=sb.storage.from('materiais').getPublicUrl(path);
+    const titulo = file.name.replace(/\.[^.]+$/,'');
+
+    const {error:dbErr}=await sb.from('materiais').insert({
+      titulo, curso_id, disciplina_id, tipo:'pdf',
+      url: pub.publicUrl, descricao: desc||null, ordem: i
+    });
+    if(dbErr){ falhas++; console.error('[db]',file.name,dbErr); continue; }
+    ok++;
+  }
+
+  btn.disabled=false; btn.textContent='Adicionar';
   document.getElementById('fileInput').value='';
   document.getElementById('fileName').style.display='none';
-  selectedFile=null;btn.disabled=false;btn.textContent='Adicionar Material';
+  document.getElementById('m-desc').value='';
+  selectedFiles=[];
+
+  if(ok)     toast(ok+' material(is) adicionado(s)!','success');
+  if(falhas) toast(falhas+' arquivo(s) falharam.','error');
+
   await Promise.all([carregarMateriais(),carregarDashboard()]);
 }
 
 async function carregarMateriais(){
-  const filtro=document.getElementById('filtro-curso-mat')?.value;
-  let q=sb.from('materiais').select('*,cursos(nome)').order('created_at',{ascending:false});
-  if(filtro)q=q.eq('curso_id',filtro);
-  const{data}=await q;
-  const tbody=document.getElementById('tabela-materiais');
-  if(!data?.length){tbody.innerHTML='<tr><td colspan="5" class="empty">Nenhum material.</td></tr>';return;}
-  tbody.innerHTML=data.map(m=>`
-    <tr>
-      <td>${m.titulo}</td><td>${m.cursos?.nome||'—'}</td>
-      <td><span class="badge badge-${m.tipo==='pdf'?'blue':'green'}">${(m.tipo||'').toUpperCase()}</span></td>
-      <td>${m.created_at?new Date(m.created_at).toLocaleDateString('pt-BR'):'—'}</td>
-      <td>
-        <a href="${m.url}" target="_blank" class="btn btn-outline btn-sm">Ver</a>
-        <button class="btn btn-danger btn-sm" onclick="excluirMaterial('${m.id}')">Excluir</button>
-      </td>
-    </tr>`).join('');
+  const fCurso = document.getElementById('filtro-curso-mat')?.value;
+  const fTipo  = document.getElementById('filtro-tipo-mat')?.value;
+
+  let q=sb.from('vw_materiais').select('*').order('curso_nome').order('grupo').order('ordem').order('created_at');
+  if(fCurso) q=q.eq('curso_id',fCurso);
+  if(fTipo)  q=q.eq('tipo',fTipo);
+  const {data}=await q;
+
+  const el=document.getElementById('lista-materiais');
+  if(!data?.length){el.innerHTML='<div class="empty" style="background:#fff;border-radius:8px;">Nenhum material.</div>';return;}
+
+  const grupos={};
+  data.forEach(m=>{
+    const k = (m.curso_nome||'Sem curso') + ' ||| ' + m.grupo;
+    (grupos[k] = grupos[k] || []).push(m);
+  });
+
+  el.innerHTML = Object.entries(grupos).map(function(entry){
+    const k=entry[0], itens=entry[1];
+    const partes=k.split(' ||| ');
+    const curso=partes[0], disc=partes[1];
+    return '<div class="card" style="padding:0;overflow:hidden;">'+
+      '<div style="background:var(--light);padding:12px 18px;border-bottom:1px solid var(--border);">'+
+        '<div style="font-size:.9rem;font-weight:700;color:var(--primary);">'+disc+'</div>'+
+        '<div style="font-size:.72rem;color:var(--gray);">'+curso+' · '+itens.length+' item(ns)</div>'+
+      '</div>'+
+      '<table class="data-table"><tbody>'+
+        itens.map(function(m){
+          return '<tr>'+
+            '<td style="width:44px;">'+(m.tipo==='pdf'?'📄':'▶')+'</td>'+
+            '<td><strong>'+m.titulo+'</strong>'+(m.descricao?'<div style="font-size:.72rem;color:var(--gray);">'+m.descricao+'</div>':'')+'</td>'+
+            '<td style="width:110px;"><span class="badge badge-'+(m.tipo==='pdf'?'blue':'green')+'">'+(m.tipo||'').toUpperCase()+'</span></td>'+
+            '<td style="width:110px;">'+(m.created_at?new Date(m.created_at).toLocaleDateString('pt-BR'):'—')+'</td>'+
+            '<td style="width:180px;white-space:nowrap;">'+
+              '<a href="'+m.url+'" target="_blank" class="btn btn-outline btn-sm">Abrir</a> '+
+              '<button class="btn btn-danger btn-sm" onclick="excluirMaterial(\''+m.id+'\')">Excluir</button>'+
+            '</td></tr>';
+        }).join('')+
+      '</tbody></table></div>';
+  }).join('');
 }
 
 async function excluirMaterial(id){
@@ -993,6 +1207,281 @@ async function excluirMaterial(id){
   toast('Material excluído.','success');
   await carregarMateriais();
 }
+
+/* ==========================================================================
+   ATIVIDADES
+   ========================================================================== */
+let ativCache=[], ativAtual=null;
+
+function onCursoAtividade(){
+  const cursoId=document.getElementById('at-curso').value;
+  const sel=document.getElementById('at-disciplina');
+  sel.innerHTML='<option value="">Selecione a disciplina</option>';
+  discCache.filter(d=>d.curso_id===cursoId).forEach(d=>{
+    const o=document.createElement('option'); o.value=d.id; o.textContent=d.nome; sel.appendChild(o);
+  });
+}
+
+function limparFormAtiv(){
+  ['at-id','at-titulo','at-enunciado','at-prazo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('at-curso').value='';
+  document.getElementById('at-disciplina').innerHTML='<option value="">Selecione a disciplina</option>';
+  document.getElementById('ativ-form-title').textContent='Nova atividade';
+  document.getElementById('btnAtiv').textContent='Criar atividade';
+  document.getElementById('btnCancelarAtiv').style.display='none';
+}
+
+async function salvarAtividade(){
+  const id=document.getElementById('at-id').value;
+  const disciplina_id=document.getElementById('at-disciplina').value;
+  const titulo=document.getElementById('at-titulo').value.trim();
+  if(!disciplina_id||!titulo){toast('Informe a disciplina e o título.','error');return;}
+
+  const payload={
+    disciplina_id, titulo,
+    enunciado: document.getElementById('at-enunciado').value.trim()||null,
+    prazo:     document.getElementById('at-prazo').value||null,
+  };
+
+  const btn=document.getElementById('btnAtiv');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const {error} = id
+    ? await sb.from('atividades').update(payload).eq('id',id)
+    : await sb.from('atividades').insert(payload);
+
+  btn.disabled=false;btn.textContent=id?'Salvar alterações':'Criar atividade';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast(id?'Atividade atualizada!':'Atividade criada! Agora anexe os arquivos.','success');
+  limparFormAtiv();
+  await carregarAtividades();
+}
+
+async function carregarAtividades(){
+  const {data}=await sb.from('vw_atividades').select('*').order('criado_em',{ascending:false});
+  ativCache=data||[];
+
+  const tbody=document.getElementById('tabela-atividades');
+  if(!data?.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhuma atividade criada.</td></tr>';return;}
+
+  tbody.innerHTML=data.map(function(a,i){
+    return '<tr>'+
+      '<td><strong>'+a.titulo+'</strong>'+(a.enunciado?'<div style="font-size:.72rem;color:var(--gray);">'+a.enunciado.slice(0,70)+(a.enunciado.length>70?'…':'')+'</div>':'')+'</td>'+
+      '<td>'+a.disciplina_nome+'<div style="font-size:.7rem;color:var(--gray);">'+(a.curso_nome||'—')+'</div></td>'+
+      '<td>'+dataBR(a.prazo)+'</td>'+
+      '<td>'+(a.total_anexos||0)+'</td>'+
+      '<td>'+(a.total_entregas||0)+' '+(a.pendentes_correcao?'<span class="badge badge-yellow">'+a.pendentes_correcao+' a corrigir</span>':'')+'</td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button class="btn btn-primary btn-sm" onclick="abrirAnexos('+i+')">Anexos</button> '+
+        '<button class="btn btn-outline btn-sm" onclick="editarAtividade('+i+')">Editar</button> '+
+        '<button class="btn btn-danger btn-sm" onclick="excluirAtividade(\''+a.id+'\')">Excluir</button>'+
+      '</td></tr>';
+  }).join('');
+}
+
+function editarAtividade(idx){
+  const a=ativCache[idx];
+  document.getElementById('at-id').value=a.id;
+  document.getElementById('at-curso').value=a.curso_id||'';
+  onCursoAtividade();
+  document.getElementById('at-disciplina').value=a.disciplina_id;
+  document.getElementById('at-titulo').value=a.titulo||'';
+  document.getElementById('at-enunciado').value=a.enunciado||'';
+  document.getElementById('at-prazo').value=a.prazo||'';
+  document.getElementById('ativ-form-title').textContent='Editar atividade';
+  document.getElementById('btnAtiv').textContent='Salvar alterações';
+  document.getElementById('btnCancelarAtiv').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function excluirAtividade(id){
+  if(!confirm('Excluir esta atividade?\n\nOs anexos e as entregas dos alunos também serão removidos.'))return;
+  const {error}=await sb.from('atividades').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Atividade excluída.','success');
+  await Promise.all([carregarAtividades(),carregarCorrecoes()]);
+}
+
+async function abrirAnexos(idx){
+  const a=ativCache[idx];
+  ativAtual=a;
+  document.getElementById('anx-titulo').textContent=a.titulo;
+  document.getElementById('anx-sub').textContent=a.disciplina_nome+' · arquivos que o aluno poderá baixar';
+  await carregarAnexos();
+  abrirModal('modal-anexos');
+}
+
+async function carregarAnexos(){
+  const {data}=await sb.from('atividade_anexos').select('*').eq('atividade_id',ativAtual.id).order('criado_em');
+  const el=document.getElementById('lista-anexos');
+  if(!data?.length){el.innerHTML='<div class="empty">Nenhum anexo ainda.</div>';return;}
+
+  el.innerHTML='<div class="table-wrap"><table class="data-table"><tbody>'+
+    data.map(function(x){
+      return '<tr><td style="width:40px;">📎</td>'+
+        '<td><strong>'+x.nome_arquivo+'</strong></td>'+
+        '<td style="width:170px;white-space:nowrap;">'+
+          '<button class="btn btn-outline btn-sm" onclick="baixarAnexo(\''+x.path+'\')">Baixar</button> '+
+          '<button class="btn btn-danger btn-sm" onclick="excluirAnexo(\''+x.id+'\',\''+x.path+'\')">Remover</button>'+
+        '</td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+async function subirAnexos(ev){
+  const files=Array.from(ev.target.files||[]);
+  if(!files.length || !ativAtual) return;
+
+  toast('Enviando '+files.length+' arquivo(s)...');
+  let ok=0;
+
+  for(let i=0;i<files.length;i++){
+    const f=files[i];
+    const ext=(f.name.split('.').pop()||'bin').toLowerCase();
+    const path='atividades/'+ativAtual.id+'/'+Date.now()+'_'+i+'.'+ext;
+
+    const {error:upErr}=await sb.storage.from('trabalhos').upload(path,f,{upsert:false,contentType:f.type});
+    if(upErr){ console.error('[anexo]',upErr); continue; }
+
+    const {error:dbErr}=await sb.from('atividade_anexos').insert({
+      atividade_id: ativAtual.id,
+      nome_arquivo: f.name,
+      url: path, path: path,
+      tamanho_bytes: f.size
+    });
+    if(dbErr){ console.error('[anexo db]',dbErr); continue; }
+    ok++;
+  }
+
+  ev.target.value='';
+  toast(ok?ok+' anexo(s) enviado(s)!':'Falha ao anexar.', ok?'success':'error');
+  await Promise.all([carregarAnexos(),carregarAtividades()]);
+}
+
+async function baixarAnexo(path){
+  const {data,error}=await sb.storage.from('trabalhos').createSignedUrl(path,300);
+  if(error||!data?.signedUrl){toast('Não foi possível abrir o arquivo.','error');return;}
+  window.open(data.signedUrl,'_blank');
+}
+
+async function excluirAnexo(id,path){
+  if(!confirm('Remover este anexo?'))return;
+  await sb.storage.from('trabalhos').remove([path]);
+  await sb.from('atividade_anexos').delete().eq('id',id);
+  toast('Anexo removido.','success');
+  await Promise.all([carregarAnexos(),carregarAtividades()]);
+}
+
+/* ==========================================================================
+   PARA CORRIGIR — caixa de entrada das entregas
+   ========================================================================== */
+let correcoesCache=[], entregaAtual=null;
+
+async function carregarCorrecoes(){
+  const filtro=document.getElementById('filtro-correcao')?.value ?? 'enviado';
+
+  let q=sb.from('entregas')
+    .select('*, estudantes(nome,matricula), atividades(titulo, disciplinas(nome))')
+    .order('enviado_em',{ascending:false});
+  if(filtro) q=q.eq('status',filtro);
+  const {data}=await q;
+  correcoesCache=data||[];
+
+  const {data:todas}=await sb.from('entregas').select('status');
+  const cnt=function(s){ return (todas||[]).filter(e=>e.status===s).length; };
+  document.getElementById('cr-pendentes').textContent = cnt('enviado');
+  document.getElementById('cr-corrigidas').textContent= cnt('corrigido');
+  document.getElementById('cr-total').textContent     = (todas||[]).length;
+
+  const pend=cnt('enviado');
+  document.getElementById('nav-corrigir').innerHTML =
+    '✍️ Para corrigir' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
+
+  const tbody=document.getElementById('tabela-correcoes');
+  if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma entrega.</td></tr>';return;}
+
+  tbody.innerHTML=data.map(function(e,i){
+    const corrigido = e.status==='corrigido';
+    return '<tr>'+
+      '<td><strong>'+(e.estudantes?.nome||'—')+'</strong>'+(e.estudantes?.matricula?'<div style="font-size:.7rem;color:var(--gray);">'+e.estudantes.matricula+'</div>':'')+'</td>'+
+      '<td>'+(e.atividades?.disciplinas?.nome||'—')+'</td>'+
+      '<td>'+(e.atividades?.titulo||'—')+'</td>'+
+      '<td>'+dataBR(e.enviado_em)+'</td>'+
+      '<td>'+(e.nota!=null?'<strong>'+e.nota+'</strong>':'—')+'</td>'+
+      '<td><span class="badge badge-'+(corrigido?'green':'yellow')+'">'+(corrigido?'Corrigido':'Aguardando')+'</span></td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button class="btn btn-outline btn-sm" onclick="baixarAnexo(\''+e.path+'\')">Baixar</button> '+
+        '<button class="btn btn-primary btn-sm" onclick="abrirCorrecao('+i+')">'+(corrigido?'Rever':'Corrigir')+'</button>'+
+      '</td></tr>';
+  }).join('');
+}
+
+function abrirCorrecao(idx){
+  const e=correcoesCache[idx];
+  entregaAtual=e;
+
+  document.getElementById('cor-aluno').textContent = e.estudantes?.nome || 'Aluno';
+  document.getElementById('cor-sub').textContent   =
+    (e.atividades?.disciplinas?.nome||'') + ' · ' + (e.atividades?.titulo||'');
+  document.getElementById('cor-arquivo').textContent = e.nome_arquivo;
+  document.getElementById('cor-enviado').textContent = 'Enviado em ' + dataBR(e.enviado_em);
+
+  const com=document.getElementById('cor-comentario');
+  if(e.comentario_aluno){
+    com.style.display='block';
+    com.innerHTML='<strong>Observação do aluno:</strong> '+e.comentario_aluno;
+  } else { com.style.display='none'; }
+
+  document.getElementById('cor-nota').value     = e.nota ?? '';
+  document.getElementById('cor-feedback').value = e.feedback ?? '';
+  document.getElementById('cor-aplicar').checked = true;
+  document.getElementById('btnReabrir').style.display = e.status==='corrigido' ? 'inline-block' : 'none';
+
+  abrirModal('modal-corrigir');
+}
+
+async function baixarEntrega(){
+  if(!entregaAtual)return;
+  await baixarAnexo(entregaAtual.path);
+}
+
+async function salvarCorrecao(){
+  if(!entregaAtual)return;
+  const nota=parseFloat(document.getElementById('cor-nota').value);
+  const feedback=document.getElementById('cor-feedback').value.trim()||null;
+  const aplicar=document.getElementById('cor-aplicar').checked;
+
+  if(isNaN(nota)||nota<0||nota>10){toast('Informe uma nota entre 0 e 10.','error');return;}
+
+  const btn=document.getElementById('btnCorrigir');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const {error}=await sb.rpc('corrigir_entrega',{
+    p_entrega_id: entregaAtual.id,
+    p_nota: nota,
+    p_feedback: feedback,
+    p_aplicar_na_nota: aplicar
+  });
+
+  btn.disabled=false;btn.textContent='Salvar correção';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast(aplicar?'Correção salva e nota aplicada na média!':'Correção salva.','success');
+  fecharModal('modal-corrigir');
+  await Promise.all([carregarCorrecoes(),carregarAtividades(),carregarNotas()]);
+}
+
+async function reabrirEntrega(){
+  if(!entregaAtual)return;
+  if(!confirm('Reabrir esta entrega?\n\nO aluno poderá enviar o arquivo novamente.'))return;
+
+  const {error}=await sb.from('entregas').update({status:'enviado'}).eq('id',entregaAtual.id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Entrega reaberta — o aluno já pode reenviar.','success');
+  fecharModal('modal-corrigir');
+  await carregarCorrecoes();
+}
+
 
 function onAlunoChange(){
   const alunoId=document.getElementById('n-aluno').value;
@@ -1075,12 +1564,6 @@ async function carregarDisciplinas(){
       </td>
     </tr>`;
   }).join('');
-
-  // popula o filtro de curso
-  const f=document.getElementById('filtro-curso-disc');
-  if(f && f.options.length<=1){
-    cursosCache.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.nome;f.appendChild(o);});
-  }
 }
 
 function limparFormDisc(){
