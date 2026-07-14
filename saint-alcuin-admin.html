@@ -265,6 +265,7 @@
             <div class="fin-hint">
               Este aluno ainda não tem plano. Defina os valores negociados e gere as parcelas.
               <br/><strong>Mestrado:</strong> matrícula + 26 mensalidades &nbsp;·&nbsp; <strong>Doutorado:</strong> matrícula + 36 mensalidades
+              <br/><span style="color:var(--gray);">Dia do vencimento de 1 a 31 — meses mais curtos são ajustados automaticamente (ex.: dia 31 vence em 28/02).</span>
             </div>
             <div class="form-row-4">
               <div class="form-group"><label>Valor da matrícula (R$) *</label><input type="number" id="g-matricula" step="0.01" min="0" placeholder="0,00"/></div>
@@ -275,7 +276,7 @@
                   <option value="36">36 — Doutorado</option>
                 </select>
               </div>
-              <div class="form-group"><label>Dia do vencimento *</label><input type="number" id="g-dia" min="1" max="28" value="10"/></div>
+              <div class="form-group"><label>Dia do vencimento *</label><input type="number" id="g-dia" min="1" max="31" value="10"/></div>
             </div>
             <div class="form-row">
               <div class="form-group"><label>Vencimento da matrícula</label><input type="date" id="g-venc-mat"/></div>
@@ -544,7 +545,7 @@
       <div class="form-group"><label>Qtd. mensalidades</label>
         <select id="r-qtd"><option value="26">26 — Mestrado</option><option value="36">36 — Doutorado</option></select>
       </div>
-      <div class="form-group"><label>Dia do vencimento</label><input type="number" id="r-dia" min="1" max="28"/></div>
+      <div class="form-group"><label>Dia do vencimento</label><input type="number" id="r-dia" min="1" max="31"/></div>
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
       <button class="btn btn-outline" onclick="fecharModal('modal-plano')">Cancelar</button>
@@ -821,7 +822,7 @@ async function gerarPlano(){
   const venc1   = document.getElementById('g-venc-1').value || null;
 
   if(isNaN(vMat)||isNaN(vMen)){toast('Informe os valores da matrícula e da mensalidade.','error');return;}
-  if(isNaN(dia)||dia<1||dia>28){toast('Dia de vencimento deve ser entre 1 e 28.','error');return;}
+  if(isNaN(dia)||dia<1||dia>31){toast('Dia de vencimento deve ser entre 1 e 31.','error');return;}
 
   const btn=document.getElementById('btnGerar');
   btn.disabled=true; btn.textContent='Gerando...';
