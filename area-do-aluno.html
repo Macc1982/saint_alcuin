@@ -104,7 +104,40 @@
   .fin-progress-bar{height:100%;background:linear-gradient(90deg,var(--secondary),var(--green));border-radius:6px;transition:width .6s ease;}
   .fin-alerta{background:var(--red-bg);border-left:3px solid #c1121f;color:var(--red-text);padding:12px 16px;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:18px;display:none;}
   .fin-prox{background:#eef4fb;border-left:3px solid var(--secondary);padding:12px 16px;border-radius:0 6px 6px 0;font-size:.8rem;margin-bottom:18px;display:none;}
-  .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:999;transition:transform .2s;}
+  /* ---- Grupos por disciplina ---- */
+  .grupo-card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:16px;overflow:hidden;}
+  .grupo-head{background:var(--light);padding:14px 20px;border-bottom:1px solid var(--border);}
+  .grupo-nome{font-size:.95rem;font-weight:700;color:var(--primary);}
+  .grupo-sub{font-size:.72rem;color:var(--gray);margin-top:1px;}
+  .grupo-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);}
+  .grupo-item:last-child{border-bottom:none;}
+  .grupo-item:hover{background:#f8fafc;}
+
+  /* ---- Atividades ---- */
+  .ativ{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:16px;overflow:hidden;border-left:4px solid var(--border);}
+  .ativ.entregue{border-left-color:#d97706;}
+  .ativ.corrigida{border-left-color:var(--green);}
+  .ativ.atrasada{border-left-color:#c1121f;}
+  .ativ-head{padding:18px 20px;}
+  .ativ-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
+  .ativ-titulo{font-size:1rem;font-weight:700;color:var(--primary);}
+  .ativ-disc{font-size:.74rem;color:var(--secondary);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+  .ativ-prazo{font-size:.76rem;color:var(--gray);margin-top:4px;}
+  .ativ-prazo.vencido{color:var(--red-text);font-weight:600;}
+  .ativ-enunciado{font-size:.84rem;color:var(--text);line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);white-space:pre-wrap;}
+  .ativ-secao{padding:14px 20px;border-top:1px solid var(--border);background:#fbfcfd;}
+  .ativ-secao-tit{font-size:.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .anexo-linha{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:.84rem;}
+  .anexo-linha:not(:last-child){border-bottom:1px solid var(--border);}
+  .entrega-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .feedback-box{background:var(--green-bg);border-left:3px solid var(--green);padding:12px 14px;border-radius:0 6px 6px 0;font-size:.84rem;color:#14532d;margin-top:10px;white-space:pre-wrap;}
+  .nota-badge{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;border-radius:50%;background:var(--green);color:#fff;font-size:1.05rem;font-weight:800;flex-shrink:0;}
+  input[type=file]{display:none;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--primary);color:#fff;padding:12px 22px;border-radius:8px;font-size:.84rem;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:all .3s;z-index:999;}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  .toast.success{background:var(--green);}
+  .toast.error{background:#c1121f;}
+  .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:998;transition:transform .2s;}
   .whatsapp-float:hover{transform:scale(1.08);}
   @media(max-width:860px){.dash-body{grid-template-columns:1fr;}.sidebar{display:none;}.dash-main{padding:20px 16px;}.stats-row,.stats-row-4{grid-template-columns:1fr 1fr;}.welcome-card{flex-direction:column;gap:12px;align-items:flex-start;}}
 </style>
@@ -149,6 +182,7 @@
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas">▶ &nbsp;Videoaulas</div>
       <div class="nav-label">Acadêmico</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)">◈ &nbsp;Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">📋 &nbsp;Atividades</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
       <div class="nav-label">Financeiro</div>
       <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
@@ -169,10 +203,20 @@
           <div class="stat-card"><div class="stat-value" id="st-media">—</div><div class="stat-label">Média Geral</div></div>
           <div class="stat-card"><div class="stat-value" id="st-disc">—</div><div class="stat-label">Disciplinas</div></div>
         </div>
+
+        <div class="card" id="card-progresso">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-size:.92rem;font-weight:700;color:var(--primary);">Progresso no curso</div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--secondary);" id="prog-pct">—</div>
+          </div>
+          <div style="font-size:.78rem;color:var(--gray);margin-bottom:10px;" id="prog-desc">Carregando...</div>
+          <div class="fin-progress"><div class="fin-progress-bar" id="prog-bar" style="width:0%"></div></div>
+        </div>
+
         <div class="card-grid">
           <div class="quick-card" onclick="showTab('materiais',null)"><div class="quick-icon">📄</div><div class="quick-label">Biblioteca</div><div class="quick-title">Materiais PDF</div><span class="quick-link">Acessar →</span></div>
+          <div class="quick-card" onclick="showTab('atividades',null)"><div class="quick-icon">📋</div><div class="quick-label">Trabalhos</div><div class="quick-title">Atividades</div><span class="quick-link">Ver →</span></div>
           <div class="quick-card" onclick="showTab('aulas',null)"><div class="quick-icon">▶</div><div class="quick-label">Videoaulas</div><div class="quick-title">Aulas gravadas</div><span class="quick-link">Assistir →</span></div>
-          <div class="quick-card" onclick="showTab('notas',null)"><div class="quick-icon">◎</div><div class="quick-label">Desempenho</div><div class="quick-title">Minhas notas</div><span class="quick-link">Ver →</span></div>
           <div class="quick-card" onclick="showTab('financeiro',null)"><div class="quick-icon">💰</div><div class="quick-label">Financeiro</div><div class="quick-title">Meus pagamentos</div><span class="quick-link">Ver →</span></div>
         </div>
       </div>
@@ -201,6 +245,13 @@
             <tbody id="lista-disciplinas"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody>
           </table>
         </div>
+      </div>
+
+      <!-- ============ ATIVIDADES (NOVO) ============ -->
+      <div class="tab-content" id="tab-atividades">
+        <div class="page-title">Atividades</div>
+        <div class="page-sub">Trabalhos das suas disciplinas</div>
+        <div id="lista-atividades"><div class="loading">Carregando...</div></div>
       </div>
 
       <!-- NOTAS -->
@@ -277,6 +328,8 @@
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <a href="https://wa.me/75998403658" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff"><path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/></svg>
@@ -358,19 +411,67 @@ function iniciarDashboard(){
   document.getElementById('welcome-info').textContent='Matrícula: '+(estudante.matricula||'—')+' · '+(estudante.cursos?.nome||'—')+' · Status: Ativo';
   showScreen('screen-dashboard');
   showTab('home',document.querySelector('.nav-item'));
-  Promise.all([carregarMateriais(),carregarDisciplinas(),carregarNotas(),carregarFinanceiro()]);
+  Promise.all([
+    carregarMateriais(), carregarDisciplinas(), carregarNotas(),
+    carregarFinanceiro(), carregarAtividades(), carregarProgresso()
+  ]);
+}
+
+function toast(msg,tipo=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast '+tipo+' show';
+  setTimeout(()=>el.classList.remove('show'),3500);
 }
 
 async function carregarMateriais(){
   if(!estudante)return;
-  const{data}=await sb.from('materiais').select('*').eq('curso_id',estudante.curso_id).order('ordem').order('created_at');
-  const pdfs=(data||[]).filter(m=>m.tipo==='pdf');
-  const videos=(data||[]).filter(m=>m.tipo==='video');
-  document.getElementById('st-mat').textContent=(data||[]).length;
+  const {data}=await sb.from('vw_materiais').select('*')
+    .eq('curso_id',estudante.curso_id)
+    .order('grupo').order('ordem').order('created_at');
+
+  const todos=data||[];
+  const pdfs=todos.filter(m=>m.tipo==='pdf');
+  const videos=todos.filter(m=>m.tipo==='video');
+
+  document.getElementById('st-mat').textContent=todos.length;
   document.getElementById('nav-mat').innerHTML='📄 &nbsp;Materiais <span class="nav-badge">'+pdfs.length+'</span>';
   document.getElementById('nav-aulas').innerHTML='▶ &nbsp;Videoaulas <span class="nav-badge">'+videos.length+'</span>';
-  document.getElementById('lista-pdfs').innerHTML=pdfs.length?pdfs.map(m=>`<div class="mat-card"><div class="mat-icon">📄</div><div class="mat-info"><div class="mat-title">${m.titulo}</div><div class="mat-meta">${m.descricao||'Material do curso'}</div></div><a href="${m.url}" target="_blank" class="btn btn-outline" style="font-size:.78rem;white-space:nowrap;">Abrir PDF</a></div>`).join(''):'<div class="empty">Nenhum material disponível ainda.</div>';
-  document.getElementById('lista-videos').innerHTML=videos.length?videos.map(m=>`<div class="mat-card"><div class="mat-icon">▶</div><div class="mat-info"><div class="mat-title">${m.titulo}</div><div class="mat-meta">${m.descricao||'Videoaula do curso'}</div></div><a href="${m.url}" target="_blank" class="btn btn-secondary" style="font-size:.78rem;white-space:nowrap;">Assistir</a></div>`).join(''):'<div class="empty">Nenhuma videoaula disponível ainda.</div>';
+
+  document.getElementById('lista-pdfs').innerHTML   = renderGrupos(pdfs,'pdf');
+  document.getElementById('lista-videos').innerHTML = renderGrupos(videos,'video');
+}
+
+// Agrupa por disciplina (ou "Material geral do curso")
+function renderGrupos(itens,tipo){
+  if(!itens.length){
+    return '<div class="empty" style="background:#fff;border-radius:8px;">'+
+      (tipo==='pdf'?'Nenhum material disponível ainda.':'Nenhuma videoaula disponível ainda.')+'</div>';
+  }
+
+  const grupos={};
+  itens.forEach(m=>{ (grupos[m.grupo] = grupos[m.grupo] || []).push(m); });
+
+  return Object.entries(grupos).map(function(entry){
+    const nome=entry[0], lista=entry[1];
+    return '<div class="grupo-card">'+
+      '<div class="grupo-head">'+
+        '<div class="grupo-nome">'+nome+'</div>'+
+        '<div class="grupo-sub">'+lista.length+' '+(tipo==='pdf'?'documento(s)':'aula(s)')+'</div>'+
+      '</div>'+
+      lista.map(function(m){
+        return '<div class="grupo-item">'+
+          '<div style="font-size:1.5rem;">'+(tipo==='pdf'?'📄':'▶')+'</div>'+
+          '<div style="flex:1;min-width:0;">'+
+            '<div class="mat-title">'+m.titulo+'</div>'+
+            (m.descricao?'<div class="mat-meta">'+m.descricao+'</div>':'')+
+          '</div>'+
+          '<a href="'+m.url+'" target="_blank" class="btn '+(tipo==='pdf'?'btn-outline':'btn-secondary')+'" style="font-size:.78rem;white-space:nowrap;">'+
+            (tipo==='pdf'?'Abrir PDF':'Assistir')+'</a>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  }).join('');
 }
 
 async function carregarDisciplinas(){
@@ -485,6 +586,206 @@ async function carregarFinanceiro(){
       <td class="${p.data_pagamento?'valor-pago':''}">${dataBR(p.data_pagamento)}</td>
     </tr>`;
   }).join('');
+}
+
+/* ==========================================================================
+   ATIVIDADES — baixar anexos, enviar trabalho, ver nota e feedback
+   ========================================================================== */
+const MAX_MB_TRAB = 20;
+let atividadesCache = [];
+
+async function carregarAtividades(){
+  if(!estudante)return;
+
+  // atividades das disciplinas do curso do aluno
+  const {data:ativs}=await sb.from('vw_atividades').select('*')
+    .eq('curso_id',estudante.curso_id)
+    .eq('publicada',true)
+    .order('prazo',{nullsFirst:false});
+
+  if(!ativs?.length){
+    document.getElementById('lista-atividades').innerHTML=
+      '<div class="empty" style="background:#fff;border-radius:8px;">Nenhuma atividade proposta ainda.</div>';
+    document.getElementById('nav-ativ').innerHTML='📋 &nbsp;Atividades';
+    return;
+  }
+
+  const ids=ativs.map(a=>a.id);
+  const [{data:anexos},{data:entregas}]=await Promise.all([
+    sb.from('atividade_anexos').select('*').in('atividade_id',ids),
+    sb.from('entregas').select('*').eq('aluno_id',estudante.id).in('atividade_id',ids)
+  ]);
+
+  atividadesCache = ativs.map(a=>({
+    ...a,
+    anexos:  (anexos||[]).filter(x=>x.atividade_id===a.id),
+    entrega: (entregas||[]).find(e=>e.atividade_id===a.id) || null,
+  }));
+
+  // badge: quantas ainda não entregou
+  const pendentes = atividadesCache.filter(a=>!a.entrega).length;
+  document.getElementById('nav-ativ').innerHTML =
+    '📋 &nbsp;Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
+
+  renderAtividades();
+}
+
+function renderAtividades(){
+  const hoje = new Date().toISOString().slice(0,10);
+
+  document.getElementById('lista-atividades').innerHTML = atividadesCache.map(function(a,i){
+    const e = a.entrega;
+    const vencido = a.prazo && a.prazo < hoje && !e;
+
+    let cls='', statusBadge='';
+    if(e && e.status==='corrigido'){ cls=' corrigida'; statusBadge='<span class="badge badge-green">Corrigido</span>'; }
+    else if(e){ cls=' entregue'; statusBadge='<span class="badge badge-yellow">Aguardando correção</span>'; }
+    else if(vencido){ cls=' atrasada'; statusBadge='<span class="badge badge-red">Prazo encerrado</span>'; }
+    else { statusBadge='<span class="badge badge-gray">A entregar</span>'; }
+
+    // Anexos (o que o aluno BAIXA)
+    let secAnexos='';
+    if(a.anexos.length){
+      secAnexos='<div class="ativ-secao">'+
+        '<div class="ativ-secao-tit">Arquivos da atividade</div>'+
+        a.anexos.map(function(x){
+          return '<div class="anexo-linha">'+
+            '<span>📎</span>'+
+            '<span style="flex:1;min-width:0;">'+x.nome_arquivo+'</span>'+
+            '<button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;" onclick="baixarAnexo(\''+x.path+'\')">Baixar</button>'+
+          '</div>';
+        }).join('')+
+      '</div>';
+    }
+
+    // Entrega (o que o aluno ENVIA)
+    let secEntrega='<div class="ativ-secao"><div class="ativ-secao-tit">Sua entrega</div>';
+
+    if(!e){
+      secEntrega+='<div class="entrega-box">'+
+        '<div style="flex:1;font-size:.84rem;color:var(--gray);">Envie seu trabalho em PDF, DOC ou DOCX (até '+MAX_MB_TRAB+' MB).</div>'+
+        '<button class="btn btn-secondary" style="font-size:.8rem;" onclick="escolherTrabalho('+i+')">Enviar trabalho</button>'+
+      '</div>';
+    } else if(e.status==='corrigido'){
+      secEntrega+='<div class="entrega-box">'+
+        '<div class="nota-badge">'+(e.nota ?? '—')+'</div>'+
+        '<div style="flex:1;min-width:0;">'+
+          '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+e.nome_arquivo+'</div>'+
+          '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(e.enviado_em)+' · corrigido em '+dataBR(e.corrigido_em)+'</div>'+
+        '</div>'+
+        '<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+e.path+'\')">Ver meu envio</button>'+
+      '</div>';
+      if(e.feedback){
+        secEntrega+='<div class="feedback-box"><strong>Feedback do professor:</strong>\n'+e.feedback+'</div>';
+      }
+    } else {
+      // enviado, aguardando correção → PODE TROCAR o arquivo
+      secEntrega+='<div class="entrega-box">'+
+        '<div style="font-size:1.4rem;">📄</div>'+
+        '<div style="flex:1;min-width:0;">'+
+          '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+e.nome_arquivo+'</div>'+
+          '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(e.enviado_em)+' · aguardando correção</div>'+
+        '</div>'+
+        '<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+e.path+'\')">Ver</button>'+
+        '<button class="btn btn-secondary" style="font-size:.76rem;" onclick="escolherTrabalho('+i+')">Trocar arquivo</button>'+
+      '</div>'+
+      '<div style="font-size:.74rem;color:var(--gray);margin-top:8px;">Enviou o arquivo errado? Você pode trocá-lo enquanto o trabalho não for corrigido.</div>';
+    }
+
+    secEntrega+='<input type="file" id="trab-'+i+'" accept=".pdf,.doc,.docx" onchange="enviarTrabalho('+i+',event)"/>';
+    secEntrega+='</div>';
+
+    return '<div class="ativ'+cls+'">'+
+      '<div class="ativ-head">'+
+        '<div class="ativ-topo">'+
+          '<div style="min-width:0;">'+
+            '<div class="ativ-disc">'+a.disciplina_nome+'</div>'+
+            '<div class="ativ-titulo">'+a.titulo+'</div>'+
+          '</div>'+
+          '<div style="flex-shrink:0;">'+statusBadge+'</div>'+
+        '</div>'+
+        (a.prazo ? '<div class="ativ-prazo'+(vencido?' vencido':'')+'">Prazo: '+dataBR(a.prazo)+'</div>' : '')+
+        (a.enunciado ? '<div class="ativ-enunciado">'+a.enunciado+'</div>' : '')+
+      '</div>'+
+      secAnexos+
+      secEntrega+
+    '</div>';
+  }).join('');
+}
+
+// Bucket privado → URL assinada temporária
+async function baixarAnexo(path){
+  const {data,error}=await sb.storage.from('trabalhos').createSignedUrl(path,300);
+  if(error||!data?.signedUrl){toast('Não foi possível abrir o arquivo.','error');return;}
+  window.open(data.signedUrl,'_blank');
+}
+
+function escolherTrabalho(i){
+  document.getElementById('trab-'+i).click();
+}
+
+async function enviarTrabalho(i, ev){
+  const file=ev.target.files[0];
+  if(!file) return;
+
+  const a=atividadesCache[i];
+
+  if(file.size > MAX_MB_TRAB*1024*1024){
+    toast('Arquivo muito grande (máx. '+MAX_MB_TRAB+' MB).','error');
+    ev.target.value='';
+    return;
+  }
+
+  toast('Enviando seu trabalho...');
+
+  const ext=(file.name.split('.').pop()||'pdf').toLowerCase();
+  const path='entregas/'+a.id+'/'+estudante.id+'_'+Date.now()+'.'+ext;
+
+  const {error:upErr}=await sb.storage.from('trabalhos').upload(path,file,{upsert:false,contentType:file.type});
+  if(upErr){
+    toast('Falha no envio. Tente novamente.','error');
+    console.error('[entrega]',upErr);
+    ev.target.value='';
+    return;
+  }
+
+  const {error:dbErr}=await sb.from('entregas').upsert({
+    atividade_id: a.id,
+    aluno_id:     estudante.id,
+    nome_arquivo: file.name,
+    url:  path,
+    path: path,
+    status: 'enviado',
+    enviado_em: new Date().toISOString()
+  },{onConflict:'atividade_id,aluno_id'});
+
+  ev.target.value='';
+
+  if(dbErr){
+    toast('Erro ao registrar a entrega.','error');
+    console.error('[entrega db]',dbErr);
+    return;
+  }
+
+  toast('Trabalho enviado!','success');
+  await carregarAtividades();
+}
+
+/* ==========================================================================
+   PROGRESSO NO CURSO
+   ========================================================================== */
+async function carregarProgresso(){
+  if(!estudante)return;
+  const {data}=await sb.from('vw_progresso_aluno').select('*').eq('aluno_id',estudante.id).maybeSingle();
+
+  const pct = data?.percentual ?? 0;
+  const conc = data?.concluidas ?? 0;
+  const tot  = data?.total_disciplinas ?? 0;
+
+  document.getElementById('prog-pct').textContent = pct+'%';
+  document.getElementById('prog-bar').style.width = pct+'%';
+  document.getElementById('prog-desc').textContent =
+    tot ? `${conc} de ${tot} disciplinas concluídas` : 'Nenhuma disciplina cadastrada ainda';
 }
 
 function emitirDeclaracao(tipo){
