@@ -388,8 +388,8 @@
 
           <div class="success-box" id="success-box">
             <div class="success-icon">✓</div>
-            <div class="success-title">Inscrição enviada com sucesso!</div>
-            <p class="success-sub">Recebemos sua solicitação e ela já está em análise.<br/>Entraremos em contato pelo <strong>WhatsApp</strong> em breve.</p>
+            <div class="success-title">Inscrição recebida!</div>
+            <p class="success-sub">Sua inscrição foi registrada e está <strong>em análise</strong> pela coordenação.<br/>Entraremos em contato pelo WhatsApp informado.</p>
             <button class="btn-reset" onclick="resetForm()">Fazer nova inscrição</button>
           </div>
         </div>
@@ -495,7 +495,7 @@
     btn.disabled = true;
     btn.textContent = 'Enviando...';
 
-    // 1) Registra a inscrição no banco (aparece no painel da coordenação)
+    // Registra a inscrição no banco → aparece no painel da coordenação
     const { error } = await sb.from('matriculas').insert({
       nome:      nome,
       email:     email,
@@ -515,20 +515,7 @@
       return;
     }
 
-    // 2) Abre o WhatsApp com a mensagem (fluxo que já funcionava)
-    const curso = cursos.find(c => c.id === cursoId);
-    const texto =
-      '\u{1F4CB} *Nova Inscri\u00E7\u00E3o \u2014 Saint Alcuin of York*\n\n' +
-      '\u{1F464} *Nome:* ' + nome + '\n' +
-      '\u{1F4F1} *WhatsApp:* ' + whats + '\n' +
-      '\u2709\uFE0F *E-mail:* ' + email + '\n' +
-      '\u{1F393} *Curso:* ' + (curso ? curso.nome : '') + '\n' +
-      '\u{1F4DA} *Gradua\u00E7\u00E3o:* ' + grad +
-      (msg ? '\n\u{1F4AC} *Mensagem:* ' + msg : '');
-    const url = 'https://wa.me/75998403658?text=' + encodeURIComponent(texto);
-    window.open(url, '_blank');
-
-    // 3) Tela de sucesso
+    // Tela de sucesso
     document.getElementById('form-wrapper').style.display = 'none';
     document.getElementById('success-box').style.display  = 'block';
   }
