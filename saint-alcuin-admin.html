@@ -520,6 +520,26 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MODAL: LIBERAR COM PRAZO -->
+<div class="modal-bg" id="modal-liberar">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-title" id="lib-titulo">Liberar atividade</div>
+    <div class="modal-sub" id="lib-sub">Defina a data de entrega para este aluno.</div>
+    <input type="hidden" id="lib-aluno"/>
+    <input type="hidden" id="lib-ativ"/>
+    <input type="hidden" id="lib-modo"/>
+    <div class="form-group">
+      <label>Data de entrega (prazo do aluno)</label>
+      <input type="date" id="lib-prazo"/>
+    </div>
+    <div class="fin-hint">O prazo é individual — vale só para este aluno, a partir de agora.</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-outline" onclick="fecharModal('modal-liberar')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarLiberar()" id="btnConfirmarLib">Liberar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: ANEXOS DA ATIVIDADE (arquivos que o aluno baixa) -->
 <div class="modal-bg" id="modal-anexos">
   <div class="modal-box" style="max-width:640px;">
@@ -1847,11 +1867,11 @@ async function carregarTrilhaAluno(){
 
   el.innerHTML =
     '<div style="margin-bottom:14px;">'+
-      '<button class="btn btn-primary" onclick="liberarProxima(\''+alunoId+'\')" '+(proxBloqueada?'':'disabled')+'>'+
+      '<button class="btn btn-primary" onclick="abrirLiberar(\''+alunoId+'\',null,\'proxima\')" '+(proxBloqueada?'':'disabled')+'>'+
         (proxBloqueada?'🔓 Liberar próxima etapa':'Tudo liberado')+
       '</button>'+
     '</div>'+
-    '<div class="table-wrap"><table class="data-table"><thead><tr><th style="width:44px;">#</th><th>Atividade</th><th>Disciplina</th><th>Estado</th><th>Nota</th><th></th></tr></thead><tbody>'+
+    '<div class="table-wrap"><table class="data-table"><thead><tr><th style="width:44px;">#</th><th>Atividade</th><th>Disciplina</th><th>Estado</th><th>Prazo</th><th>Nota</th><th></th></tr></thead><tbody>'+
     trilhaCache.map(function(t){
       const est=t.estado;
       const [cls,lbl,icon] =
@@ -1861,32 +1881,72 @@ async function carregarTrilhaAluno(){
                             ['badge-gray','Bloqueada','🔒'];
       let acao='';
       if(est==='bloqueada'){
-        acao='<button class="btn btn-outline btn-sm" onclick="liberarUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Liberar</button>';
+        acao='<button class="btn btn-outline btn-sm" onclick="abrirLiberar(\''+t.aluno_id+'\',\''+t.atividade_id+'\',\'uma\')">Liberar</button>';
       } else if(est==='liberada'){
-        acao='<button class="btn btn-danger btn-sm" onclick="bloquearUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Bloquear</button>';
+        acao='<button class="btn btn-outline btn-sm" onclick="abrirPrazo(\''+t.aluno_id+'\',\''+t.atividade_id+'\',\''+(t.prazo||'')+'\',\''+t.titulo.replace(/\x27/g,"")+'\')">Prazo</button> '+
+             '<button class="btn btn-danger btn-sm" onclick="bloquearUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Bloquear</button>';
       }
       return '<tr>'+
         '<td>'+t.posicao+'</td>'+
         '<td><strong>'+t.titulo+'</strong></td>'+
         '<td>'+t.disciplina_nome+'</td>'+
         '<td><span class="badge '+cls+'">'+icon+' '+lbl+'</span></td>'+
+        '<td>'+(t.prazo?dataBR(t.prazo):'—')+'</td>'+
         '<td>'+(t.nota!=null?'<strong>'+t.nota+'</strong>':'—')+'</td>'+
         '<td style="white-space:nowrap;">'+acao+'</td>'+
       '</tr>';
     }).join('')+'</tbody></table></div>';
 }
 
-async function liberarProxima(alunoId){
-  const {data,error}=await sb.rpc('liberar_proxima',{p_aluno_id:alunoId});
-  if(error){toast('Erro: '+error.message,'error');return;}
-  toast(data?('Liberado: '+data):'Não há próxima etapa.','success');
-  await carregarTrilhaAluno();
+// Abre o modal de prazo ao liberar (próxima ou específica)
+function abrirLiberar(alunoId, ativId, modo){
+  document.getElementById('lib-aluno').value=alunoId;
+  document.getElementById('lib-ativ').value=ativId||'';
+  document.getElementById('lib-modo').value=modo; // 'proxima' | 'uma'
+  document.getElementById('lib-titulo').textContent = modo==='proxima' ? 'Liberar próxima etapa' : 'Liberar atividade';
+  document.getElementById('lib-sub').textContent='Defina a data de entrega para este aluno.';
+  document.getElementById('lib-prazo').value='';
+  document.getElementById('btnConfirmarLib').textContent='Liberar';
+  abrirModal('modal-liberar');
 }
 
-async function liberarUma(alunoId,ativId){
-  const {error}=await sb.rpc('liberar_atividade',{p_aluno_id:alunoId,p_atividade_id:ativId});
+// Abre o modal só para editar o prazo de uma atividade já liberada
+function abrirPrazo(alunoId, ativId, prazoAtual, titulo){
+  document.getElementById('lib-aluno').value=alunoId;
+  document.getElementById('lib-ativ').value=ativId;
+  document.getElementById('lib-modo').value='prazo';
+  document.getElementById('lib-titulo').textContent='Editar prazo';
+  document.getElementById('lib-sub').textContent=titulo;
+  document.getElementById('lib-prazo').value=prazoAtual||'';
+  document.getElementById('btnConfirmarLib').textContent='Salvar prazo';
+  abrirModal('modal-liberar');
+}
+
+async function confirmarLiberar(){
+  const alunoId=document.getElementById('lib-aluno').value;
+  const ativId=document.getElementById('lib-ativ').value||null;
+  const modo=document.getElementById('lib-modo').value;
+  const prazo=document.getElementById('lib-prazo').value||null;
+
+  const btn=document.getElementById('btnConfirmarLib');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  let error;
+  if(modo==='proxima'){
+    const r=await sb.rpc('liberar_proxima',{p_aluno_id:alunoId, p_prazo:prazo});
+    error=r.error;
+  } else if(modo==='uma'){
+    const r=await sb.rpc('liberar_atividade',{p_aluno_id:alunoId, p_atividade_id:ativId, p_prazo:prazo});
+    error=r.error;
+  } else { // prazo
+    const r=await sb.rpc('definir_prazo',{p_aluno_id:alunoId, p_atividade_id:ativId, p_prazo:prazo});
+    error=r.error;
+  }
+
+  btn.disabled=false;
   if(error){toast('Erro: '+error.message,'error');return;}
-  toast('Atividade liberada.','success');
+  toast(modo==='prazo'?'Prazo atualizado.':'Atividade liberada.','success');
+  fecharModal('modal-liberar');
   await carregarTrilhaAluno();
 }
 
