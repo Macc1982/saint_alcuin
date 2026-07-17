@@ -131,6 +131,7 @@
       <div class="nav-item" onclick="showTab('cursos',this)">🎓 Cursos</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)">◈ Disciplinas</div>
       <div class="nav-item" onclick="showTab('atividades',this)">📋 Atividades</div>
+      <div class="nav-item" onclick="showTab('trilha',this)">🧭 Trilha do aluno</div>
     </nav>
     <div class="main">
 
@@ -422,6 +423,32 @@
           </table>
         </div>
       </div>
+
+      <!-- ============ TRILHA DO ALUNO ============ -->
+      <div class="tab" id="tab-trilha">
+        <div class="page-title">Trilha do aluno</div>
+        <div class="page-sub">Acompanhe o progresso e libere as próximas atividades</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Ordem da trilha do curso</div></div>
+          <div class="fin-hint">Defina a sequência das atividades do curso. O aluno percorre nesta ordem — cada etapa liberada por você.</div>
+          <div class="form-group" style="max-width:340px;">
+            <label>Curso</label>
+            <select id="trilha-curso" onchange="carregarOrdemTrilha()"><option value="">Selecione o curso</option></select>
+          </div>
+          <div id="ordem-trilha"><div class="empty">Selecione um curso para ordenar as atividades.</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Progresso individual</div></div>
+          <div class="form-group" style="max-width:340px;">
+            <label>Aluno</label>
+            <select id="trilha-aluno" onchange="carregarTrilhaAluno()"><option value="">Selecione o aluno</option></select>
+          </div>
+          <div id="trilha-aluno-view"><div class="empty">Selecione um aluno para ver a trilha dele.</div></div>
+        </div>
+      </div>
+
 
       <!-- NOTAS -->
       <div class="tab" id="tab-notas">
@@ -846,6 +873,7 @@ async function carregarAlunos(){
     data.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.nome+(a.cursos?.nome?' — '+a.cursos.nome:'');s.appendChild(o);});
     if(val)s.value=val;
   });
+  popularSelectsTrilha();
 }
 
 async function cadastrarAluno(){
@@ -1734,6 +1762,139 @@ async function salvarNotasTurma(){
 
   toast(`${linhas.length} nota(s) salva(s)!`,'success');
   await Promise.all([carregarDisciplinas(),carregarNotas()]);
+}
+
+/* ==========================================================================
+   TRILHA DO ALUNO (admin) — ordenar sequência + liberar por aluno
+   ========================================================================== */
+
+function popularSelectsTrilha(){
+  // curso
+  const sc=document.getElementById('trilha-curso');
+  if(sc){
+    const v=sc.value;
+    sc.innerHTML='<option value="">Selecione o curso</option>';
+    cursosCache.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.nome;sc.appendChild(o);});
+    if(v)sc.value=v;
+  }
+  // aluno
+  const sa=document.getElementById('trilha-aluno');
+  if(sa){
+    const v=sa.value;
+    sa.innerHTML='<option value="">Selecione o aluno</option>';
+    alunosCache.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.textContent=a.nome+(a.cursos?.nome?' — '+a.cursos.nome:'');sa.appendChild(o);});
+    if(v)sa.value=v;
+  }
+}
+
+// ---- Ordenar a trilha do curso (setas ↑ ↓) ----
+let ordemCache=[];
+
+async function carregarOrdemTrilha(){
+  const cursoId=document.getElementById('trilha-curso').value;
+  const el=document.getElementById('ordem-trilha');
+  if(!cursoId){el.innerHTML='<div class="empty">Selecione um curso para ordenar as atividades.</div>';return;}
+
+  const {data}=await sb.from('vw_atividades').select('*')
+    .eq('curso_id',cursoId)
+    .order('ordem_trilha',{nullsFirst:false})
+    .order('criado_em');
+  ordemCache=data||[];
+
+  if(!ordemCache.length){el.innerHTML='<div class="empty">Nenhuma atividade neste curso ainda.</div>';return;}
+
+  el.innerHTML='<div class="table-wrap"><table class="data-table"><thead><tr><th style="width:50px;">#</th><th>Atividade</th><th>Disciplina</th><th style="width:120px;">Ordem</th></tr></thead><tbody>'+
+    ordemCache.map(function(a,i){
+      return '<tr>'+
+        '<td><strong>'+(i+1)+'</strong></td>'+
+        '<td>'+a.titulo+'</td>'+
+        '<td>'+a.disciplina_nome+'</td>'+
+        '<td style="white-space:nowrap;">'+
+          '<button class="btn btn-outline btn-sm" '+(i===0?'disabled':'')+' onclick="moverAtividade('+i+',-1)">↑</button> '+
+          '<button class="btn btn-outline btn-sm" '+(i===ordemCache.length-1?'disabled':'')+' onclick="moverAtividade('+i+',1)">↓</button>'+
+        '</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+async function moverAtividade(i,dir){
+  const j=i+dir;
+  if(j<0||j>=ordemCache.length)return;
+  // troca as posições no array
+  const tmp=ordemCache[i]; ordemCache[i]=ordemCache[j]; ordemCache[j]=tmp;
+  // grava a nova ordem (1..N) de todos
+  const updates=ordemCache.map((a,idx)=>sb.from('atividades').update({ordem_trilha:idx+1}).eq('id',a.id));
+  await Promise.all(updates);
+  toast('Ordem atualizada.','success');
+  await carregarOrdemTrilha();
+}
+
+// ---- Progresso individual do aluno ----
+let trilhaCache=[];
+
+async function carregarTrilhaAluno(){
+  const alunoId=document.getElementById('trilha-aluno').value;
+  const el=document.getElementById('trilha-aluno-view');
+  if(!alunoId){el.innerHTML='<div class="empty">Selecione um aluno para ver a trilha dele.</div>';return;}
+
+  const {data}=await sb.from('vw_trilha_aluno').select('*')
+    .eq('aluno_id',alunoId).order('posicao');
+  trilhaCache=data||[];
+
+  if(!trilhaCache.length){el.innerHTML='<div class="empty">Este curso ainda não tem atividades na trilha.</div>';return;}
+
+  const proxBloqueada = trilhaCache.find(t=>t.estado==='bloqueada');
+
+  el.innerHTML =
+    '<div style="margin-bottom:14px;">'+
+      '<button class="btn btn-primary" onclick="liberarProxima(\''+alunoId+'\')" '+(proxBloqueada?'':'disabled')+'>'+
+        (proxBloqueada?'🔓 Liberar próxima etapa':'Tudo liberado')+
+      '</button>'+
+    '</div>'+
+    '<div class="table-wrap"><table class="data-table"><thead><tr><th style="width:44px;">#</th><th>Atividade</th><th>Disciplina</th><th>Estado</th><th>Nota</th><th></th></tr></thead><tbody>'+
+    trilhaCache.map(function(t){
+      const est=t.estado;
+      const [cls,lbl,icon] =
+        est==='concluida' ? ['badge-green','Concluída','✓'] :
+        est==='entregue'  ? ['badge-yellow','Entregue','📤'] :
+        est==='liberada'  ? ['badge-blue','Liberada','🔓'] :
+                            ['badge-gray','Bloqueada','🔒'];
+      let acao='';
+      if(est==='bloqueada'){
+        acao='<button class="btn btn-outline btn-sm" onclick="liberarUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Liberar</button>';
+      } else if(est==='liberada'){
+        acao='<button class="btn btn-danger btn-sm" onclick="bloquearUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Bloquear</button>';
+      }
+      return '<tr>'+
+        '<td>'+t.posicao+'</td>'+
+        '<td><strong>'+t.titulo+'</strong></td>'+
+        '<td>'+t.disciplina_nome+'</td>'+
+        '<td><span class="badge '+cls+'">'+icon+' '+lbl+'</span></td>'+
+        '<td>'+(t.nota!=null?'<strong>'+t.nota+'</strong>':'—')+'</td>'+
+        '<td style="white-space:nowrap;">'+acao+'</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+async function liberarProxima(alunoId){
+  const {data,error}=await sb.rpc('liberar_proxima',{p_aluno_id:alunoId});
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast(data?('Liberado: '+data):'Não há próxima etapa.','success');
+  await carregarTrilhaAluno();
+}
+
+async function liberarUma(alunoId,ativId){
+  const {error}=await sb.rpc('liberar_atividade',{p_aluno_id:alunoId,p_atividade_id:ativId});
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Atividade liberada.','success');
+  await carregarTrilhaAluno();
+}
+
+async function bloquearUma(alunoId,ativId){
+  const {error}=await sb.rpc('bloquear_atividade',{p_aluno_id:alunoId,p_atividade_id:ativId});
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Atividade bloqueada.','success');
+  await carregarTrilhaAluno();
 }
 
 function abrirEdicao(idx){
