@@ -122,11 +122,23 @@
   .grupo-item:last-child{border-bottom:none;}
   .grupo-item:hover{background:#f8fafc;}
 
-  /* ---- Atividades ---- */
-  .ativ{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:16px;overflow:hidden;border-left:4px solid var(--border);}
-  .ativ.entregue{border-left-color:#d97706;}
-  .ativ.corrigida{border-left-color:var(--green);}
-  .ativ.atrasada{border-left-color:#c1121f;}
+  /* ---- Trilha (linha do tempo vertical) ---- */
+  .trilha{position:relative;}
+  .trilha-item{display:flex;gap:16px;}
+  .trilha-eixo{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:40px;}
+  .trilha-no{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;flex-shrink:0;z-index:1;border:3px solid #fff;box-shadow:0 0 0 1px var(--border);}
+  .trilha-no.no-ok{background:var(--green);color:#fff;box-shadow:0 0 0 1px var(--green);}
+  .trilha-no.no-env{background:#d97706;color:#fff;box-shadow:0 0 0 1px #d97706;}
+  .trilha-no.no-atual{background:var(--secondary);color:#fff;box-shadow:0 0 0 4px rgba(20,93,160,.2);animation:pulseNo 2s infinite;}
+  .trilha-no.no-lock{background:#e5e7eb;color:#9ca3af;}
+  @keyframes pulseNo{0%,100%{box-shadow:0 0 0 4px rgba(20,93,160,.18);}50%{box-shadow:0 0 0 7px rgba(20,93,160,.08);}}
+  .trilha-linha{width:3px;flex:1;background:var(--border);margin:2px 0;min-height:24px;}
+  .trilha-conteudo{flex:1;min-width:0;padding-bottom:22px;}
+
+  .ativ-card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden;border-left:4px solid var(--secondary);}
+  .ativ-card.entregue{border-left-color:#d97706;}
+  .ativ-card.corrigida{border-left-color:var(--green);}
+  .ativ-card.locked{border-left-color:#e5e7eb;background:#fafafa;box-shadow:0 1px 4px rgba(0,0,0,.04);padding:16px 20px;}
   .ativ-head{padding:18px 20px;}
   .ativ-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
   .ativ-titulo{font-size:1rem;font-weight:700;color:var(--primary);}
@@ -690,33 +702,34 @@ let atividadesCache = [];
 async function carregarAtividades(){
   if(!estudante)return;
 
-  // atividades das disciplinas do curso do aluno
-  const {data:ativs}=await sb.from('vw_atividades').select('*')
-    .eq('curso_id',estudante.curso_id)
-    .eq('publicada',true)
-    .order('prazo',{nullsFirst:false});
+  // A trilha do aluno (view já traz estado + entrega de cada atividade)
+  const {data}=await sb.from('vw_trilha_aluno').select('*')
+    .eq('aluno_id',estudante.id).order('posicao');
 
-  if(!ativs?.length){
+  const trilha=data||[];
+
+  if(!trilha.length){
     document.getElementById('lista-atividades').innerHTML=
-      '<div class="empty" style="background:#fff;border-radius:8px;">Nenhuma atividade proposta ainda.</div>';
+      '<div class="empty" style="background:#fff;border-radius:8px;">Nenhuma atividade na sua trilha ainda.</div>';
     document.getElementById('nav-ativ').innerHTML='📋 &nbsp;Atividades';
     return;
   }
 
-  const ids=ativs.map(a=>a.id);
-  const [{data:anexos},{data:entregas}]=await Promise.all([
-    sb.from('atividade_anexos').select('*').in('atividade_id',ids),
-    sb.from('entregas').select('*').eq('aluno_id',estudante.id).in('atividade_id',ids)
-  ]);
+  // anexos das atividades liberadas (bloqueadas não precisam)
+  const idsLiberadas=trilha.filter(t=>t.estado!=='bloqueada').map(t=>t.atividade_id);
+  let anexos=[];
+  if(idsLiberadas.length){
+    const {data:ax}=await sb.from('atividade_anexos').select('*').in('atividade_id',idsLiberadas);
+    anexos=ax||[];
+  }
 
-  atividadesCache = ativs.map(a=>({
-    ...a,
-    anexos:  (anexos||[]).filter(x=>x.atividade_id===a.id),
-    entrega: (entregas||[]).find(e=>e.atividade_id===a.id) || null,
+  atividadesCache = trilha.map(t=>({
+    ...t,
+    anexos: anexos.filter(x=>x.atividade_id===t.atividade_id),
   }));
 
-  // badge: quantas ainda não entregou
-  const pendentes = atividadesCache.filter(a=>!a.entrega).length;
+  // badge: quantas liberadas ainda não entregues
+  const pendentes = atividadesCache.filter(t=>t.estado==='liberada').length;
   document.getElementById('nav-ativ').innerHTML =
     '📋 &nbsp;Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
 
@@ -724,86 +737,110 @@ async function carregarAtividades(){
 }
 
 function renderAtividades(){
-  const hoje = new Date().toISOString().slice(0,10);
+  const hoje=new Date().toISOString().slice(0,10);
 
-  document.getElementById('lista-atividades').innerHTML = atividadesCache.map(function(a,i){
-    const e = a.entrega;
-    const vencido = a.prazo && a.prazo < hoje && !e;
+  document.getElementById('lista-atividades').innerHTML =
+    '<div class="trilha">' +
+    atividadesCache.map(function(t,i){
+      const est=t.estado; // bloqueada | liberada | entregue | concluida
+      const ult = i===atividadesCache.length-1;
 
-    let cls='', statusBadge='';
-    if(e && e.status==='corrigido'){ cls=' corrigida'; statusBadge='<span class="badge badge-green">Corrigido</span>'; }
-    else if(e){ cls=' entregue'; statusBadge='<span class="badge badge-yellow">Aguardando correção</span>'; }
-    else if(vencido){ cls=' atrasada'; statusBadge='<span class="badge badge-red">Prazo encerrado</span>'; }
-    else { statusBadge='<span class="badge badge-gray">A entregar</span>'; }
+      // Nó da linha do tempo
+      const [nodeCls,nodeIcon] =
+        est==='concluida' ? ['no-ok','✓'] :
+        est==='entregue'  ? ['no-env','📤'] :
+        est==='liberada'  ? ['no-atual','●'] :
+                            ['no-lock','🔒'];
 
-    // Anexos (o que o aluno BAIXA)
-    let secAnexos='';
-    if(a.anexos.length){
-      secAnexos='<div class="ativ-secao">'+
-        '<div class="ativ-secao-tit">Arquivos da atividade</div>'+
-        a.anexos.map(function(x){
-          return '<div class="anexo-linha">'+
-            '<span>📎</span>'+
-            '<span style="flex:1;min-width:0;">'+x.nome_arquivo+'</span>'+
-            '<button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;" onclick="baixarAnexo(\''+x.path+'\')">Baixar</button>'+
-          '</div>';
-        }).join('')+
-      '</div>';
-    }
-
-    // Entrega (o que o aluno ENVIA)
-    let secEntrega='<div class="ativ-secao"><div class="ativ-secao-tit">Sua entrega</div>';
-
-    if(!e){
-      secEntrega+='<div class="entrega-box">'+
-        '<div style="flex:1;font-size:.84rem;color:var(--gray);">Envie seu trabalho em PDF, DOC ou DOCX (até '+MAX_MB_TRAB+' MB).</div>'+
-        '<button class="btn btn-secondary" style="font-size:.8rem;" onclick="escolherTrabalho('+i+')">Enviar trabalho</button>'+
-      '</div>';
-    } else if(e.status==='corrigido'){
-      secEntrega+='<div class="entrega-box">'+
-        '<div class="nota-badge">'+(e.nota ?? '—')+'</div>'+
-        '<div style="flex:1;min-width:0;">'+
-          '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+e.nome_arquivo+'</div>'+
-          '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(e.enviado_em)+' · corrigido em '+dataBR(e.corrigido_em)+'</div>'+
-        '</div>'+
-        '<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+e.path+'\')">Ver meu envio</button>'+
-      '</div>';
-      if(e.feedback){
-        secEntrega+='<div class="feedback-box"><strong>Feedback do professor:</strong>\n'+e.feedback+'</div>';
+      // ---- Bloqueada: card fechado ----
+      if(est==='bloqueada'){
+        return trilhaItem(nodeCls,nodeIcon,ult,
+          '<div class="ativ-card locked">'+
+            '<div class="ativ-disc">'+t.disciplina_nome+'</div>'+
+            '<div class="ativ-titulo" style="color:var(--gray);">'+t.titulo+' 🔒</div>'+
+            '<div style="font-size:.78rem;color:var(--gray);margin-top:4px;">Disponível após liberação da etapa anterior.</div>'+
+          '</div>');
       }
-    } else {
-      // enviado, aguardando correção → PODE TROCAR o arquivo
-      secEntrega+='<div class="entrega-box">'+
-        '<div style="font-size:1.4rem;">📄</div>'+
-        '<div style="flex:1;min-width:0;">'+
-          '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+e.nome_arquivo+'</div>'+
-          '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(e.enviado_em)+' · aguardando correção</div>'+
-        '</div>'+
-        '<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+e.path+'\')">Ver</button>'+
-        '<button class="btn btn-secondary" style="font-size:.76rem;" onclick="escolherTrabalho('+i+')">Trocar arquivo</button>'+
-      '</div>'+
-      '<div style="font-size:.74rem;color:var(--gray);margin-top:8px;">Enviou o arquivo errado? Você pode trocá-lo enquanto o trabalho não for corrigido.</div>';
-    }
 
-    secEntrega+='<input type="file" id="trab-'+i+'" accept=".pdf,.doc,.docx" onchange="enviarTrabalho('+i+',event)"/>';
-    secEntrega+='</div>';
+      // ---- Liberada / entregue / concluída: card aberto ----
+      const vencido = t.prazo && t.prazo < hoje && est==='liberada';
 
-    return '<div class="ativ'+cls+'">'+
-      '<div class="ativ-head">'+
-        '<div class="ativ-topo">'+
-          '<div style="min-width:0;">'+
-            '<div class="ativ-disc">'+a.disciplina_nome+'</div>'+
-            '<div class="ativ-titulo">'+a.titulo+'</div>'+
+      let statusBadge =
+        est==='concluida' ? '<span class="badge badge-green">Concluída</span>' :
+        est==='entregue'  ? '<span class="badge badge-yellow">Aguardando correção</span>' :
+        vencido           ? '<span class="badge badge-red">Prazo encerrado</span>' :
+                            '<span class="badge badge-blue">Disponível</span>';
+
+      // anexos
+      let secAnexos='';
+      if(t.anexos && t.anexos.length){
+        secAnexos='<div class="ativ-secao"><div class="ativ-secao-tit">Arquivos da atividade</div>'+
+          t.anexos.map(function(x){
+            return '<div class="anexo-linha"><span>📎</span>'+
+              '<span style="flex:1;min-width:0;">'+x.nome_arquivo+'</span>'+
+              '<button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;" onclick="baixarAnexo(\''+x.path+'\')">Baixar</button>'+
+            '</div>';
+          }).join('')+'</div>';
+      }
+
+      // entrega
+      let secEntrega='<div class="ativ-secao"><div class="ativ-secao-tit">Sua entrega</div>';
+      if(est==='concluida'){
+        secEntrega+='<div class="entrega-box">'+
+          '<div class="nota-badge">'+(t.nota ?? '—')+'</div>'+
+          '<div style="flex:1;min-width:0;">'+
+            '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+(t.entrega_arquivo||'Seu envio')+'</div>'+
+            '<div style="font-size:.74rem;color:var(--gray);">Corrigido em '+dataBR(t.corrigido_em)+'</div>'+
           '</div>'+
-          '<div style="flex-shrink:0;">'+statusBadge+'</div>'+
-        '</div>'+
-        (a.prazo ? '<div class="ativ-prazo'+(vencido?' vencido':'')+'">Prazo: '+dataBR(a.prazo)+'</div>' : '')+
-        (a.enunciado ? '<div class="ativ-enunciado">'+a.enunciado+'</div>' : '')+
-      '</div>'+
-      secAnexos+
-      secEntrega+
+          (t.entrega_path?'<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+t.entrega_path+'\')">Ver envio</button>':'')+
+        '</div>';
+        if(t.feedback){ secEntrega+='<div class="feedback-box"><strong>Feedback do professor:</strong>\n'+t.feedback+'</div>'; }
+      } else if(est==='entregue'){
+        secEntrega+='<div class="entrega-box">'+
+          '<div style="font-size:1.4rem;">📄</div>'+
+          '<div style="flex:1;min-width:0;">'+
+            '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+(t.entrega_arquivo||'Seu envio')+'</div>'+
+            '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(t.enviado_em)+' · aguardando correção</div>'+
+          '</div>'+
+          (t.entrega_path?'<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+t.entrega_path+'\')">Ver</button>':'')+
+          '<button class="btn btn-secondary" style="font-size:.76rem;" onclick="escolherTrabalho('+i+')">Trocar arquivo</button>'+
+        '</div>';
+      } else {
+        secEntrega+='<div class="entrega-box">'+
+          '<div style="flex:1;font-size:.84rem;color:var(--gray);">Envie seu trabalho em PDF, DOC ou DOCX (até '+MAX_MB_TRAB+' MB).</div>'+
+          '<button class="btn btn-secondary" style="font-size:.8rem;" onclick="escolherTrabalho('+i+')">Enviar trabalho</button>'+
+        '</div>';
+      }
+      secEntrega+='<input type="file" id="trab-'+i+'" accept=".pdf,.doc,.docx" onchange="enviarTrabalho('+i+',event)"/>';
+      secEntrega+='</div>';
+
+      const card='<div class="ativ-card'+(est==='concluida'?' corrigida':est==='entregue'?' entregue':'')+'">'+
+        '<div class="ativ-head">'+
+          '<div class="ativ-topo">'+
+            '<div style="min-width:0;">'+
+              '<div class="ativ-disc">'+t.disciplina_nome+'</div>'+
+              '<div class="ativ-titulo">'+t.titulo+'</div>'+
+            '</div>'+
+            '<div style="flex-shrink:0;">'+statusBadge+'</div>'+
+          '</div>'+
+          (t.prazo?'<div class="ativ-prazo'+(vencido?' vencido':'')+'">Prazo: '+dataBR(t.prazo)+'</div>':'')+
+          (t.enunciado?'<div class="ativ-enunciado">'+t.enunciado+'</div>':'')+
+        '</div>'+secAnexos+secEntrega+'</div>';
+
+      return trilhaItem(nodeCls,nodeIcon,ult,card);
+    }).join('') +
     '</div>';
-  }).join('');
+}
+
+// Monta um item da linha do tempo (nó + linha + conteúdo)
+function trilhaItem(nodeCls,icon,ultimo,conteudo){
+  return '<div class="trilha-item">'+
+    '<div class="trilha-eixo">'+
+      '<div class="trilha-no '+nodeCls+'">'+icon+'</div>'+
+      (ultimo?'':'<div class="trilha-linha"></div>')+
+    '</div>'+
+    '<div class="trilha-conteudo">'+conteudo+'</div>'+
+  '</div>';
 }
 
 // Bucket privado → URL assinada temporária
@@ -822,6 +859,7 @@ async function enviarTrabalho(i, ev){
   if(!file) return;
 
   const a=atividadesCache[i];
+  const ativId = a.atividade_id;  // na trilha, o id da atividade vem em atividade_id
 
   if(file.size > MAX_MB_TRAB*1024*1024){
     toast('Arquivo muito grande (máx. '+MAX_MB_TRAB+' MB).','error');
@@ -832,7 +870,7 @@ async function enviarTrabalho(i, ev){
   toast('Enviando seu trabalho...');
 
   const ext=(file.name.split('.').pop()||'pdf').toLowerCase();
-  const path='entregas/'+a.id+'/'+estudante.id+'_'+Date.now()+'.'+ext;
+  const path='entregas/'+ativId+'/'+estudante.id+'_'+Date.now()+'.'+ext;
 
   const {error:upErr}=await sb.storage.from('trabalhos').upload(path,file,{upsert:false,contentType:file.type});
   if(upErr){
@@ -843,7 +881,7 @@ async function enviarTrabalho(i, ev){
   }
 
   const {error:dbErr}=await sb.from('entregas').upsert({
-    atividade_id: a.id,
+    atividade_id: ativId,
     aluno_id:     estudante.id,
     nome_arquivo: file.name,
     url:  path,
@@ -861,7 +899,7 @@ async function enviarTrabalho(i, ev){
   }
 
   toast('Trabalho enviado!','success');
-  await carregarAtividades();
+  await Promise.all([carregarAtividades(),carregarProgresso()]);
 }
 
 /* ==========================================================================
