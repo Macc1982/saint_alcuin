@@ -194,21 +194,21 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)">📊 Dashboard</div>
-      <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas">📝 Matrículas</div>
-      <div class="nav-item" onclick="showTab('alunos',this)">👤 Alunos</div>
-      <div class="nav-item" onclick="showTab('financeiro',this)">💰 Financeiro</div>
-      <div class="nav-item" onclick="showTab('documentos',this)">🗂 Documentos</div>
-      <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
-      <div class="nav-item" onclick="showTab('linhas',this)">🔬 Linhas de pesquisa</div>
-      <div class="nav-item" onclick="showTab('acervo',this)">📚 Acervo do curso</div>
-      <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">✍️ Para corrigir</div>
-      <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)">Dashboard</div>
+      <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas">Matrículas</div>
+      <div class="nav-item" onclick="showTab('alunos',this)">Alunos</div>
+      <div class="nav-item" onclick="showTab('financeiro',this)">Financeiro</div>
+      <div class="nav-item" onclick="showTab('documentos',this)">Documentos</div>
+      <div class="nav-item" onclick="showTab('materiais',this)">Materiais</div>
+      <div class="nav-item" onclick="showTab('linhas',this)">Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('acervo',this)">Acervo do curso</div>
+      <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">Para corrigir</div>
+      <div class="nav-item" onclick="showTab('notas',this)">Notas</div>
       <div class="nav-label">Cursos</div>
-      <div class="nav-item" onclick="showTab('cursos',this)">🎓 Cursos</div>
-      <div class="nav-item" onclick="showTab('disciplinas',this)">◈ Disciplinas</div>
-      <div class="nav-item" onclick="showTab('atividades',this)">📋 Atividades</div>
-      <div class="nav-item" onclick="showTab('trilha',this)">🧭 Trilha do aluno</div>
+      <div class="nav-item" onclick="showTab('cursos',this)">Cursos</div>
+      <div class="nav-item" onclick="showTab('disciplinas',this)">Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)">Atividades</div>
+      <div class="nav-item" onclick="showTab('trilha',this)">Trilha do aluno</div>
     </nav>
     <div class="main">
 
@@ -539,6 +539,7 @@
             <div class="form-group">
               <label>Categoria</label>
               <select id="ac-categoria">
+                <option value="linhas">Linhas de pesquisa</option>
                 <option value="ementa">Ementa do curso</option>
                 <option value="normas">Normas de artigos científicos</option>
                 <option value="estrutura">Estrutura da dissertação/tese</option>
@@ -1868,6 +1869,7 @@ async function excluirDoc(id,path){
    ========================================================================== */
 
 const AC_LABELS={
+  linhas:'Linhas de pesquisa',
   ementa:'Ementa do curso', normas:'Normas de artigos científicos',
   estrutura:'Estrutura da dissertação/tese',
   regulamento:'Regulamento', edital:'Edital', cronograma:'Cronograma'
@@ -2283,7 +2285,7 @@ async function carregarCorrecoes(){
 
   const pend=cnt('enviado');
   document.getElementById('nav-corrigir').innerHTML =
-    '✍️ Para corrigir' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
+    'Para corrigir' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
 
   const el=document.getElementById('lista-correcoes');
   const hint=document.getElementById('corr-hint');
@@ -2324,7 +2326,7 @@ async function carregarCorrecoes(){
       html+=`<tr>
         <td><strong>${e.estudantes?.nome||'—'}</strong>${e.estudantes?.matricula?'<div style="font-size:.7rem;color:var(--gray);">'+e.estudantes.matricula+'</div>':''}</td>
         <td>${e.atividades?.disciplinas?.nome||'—'}</td>
-        <td>${e.atividades?.titulo||'—'}</td>
+        <td>${e.atividades?.titulo||'—'} ${e.em_grupo?'<span class="badge badge-blue">Em grupo</span>':'<span class="badge badge-gray">Individual</span>'}</td>
         <td>${dataBR(e.enviado_em)}</td>
         <td style="text-align:center">${e.nota!=null?'<strong>'+e.nota+'</strong>':'—'}</td>
         <td><span class="badge badge-${corrigido?'green':'yellow'}">${corrigido?'Corrigido':'Aguardando'}</span></td>
@@ -2352,10 +2354,11 @@ function abrirCorrecao(idx){
   document.getElementById('cor-enviado').textContent = 'Enviado em ' + dataBR(e.enviado_em);
 
   const com=document.getElementById('cor-comentario');
-  if(e.comentario_aluno){
-    com.style.display='block';
-    com.innerHTML='<strong>Observação do aluno:</strong> '+e.comentario_aluno;
-  } else { com.style.display='none'; }
+  let extras='';
+  extras+='<div style="margin-bottom:8px;"><span class="badge badge-'+(e.em_grupo?'blue':'gray')+'">'+
+          (e.em_grupo?'Trabalho em grupo':'Trabalho individual')+'</span></div>';
+  if(e.comentario_aluno){ extras+='<strong>Observação do aluno:</strong> '+e.comentario_aluno; }
+  com.style.display='block'; com.innerHTML=extras;
 
   document.getElementById('cor-nota').value     = e.nota ?? '';
   document.getElementById('cor-feedback').value = e.feedback ?? '';
@@ -2773,29 +2776,37 @@ async function carregarTrilhaAluno(){
   if(!trilhaCache.length){el.innerHTML='<div class="empty">Este curso ainda não tem atividades na trilha.</div>';return;}
 
   const proxBloqueada = trilhaCache.find(t=>t.estado==='bloqueada');
+  const dispensadas   = trilhaCache.filter(t=>t.estado==='dispensada').length;
 
   el.innerHTML =
-    '<div style="margin-bottom:14px;">'+
+    '<div style="margin-bottom:14px;display:flex;align-items:center;gap:14px;">'+
       '<button class="btn btn-primary" onclick="abrirLiberar(\''+alunoId+'\',null,\'proxima\')" '+(proxBloqueada?'':'disabled')+'>'+
         (proxBloqueada?'🔓 Liberar próxima etapa':'Tudo liberado')+
       '</button>'+
+      (dispensadas?'<span style="font-size:.78rem;color:var(--gray);">'+dispensadas+' atividade(s) dispensada(s) para este aluno</span>':'')+
     '</div>'+
     '<div class="table-wrap"><table class="data-table"><thead><tr><th style="width:44px;">#</th><th>Atividade</th><th>Disciplina</th><th>Estado</th><th>Prazo</th><th>Nota</th><th></th></tr></thead><tbody>'+
     trilhaCache.map(function(t){
       const est=t.estado;
       const [cls,lbl,icon] =
-        est==='concluida' ? ['badge-green','Concluída','✓'] :
-        est==='entregue'  ? ['badge-yellow','Entregue','📤'] :
-        est==='liberada'  ? ['badge-blue','Liberada','🔓'] :
-                            ['badge-gray','Bloqueada','🔒'];
+        est==='concluida'  ? ['badge-green','Concluída','✓'] :
+        est==='entregue'   ? ['badge-yellow','Entregue','📤'] :
+        est==='liberada'   ? ['badge-blue','Liberada','🔓'] :
+        est==='dispensada' ? ['badge-gray','Dispensada','—'] :
+                             ['badge-gray','Bloqueada','🔒'];
       let acao='';
-      if(est==='bloqueada'){
-        acao='<button class="btn btn-outline btn-sm" onclick="abrirLiberar(\''+t.aluno_id+'\',\''+t.atividade_id+'\',\'uma\')">Liberar</button>';
+      if(est==='dispensada'){
+        acao='<button class="btn btn-outline btn-sm" onclick="restaurarAtiv(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Restaurar</button>';
+      } else if(est==='bloqueada'){
+        acao='<button class="btn btn-outline btn-sm" onclick="abrirLiberar(\''+t.aluno_id+'\',\''+t.atividade_id+'\',\'uma\')">Liberar</button> '+
+             '<button class="btn btn-danger btn-sm" onclick="dispensarAtiv(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Dispensar</button>';
       } else if(est==='liberada'){
         acao='<button class="btn btn-outline btn-sm" onclick="abrirPrazo(\''+t.aluno_id+'\',\''+t.atividade_id+'\',\''+(t.prazo||'')+'\',\''+t.titulo.replace(/\x27/g,"")+'\')">Prazo</button> '+
-             '<button class="btn btn-danger btn-sm" onclick="bloquearUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Bloquear</button>';
+             '<button class="btn btn-outline btn-sm" onclick="bloquearUma(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Bloquear</button> '+
+             '<button class="btn btn-danger btn-sm" onclick="dispensarAtiv(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Dispensar</button>';
       }
-      return '<tr>'+
+      const dim = est==='dispensada' ? ' style="opacity:.5"' : '';
+      return '<tr'+dim+'>'+
         '<td>'+t.posicao+'</td>'+
         '<td><strong>'+t.titulo+'</strong></td>'+
         '<td>'+t.disciplina_nome+'</td>'+
@@ -2856,6 +2867,21 @@ async function confirmarLiberar(){
   if(error){toast('Erro: '+error.message,'error');return;}
   toast(modo==='prazo'?'Prazo atualizado.':'Atividade liberada.','success');
   fecharModal('modal-liberar');
+  await carregarTrilhaAluno();
+}
+
+async function dispensarAtiv(alunoId,ativId){
+  if(!confirm('Dispensar esta atividade para este aluno?\n\nEla sai da trilha dele e não conta no progresso. Os demais alunos não são afetados.'))return;
+  const {error}=await sb.rpc('dispensar_atividade',{p_aluno_id:alunoId,p_atividade_id:ativId});
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Atividade dispensada para este aluno.','success');
+  await carregarTrilhaAluno();
+}
+
+async function restaurarAtiv(alunoId,ativId){
+  const {error}=await sb.rpc('restaurar_atividade',{p_aluno_id:alunoId,p_atividade_id:ativId});
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Atividade restaurada (bloqueada).','success');
   await carregarTrilhaAluno();
 }
 
@@ -2928,7 +2954,7 @@ async function carregarMatriculas(){
   // Badge no menu (inscrições aguardando)
   const pend=cnt('inscrito');
   document.getElementById('nav-matriculas').innerHTML =
-    '📝 Matrículas' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
+    'Matrículas' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
 
   const tbody=document.getElementById('tabela-matriculas');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma inscrição.</td></tr>';return;}
