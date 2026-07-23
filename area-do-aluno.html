@@ -254,20 +254,20 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)">Início</div>
-      <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat">Materiais</div>
-      <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas">Videoaulas</div>
+      <div class="nav-item active" onclick="showTab('home',this)">⌂ &nbsp;Início</div>
+      <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat">📄 &nbsp;Materiais</div>
+      <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas">▶ &nbsp;Videoaulas</div>
       <div class="nav-label">Acadêmico</div>
-      <div class="nav-item" onclick="showTab('disciplinas',this)">Disciplinas</div>
-      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">Atividades</div>
-      <div class="nav-item" onclick="showTab('notas',this)">Notas</div>
-      <div class="nav-item" onclick="showTab('linhas',this)">Linhas de pesquisa</div>
-      <div class="nav-item" onclick="showTab('acervo',this)">Acervo do curso</div>
+      <div class="nav-item" onclick="showTab('disciplinas',this)">◈ &nbsp;Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">📋 &nbsp;Atividades</div>
+      <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
+      <div class="nav-item" onclick="showTab('linhas',this)">🔬 &nbsp;Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('acervo',this)">📚 &nbsp;Acervo do curso</div>
       <div class="nav-label">Financeiro</div>
-      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">Pagamentos</div>
+      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
       <div class="nav-label">Documentos</div>
-      <div class="nav-item" onclick="showTab('meusdocs',this)">Meus documentos</div>
-      <div class="nav-item" onclick="showTab('declaracoes',this)">Declarações</div>
+      <div class="nav-item" onclick="showTab('meusdocs',this)">🗂 &nbsp;Meus documentos</div>
+      <div class="nav-item" onclick="showTab('declaracoes',this)">☰ &nbsp;Declarações</div>
     </nav>
 
     <div class="dash-main">
@@ -615,8 +615,8 @@ async function carregarMateriais(){
   const videos=todos.filter(m=>m.tipo==='video');
 
   document.getElementById('st-mat').textContent=todos.length;
-  document.getElementById('nav-mat').innerHTML='Materiais <span class="nav-badge">'+pdfs.length+'</span>';
-  document.getElementById('nav-aulas').innerHTML='Videoaulas <span class="nav-badge">'+videos.length+'</span>';
+  document.getElementById('nav-mat').innerHTML='📄 &nbsp;Materiais <span class="nav-badge">'+pdfs.length+'</span>';
+  document.getElementById('nav-aulas').innerHTML='▶ &nbsp;Videoaulas <span class="nav-badge">'+videos.length+'</span>';
 
   document.getElementById('lista-pdfs').innerHTML   = renderGrupos(pdfs,'pdf');
   document.getElementById('lista-videos').innerHTML = renderGrupos(videos,'video');
@@ -730,10 +730,10 @@ async function carregarFinanceiro(){
   if(atrasadas.length){
     alerta.style.display='block';
     alerta.innerHTML = `<strong>Atenção:</strong> você tem ${atrasadas.length} parcela${atrasadas.length>1?'s':''} em atraso. Regularize para manter seu acesso ativo.`;
-    document.getElementById('nav-fin').innerHTML='Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
+    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
   } else {
     alerta.style.display='none';
-    document.getElementById('nav-fin').innerHTML='Pagamentos';
+    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos';
   }
 
   // Próxima a vencer (em aberto, não atrasada, mais próxima)
@@ -786,7 +786,7 @@ async function carregarAtividades(){
   if(!trilha.length){
     document.getElementById('lista-atividades').innerHTML=
       '<div class="empty" style="background:#fff;border-radius:8px;">Nenhuma atividade na sua trilha ainda.</div>';
-    document.getElementById('nav-ativ').innerHTML='Atividades';
+    document.getElementById('nav-ativ').innerHTML='📋 &nbsp;Atividades';
     return;
   }
 
@@ -806,7 +806,7 @@ async function carregarAtividades(){
   // badge: quantas liberadas ainda não entregues
   const pendentes = atividadesCache.filter(t=>t.estado==='liberada').length;
   document.getElementById('nav-ativ').innerHTML =
-    'Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
+    '📋 &nbsp;Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
 
   renderAtividades();
 }
@@ -1040,7 +1040,8 @@ async function carregarLinhasAluno(){
   const {data,error}=await sb.from('materiais').select('*')
     .eq('curso_id',estudante.curso_id)
     .eq('categoria','linhas')
-    .order('created_at',{ascending:false});
+    .order('created_at',{ascending:false})
+    .limit(1);
 
   if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar.</div></div>';return;}
   if(!data||!data.length){
@@ -1048,28 +1049,14 @@ async function carregarLinhasAluno(){
     return;
   }
 
-  const principal=data[0];
-  const outros=data.slice(1);
-
-  let html=`
-    <a class="destaque" href="${principal.url}" target="_blank" rel="noopener">
+  const doc=data[0];
+  el.innerHTML=`
+    <a class="destaque" href="${doc.url}" target="_blank" rel="noopener">
       <div class="destaque-tag">Documento oficial</div>
-      <div class="destaque-titulo">${principal.titulo}</div>
-      <div class="destaque-desc">${principal.descricao||'Eixos temáticos do programa. Sua dissertação deve vincular-se a uma das linhas descritas neste documento.'}</div>
+      <div class="destaque-titulo">${doc.titulo}</div>
+      <div class="destaque-desc">${doc.descricao||'Eixos temáticos do programa. Sua dissertação deve vincular-se a uma das linhas descritas neste documento.'}</div>
       <div class="destaque-acao">Abrir documento &rarr;</div>
     </a>`;
-
-  if(outros.length){
-    html+='<div class="sec-title">Outros documentos</div><div class="doc-grid">'+
-      outros.map(m=>`
-        <div class="doc-card">
-          <div class="doc-titulo">${m.titulo}</div>
-          <div class="doc-desc">${m.descricao||'Documento complementar'}</div>
-          <a class="doc-abrir" href="${m.url}" target="_blank" rel="noopener">Abrir documento &rarr;</a>
-        </div>`).join('')+'</div>';
-  }
-
-  el.innerHTML=html;
 }
 
 /* ==========================================================================
