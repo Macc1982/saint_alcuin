@@ -82,7 +82,7 @@
   .upload-icon{font-size:2rem;margin-bottom:8px;}
   .upload-text{font-size:.82rem;color:var(--gray);}
   .upload-text strong{color:var(--secondary);}
-  #fileInput{display:none;}
+  #fileInput,#docInput,#acInput{display:none;}
   .loading{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   .empty{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   /* ---- Financeiro ---- */
@@ -94,6 +94,59 @@
   .modal-box{background:#fff;border-radius:10px;padding:28px;width:100%;max-width:460px;box-shadow:0 16px 48px rgba(0,0,0,.2);}
   .modal-title{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:6px;}
   .modal-sub{font-size:.78rem;color:var(--gray);margin-bottom:18px;}
+  .modal-box.wide{max-width:720px;}
+
+  /* ---------- Dashboard ---------- */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;}
+  .kpi{background:var(--white);border-radius:10px;padding:18px 20px 16px;box-shadow:0 1px 3px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04);border:1px solid var(--border);position:relative;overflow:hidden;}
+  .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+  .kpi-green::before{background:#15803d;}
+  .kpi-blue::before{background:var(--secondary);}
+  .kpi-red::before{background:#c1121f;}
+  .kpi-neutral::before{background:#94a3b8;}
+  .kpi-label{font-size:.64rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:1.65rem;font-weight:700;color:var(--primary);line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+  .kpi-green .kpi-value{color:#15803d;}
+  .kpi-red .kpi-value{color:#c1121f;}
+  .kpi-foot{font-size:.7rem;color:var(--gray);margin-top:6px;min-height:1em;}
+  .mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+  .mini{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:baseline;gap:10px;}
+  .mini-value{font-size:1.15rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;}
+  .mini-label{font-size:.72rem;color:var(--gray);}
+  .dash-cols{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:start;}
+  .card-hint{font-size:.72rem;color:var(--gray);}
+  .bar-track{height:6px;background:#eef2f6;border-radius:4px;overflow:hidden;margin-top:6px;display:flex;}
+  .bar-seg{height:100%;}
+  .bar-pago{background:#15803d;}
+  .bar-aberto{background:var(--secondary);}
+  .bar-venc{background:#c1121f;}
+  .fin-linha{padding:14px 0;border-bottom:1px solid var(--border);}
+  .fin-linha:last-child{border-bottom:none;}
+  .fin-topo{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
+  .fin-nome{font-size:.85rem;font-weight:600;color:var(--primary);}
+  .fin-total{font-size:.78rem;color:var(--gray);font-variant-numeric:tabular-nums;}
+  .fin-nums{display:flex;gap:16px;margin-top:7px;font-size:.72rem;font-variant-numeric:tabular-nums;}
+  .fin-nums span{display:flex;align-items:center;gap:5px;color:var(--gray);}
+  .fin-nums i{width:7px;height:7px;border-radius:2px;display:inline-block;font-style:normal;}
+
+  /* ---------- Documentos / Acervo ---------- */
+  .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;}
+  .doc-card{border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--white);transition:border-color .15s,box-shadow .15s;}
+  .doc-card:hover{border-color:var(--secondary);box-shadow:0 2px 8px rgba(20,93,160,.09);}
+  .doc-tipo{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--secondary);margin-bottom:6px;}
+  .doc-titulo{font-size:.85rem;font-weight:600;color:var(--primary);line-height:1.35;margin-bottom:4px;word-break:break-word;}
+  .doc-meta{font-size:.7rem;color:var(--gray);margin-bottom:10px;}
+  .doc-acoes{display:flex;gap:8px;}
+  .link-btn{background:none;border:none;font-size:.72rem;font-weight:600;color:var(--secondary);cursor:pointer;padding:0;}
+  .link-btn:hover{text-decoration:underline;}
+  .link-btn.danger{color:#c1121f;}
+  .sec-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin:22px 0 10px;}
+  .sec-title:first-child{margin-top:0;}
+
+  @media(max-width:1100px){
+    .kpi-grid,.mini-grid{grid-template-columns:repeat(2,1fr);}
+    .dash-cols{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
@@ -124,7 +177,9 @@
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas">📝 Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)">👤 Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)">💰 Financeiro</div>
+      <div class="nav-item" onclick="showTab('documentos',this)">🗂 Documentos</div>
       <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
+      <div class="nav-item" onclick="showTab('acervo',this)">📚 Acervo do curso</div>
       <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">✍️ Para corrigir</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
       <div class="nav-label">Cursos</div>
@@ -137,13 +192,56 @@
 
       <!-- DASHBOARD -->
       <div class="tab active" id="tab-dashboard">
-        <div class="page-title">Dashboard</div><div class="page-sub">Visão geral</div>
-        <div class="stats-row">
-          <div class="stat-card"><div class="stat-value" id="st-alunos">—</div><div class="stat-label">Alunos</div></div>
-          <div class="stat-card"><div class="stat-value" id="st-materiais">—</div><div class="stat-label">Materiais</div></div>
-          <div class="stat-card"><div class="stat-value" id="st-cursos">—</div><div class="stat-label">Cursos</div></div>
+        <div class="page-title">Dashboard</div><div class="page-sub">Visão geral da instituição</div>
+
+        <div class="kpi-grid">
+          <div class="kpi kpi-green">
+            <div class="kpi-label">Recebido</div>
+            <div class="kpi-value" id="k-recebido">—</div>
+            <div class="kpi-foot" id="k-recebido-sub">&nbsp;</div>
+          </div>
+          <div class="kpi kpi-blue">
+            <div class="kpi-label">A vencer</div>
+            <div class="kpi-value" id="k-avencer">—</div>
+            <div class="kpi-foot" id="k-avencer-sub">&nbsp;</div>
+          </div>
+          <div class="kpi kpi-red">
+            <div class="kpi-label">Vencido</div>
+            <div class="kpi-value" id="k-vencido">—</div>
+            <div class="kpi-foot" id="k-vencido-sub">&nbsp;</div>
+          </div>
+          <div class="kpi kpi-neutral">
+            <div class="kpi-label">Inadimplência</div>
+            <div class="kpi-value" id="k-inad">—</div>
+            <div class="kpi-foot" id="k-inad-sub">&nbsp;</div>
+          </div>
         </div>
-        <div class="card"><div class="card-header"><div class="card-title">Alunos por Curso</div></div><div id="dash-cursos"><div class="loading">Carregando...</div></div></div>
+
+        <div class="mini-grid">
+          <div class="mini"><div class="mini-value" id="st-alunos">—</div><div class="mini-label">Alunos ativos</div></div>
+          <div class="mini"><div class="mini-value" id="st-cursos">—</div><div class="mini-label">Cursos</div></div>
+          <div class="mini"><div class="mini-value" id="st-materiais">—</div><div class="mini-label">Materiais</div></div>
+          <div class="mini"><div class="mini-value" id="st-corrigir">—</div><div class="mini-label">A corrigir</div></div>
+        </div>
+
+        <div class="dash-cols">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Financeiro por curso</div></div>
+            <div id="dash-fin"><div class="loading">Carregando...</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Alunos por curso</div></div>
+            <div id="dash-cursos"><div class="loading">Carregando...</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Parcelas vencidas</div>
+            <span class="card-hint" id="dash-venc-hint"></span>
+          </div>
+          <div id="dash-vencidas"><div class="loading">Carregando...</div></div>
+        </div>
       </div>
 
       <!-- ============ MATRÍCULAS (NOVO) ============ -->
@@ -311,6 +409,106 @@
               <tbody id="tabela-parcelas"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ============ DOCUMENTOS DO ALUNO ============ -->
+      <div class="tab" id="tab-documentos">
+        <div class="page-title">Documentos do aluno</div>
+        <div class="page-sub">Arquivo institucional — você valida por fora e publica aqui. O aluno visualiza e baixa.</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Enviar documento</div></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Aluno</label>
+              <select id="doc-aluno" onchange="carregarDocumentos()"><option value="">Selecione o aluno</option></select>
+            </div>
+            <div class="form-group">
+              <label>Tipo</label>
+              <select id="doc-tipo">
+                <option value="rg">RG / Identidade</option>
+                <option value="cpf">CPF</option>
+                <option value="diploma">Diploma</option>
+                <option value="historico">Histórico escolar</option>
+                <option value="comprovante_residencia">Comprovante de residência</option>
+                <option value="certidao">Certidão</option>
+                <option value="foto">Foto</option>
+                <option value="contrato">Contrato</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Título do documento</label>
+            <input id="doc-titulo" placeholder="Ex.: RG — frente e verso"/>
+          </div>
+          <div class="upload-area" onclick="document.getElementById('docInput').click()">
+            <div class="upload-icon">🗂</div>
+            <div class="upload-text"><strong>Escolher arquivos</strong> · PDF, JPG ou PNG · vários de uma vez</div>
+            <div class="upload-text" id="docFileName" style="display:none;margin-top:8px;color:var(--secondary);font-weight:600;"></div>
+          </div>
+          <input type="file" id="docInput" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="onDocSelected(event)"/>
+          <div style="margin-top:16px"><button class="btn btn-primary" id="btnDoc" onclick="enviarDocumentos()">Enviar documentos</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Arquivo do aluno</div>
+            <span class="card-hint" id="doc-hint"></span>
+          </div>
+          <div id="doc-lista"><div class="empty">Selecione um aluno para ver os documentos.</div></div>
+        </div>
+      </div>
+
+      <!-- ============ ACERVO DO CURSO ============ -->
+      <div class="tab" id="tab-acervo">
+        <div class="page-title">Acervo do curso</div>
+        <div class="page-sub">Ementas, normas de artigos científicos, regulamentos, editais e cronogramas</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Publicar no acervo</div></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Curso</label>
+              <select id="ac-curso"><option value="">Selecione o curso</option></select>
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="ac-categoria">
+                <option value="ementa">Ementa do curso</option>
+                <option value="normas">Normas de artigos científicos</option>
+                <option value="regulamento">Regulamento</option>
+                <option value="edital">Edital</option>
+                <option value="cronograma">Cronograma</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Título</label>
+            <input id="ac-titulo" placeholder="Ex.: Normas ABNT para submissão de artigos"/>
+          </div>
+          <div class="form-group">
+            <label>Descrição <span style="font-weight:400;color:var(--gray)">(opcional)</span></label>
+            <textarea id="ac-desc" rows="2" placeholder="Breve descrição do documento"></textarea>
+          </div>
+          <div class="upload-area" onclick="document.getElementById('acInput').click()">
+            <div class="upload-icon">📚</div>
+            <div class="upload-text"><strong>Escolher PDF</strong></div>
+            <div class="upload-text" id="acFileName" style="display:none;margin-top:8px;color:var(--secondary);font-weight:600;"></div>
+          </div>
+          <input type="file" id="acInput" accept=".pdf" onchange="onAcSelected(event)"/>
+          <div style="margin-top:16px"><button class="btn btn-primary" id="btnAcervo" onclick="publicarAcervo()">Publicar</button></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Publicados</div>
+            <select id="filtro-curso-acervo" onchange="carregarAcervo()" style="max-width:220px;background:var(--light);border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.8rem;">
+              <option value="">Todos os cursos</option>
+            </select>
+          </div>
+          <div id="acervo-lista"><div class="loading">Carregando...</div></div>
         </div>
       </div>
 
@@ -827,7 +1025,7 @@ async function iniciarApp(){
   await Promise.all([
     carregarDashboard(), carregarAlunos(), carregarMateriais(),
     carregarNotas(), carregarMatriculas(), carregarCursosTabela(),
-    carregarAtividades(), carregarCorrecoes()
+    carregarAtividades(), carregarCorrecoes(), carregarAcervo()
   ]);
 }
 
@@ -843,7 +1041,7 @@ async function carregarCursos(){
   if(!data)return;
   cursosCache=data;
   document.getElementById('st-cursos').textContent=data.length;
-  ['a-curso','m-curso','d-curso','at-curso','filtro-curso-mat','filtro-curso-disc'].forEach(id=>{
+  ['a-curso','m-curso','d-curso','at-curso','ac-curso','filtro-curso-mat','filtro-curso-disc','filtro-curso-acervo'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
     const val=el.value;
@@ -854,15 +1052,122 @@ async function carregarCursos(){
 }
 
 async function carregarDashboard(){
-  const{data:al}=await sb.from('estudantes').select('*');
-  const{data:mat}=await sb.from('materiais').select('*');
-  document.getElementById('st-alunos').textContent=al?.length||0;
-  document.getElementById('st-materiais').textContent=mat?.length||0;
+  const [rAl, rMat, rFin, rEnt] = await Promise.all([
+    sb.from('estudantes').select('id,curso_id,status'),
+    sb.from('materiais').select('id'),
+    sb.from('v_financeiro_resumo').select('*'),
+    sb.from('entregas').select('id').is('corrigido_em',null)
+  ]);
+
+  const al  = rAl.data  || [];
+  const mat = rMat.data || [];
+  const fin = rFin.data || [];
+  const ent = rEnt.data || [];
+
+  const ativos = al.filter(a=>(a.status||'ativo')==='ativo').length;
+  document.getElementById('st-alunos').textContent    = ativos;
+  document.getElementById('st-materiais').textContent = mat.length;
+  document.getElementById('st-cursos').textContent    = cursosCache.length;
+  document.getElementById('st-corrigir').textContent  = ent.length;
+
+  // --- KPIs (linha com curso_id null = total geral do rollup) ---
+  const tot = fin.find(f=>f.curso_id===null) || {recebido:0,a_vencer:0,vencido:0};
+  const recebido = Number(tot.recebido||0);
+  const aVencer  = Number(tot.a_vencer||0);
+  const vencido  = Number(tot.vencido||0);
+  const faturado = recebido + aVencer + vencido;
+  const inad     = (recebido+vencido) > 0 ? (vencido/(recebido+vencido)*100) : 0;
+
+  document.getElementById('k-recebido').textContent = brl(recebido);
+  document.getElementById('k-avencer').textContent  = brl(aVencer);
+  document.getElementById('k-vencido').textContent  = brl(vencido);
+  document.getElementById('k-inad').textContent     = inad.toFixed(1).replace('.',',')+'%';
+
+  document.getElementById('k-recebido-sub').textContent =
+    faturado ? (recebido/faturado*100).toFixed(0)+'% do total contratado' : '\u00a0';
+  document.getElementById('k-avencer-sub').textContent  = 'Contratado: '+brl(faturado);
+  document.getElementById('k-vencido-sub').textContent  = vencido>0 ? 'Requer cobrança' : 'Nenhuma pendência';
+  document.getElementById('k-inad-sub').textContent     = 'Vencido / (vencido + recebido)';
+
+  // --- Financeiro por curso ---
+  const elFin = document.getElementById('dash-fin');
+  const porCurso = fin.filter(f=>f.curso_id!==null);
+  if(!porCurso.length){
+    elFin.innerHTML='<div class="empty">Nenhuma parcela lançada.</div>';
+  }else{
+    elFin.innerHTML = porCurso.map(f=>{
+      const c   = cursosCache.find(x=>x.id===f.curso_id);
+      const rec = Number(f.recebido||0), av = Number(f.a_vencer||0), vc = Number(f.vencido||0);
+      const t   = rec+av+vc || 1;
+      return `<div class="fin-linha">
+        <div class="fin-topo">
+          <span class="fin-nome">${c?c.nome:'Curso removido'}</span>
+          <span class="fin-total">${brl(rec+av+vc)}</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-seg bar-pago"   style="width:${rec/t*100}%"></div>
+          <div class="bar-seg bar-aberto" style="width:${av /t*100}%"></div>
+          <div class="bar-seg bar-venc"   style="width:${vc /t*100}%"></div>
+        </div>
+        <div class="fin-nums">
+          <span><i class="bar-pago"></i>Recebido ${brl(rec)}</span>
+          <span><i class="bar-aberto"></i>A vencer ${brl(av)}</span>
+          <span><i class="bar-venc"></i>Vencido ${brl(vc)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // --- Alunos por curso ---
   const el=document.getElementById('dash-cursos');
-  let html='<table class="data-table"><thead><tr><th>Curso</th><th>Nível</th><th>Alunos</th></tr></thead><tbody>';
-  cursosCache.forEach(c=>{
-    const qtd=al?.filter(a=>a.curso_id===c.id).length||0;
-    html+=`<tr><td>${c.nome}</td><td><span class="badge badge-blue">${c.nivel||'—'}</span></td><td>${qtd}</td></tr>`;
+  if(!cursosCache.length){
+    el.innerHTML='<div class="empty">Nenhum curso cadastrado.</div>';
+  }else{
+    let html='<table class="data-table"><thead><tr><th>Curso</th><th>Nível</th><th style="text-align:right">Alunos</th></tr></thead><tbody>';
+    cursosCache.forEach(c=>{
+      const qtd=al.filter(a=>a.curso_id===c.id).length;
+      html+=`<tr><td>${c.nome}</td><td><span class="badge badge-blue">${c.nivel||'—'}</span></td><td style="text-align:right"><strong>${qtd}</strong></td></tr>`;
+    });
+    html+='</tbody></table>';
+    el.innerHTML=html;
+  }
+
+  await carregarVencidas();
+}
+
+async function carregarVencidas(){
+  const el=document.getElementById('dash-vencidas');
+  const {data,error}=await sb.from('financeiro_parcelas')
+    .select('id,tipo,numero,valor,vencimento,aluno_id,estudantes(nome,curso_id)')
+    .eq('status','aberto').lt('vencimento',hojeISO())
+    .order('vencimento');
+
+  if(error){el.innerHTML='<div class="empty">Erro ao carregar.</div>';return;}
+  if(!data||!data.length){
+    el.innerHTML='<div class="empty">Nenhuma parcela vencida. Tudo em dia.</div>';
+    document.getElementById('dash-venc-hint').textContent='';
+    return;
+  }
+
+  const total=data.reduce((s,p)=>s+Number(p.valor||0),0);
+  document.getElementById('dash-venc-hint').textContent=
+    `${data.length} parcela(s) · ${brl(total)}`;
+
+  const hoje=new Date(hojeISO());
+  let html='<table class="data-table"><thead><tr><th>Aluno</th><th>Curso</th><th>Parcela</th><th>Vencimento</th><th>Atraso</th><th style="text-align:right">Valor</th></tr></thead><tbody>';
+  data.forEach(p=>{
+    const c    = cursosCache.find(x=>x.id===p.estudantes?.curso_id);
+    const dias = Math.floor((hoje-new Date(p.vencimento))/86400000);
+    const cls  = dias>60?'badge-red':dias>30?'badge-yellow':'badge-gray';
+    const desc = p.tipo==='matricula' ? 'Matrícula' : 'Mensalidade nº '+p.numero;
+    html+=`<tr>
+      <td>${p.estudantes?.nome||'—'}</td>
+      <td>${c?c.nome:'—'}</td>
+      <td>${desc}</td>
+      <td>${dataBR(p.vencimento)}</td>
+      <td><span class="badge ${cls}">${dias} dia${dias===1?'':'s'}</span></td>
+      <td style="text-align:right" class="valor">${brl(p.valor)}</td>
+    </tr>`;
   });
   html+='</tbody></table>';
   el.innerHTML=html;
@@ -885,7 +1190,7 @@ async function carregarAlunos(){
       </td>
     </tr>`).join('');
   // popula selects de aluno (notas + financeiro)
-  ['n-aluno','filtro-aluno-nota','fin-aluno'].forEach(id=>{
+  ['n-aluno','filtro-aluno-nota','fin-aluno','doc-aluno'].forEach(id=>{
     const s=document.getElementById(id);
     if(!s)return;
     const val=s.value;
@@ -906,9 +1211,20 @@ async function cadastrarAluno(){
   const btn=document.getElementById('btnCadastrar');
   btn.disabled=true;btn.textContent='Cadastrando...';
   const senha_hash=await sha256(senha);
-  const{error}=await sb.from('estudantes').insert({nome,email,senha_hash,curso_id,matricula:matricula||null,status:'ativo'});
+  const{data:novo,error}=await sb.from('estudantes')
+    .insert({nome,email,senha_hash,curso_id,matricula:matricula||null,status:'ativo'})
+    .select().single();
   if(error){toast('Erro: '+error.message,'error');btn.disabled=false;btn.textContent='Cadastrar Aluno';return;}
-  toast('Aluno cadastrado! Agora gere o plano de pagamento na aba Financeiro.','success');
+
+  const{error:errMat}=await sb.from('matriculas')
+    .insert({estudante_id:novo.id,curso_id,status:'ativa'});
+  if(errMat){
+    toast('Aluno criado, mas a matricula falhou: '+errMat.message,'error');
+    btn.disabled=false;btn.textContent='Cadastrar Aluno';
+    await Promise.all([carregarAlunos(),carregarDashboard()]);
+    return;
+  }
+  toast('Aluno cadastrado e matriculado! Agora gere o plano de pagamento na aba Financeiro.','success');
   ['a-nome','a-email','a-senha','a-matricula'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('a-curso').value='';
   btn.disabled=false;btn.textContent='Cadastrar Aluno';
@@ -1204,6 +1520,257 @@ async function adicionarMaterial(){
   if(falhas) toast(falhas+' arquivo(s) falharam.','error');
 
   await Promise.all([carregarMateriais(),carregarDashboard()]);
+}
+
+/* ==========================================================================
+   DOCUMENTOS DO ALUNO
+   ========================================================================== */
+
+let docFiles=[], acFile=null;
+
+const ARQ_LABELS={
+  rg:'RG / Identidade', cpf:'CPF', diploma:'Diploma',
+  historico:'Histórico escolar', comprovante_residencia:'Comprovante de residência',
+  certidao:'Certidão', foto:'Foto', contrato:'Contrato', outro:'Outro'
+};
+
+function onDocSelected(e){
+  docFiles=Array.from(e.target.files||[]);
+  const el=document.getElementById('docFileName');
+  if(!docFiles.length){el.style.display='none';return;}
+  el.style.display='block';
+  el.textContent = docFiles.length===1 ? docFiles[0].name : docFiles.length+' arquivos selecionados';
+  if(docFiles.length===1 && !document.getElementById('doc-titulo').value.trim()){
+    document.getElementById('doc-titulo').value = docFiles[0].name.replace(/\.[^.]+$/,'');
+  }
+}
+
+async function enviarDocumentos(){
+  const alunoId = document.getElementById('doc-aluno').value;
+  const tipo    = document.getElementById('doc-tipo').value;
+  const titulo  = document.getElementById('doc-titulo').value.trim();
+
+  if(!alunoId){toast('Selecione o aluno.','error');return;}
+  if(!docFiles.length){toast('Selecione ao menos um arquivo.','error');return;}
+
+  const {data:mat,error:errMat}=await sb.from('matriculas')
+    .select('id').eq('estudante_id',alunoId).eq('status','ativa')
+    .order('data_inicio',{ascending:false}).limit(1).maybeSingle();
+
+  if(errMat||!mat){toast('Este aluno não possui matrícula ativa.','error');return;}
+
+  const btn=document.getElementById('btnDoc');
+  btn.disabled=true;
+  let ok=0,falhas=0;
+
+  for(let i=0;i<docFiles.length;i++){
+    const file=docFiles[i];
+    btn.textContent='Enviando '+(i+1)+'/'+docFiles.length+'...';
+    const ext  = (file.name.split('.').pop()||'pdf').toLowerCase();
+    const path = alunoId+'/'+tipo+'/'+Date.now()+'_'+i+'.'+ext;
+
+    const {error:upErr}=await sb.storage.from('documentos')
+      .upload(path,file,{upsert:false,contentType:file.type});
+    if(upErr){falhas++;console.error('[doc upload]',file.name,upErr);continue;}
+
+    const {data:pub}=sb.storage.from('documentos').getPublicUrl(path);
+    const nomeDoc = docFiles.length===1
+      ? (titulo || file.name.replace(/\.[^.]+$/,''))
+      : (titulo ? titulo+' ('+(i+1)+')' : file.name.replace(/\.[^.]+$/,''));
+
+    const {error:dbErr}=await sb.from('matricula_documentos').insert({
+      matricula_id: mat.id, tipo, titulo: nomeDoc,
+      nome_arquivo: file.name, url: pub.publicUrl, path,
+      status:'aprovado', enviado_por:'admin'
+    });
+    if(dbErr){falhas++;console.error('[doc db]',file.name,dbErr);continue;}
+    ok++;
+  }
+
+  btn.disabled=false;btn.textContent='Enviar documentos';
+  document.getElementById('docInput').value='';
+  document.getElementById('docFileName').style.display='none';
+  document.getElementById('doc-titulo').value='';
+  docFiles=[];
+
+  if(ok)     toast(ok+' documento(s) enviado(s).','success');
+  if(falhas) toast(falhas+' arquivo(s) falharam.','error');
+  await carregarDocumentos();
+}
+
+async function carregarDocumentos(){
+  const alunoId=document.getElementById('doc-aluno').value;
+  const el=document.getElementById('doc-lista');
+  const hint=document.getElementById('doc-hint');
+
+  if(!alunoId){
+    el.innerHTML='<div class="empty">Selecione um aluno para ver os documentos.</div>';
+    hint.textContent='';
+    return;
+  }
+  el.innerHTML='<div class="loading">Carregando...</div>';
+
+  const {data:mats}=await sb.from('matriculas').select('id').eq('estudante_id',alunoId);
+  const ids=(mats||[]).map(m=>m.id);
+  if(!ids.length){
+    el.innerHTML='<div class="empty">Este aluno não possui matrícula.</div>';
+    hint.textContent='';
+    return;
+  }
+
+  const {data,error}=await sb.from('matricula_documentos')
+    .select('*').in('matricula_id',ids).order('enviado_em',{ascending:false});
+
+  if(error){el.innerHTML='<div class="empty">Erro ao carregar.</div>';return;}
+  if(!data||!data.length){
+    el.innerHTML='<div class="empty">Nenhum documento enviado ainda.</div>';
+    hint.textContent='';
+    return;
+  }
+
+  hint.textContent=data.length+' documento(s)';
+  const grupos={};
+  data.forEach(d=>{(grupos[d.tipo]=grupos[d.tipo]||[]).push(d);});
+
+  let html='';
+  Object.keys(grupos).forEach(tipo=>{
+    html+=`<div class="sec-title">${ARQ_LABELS[tipo]||tipo}</div><div class="doc-grid">`;
+    grupos[tipo].forEach(d=>{
+      html+=`<div class="doc-card">
+        <div class="doc-titulo">${d.titulo||d.nome_arquivo}</div>
+        <div class="doc-meta">${dataBR(d.enviado_em)}</div>
+        <div class="doc-acoes">
+          <button class="link-btn" onclick="abrirDoc('${d.path}')">Abrir</button>
+          <button class="link-btn danger" onclick="excluirDoc('${d.id}','${d.path}')">Excluir</button>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+async function abrirDoc(path){
+  const {data,error}=await sb.storage.from('documentos').createSignedUrl(path,300);
+  if(error||!data){toast('Erro ao abrir o arquivo.','error');return;}
+  window.open(data.signedUrl,'_blank');
+}
+
+async function excluirDoc(id,path){
+  if(!confirm('Excluir este documento? A ação não pode ser desfeita.'))return;
+  await sb.storage.from('documentos').remove([path]);
+  const {error}=await sb.from('matricula_documentos').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Documento excluído.','success');
+  await carregarDocumentos();
+}
+
+/* ==========================================================================
+   ACERVO DO CURSO
+   ========================================================================== */
+
+const AC_LABELS={
+  ementa:'Ementa do curso', normas:'Normas de artigos científicos',
+  regulamento:'Regulamento', edital:'Edital', cronograma:'Cronograma'
+};
+
+function onAcSelected(e){
+  acFile=(e.target.files||[])[0]||null;
+  const el=document.getElementById('acFileName');
+  if(!acFile){el.style.display='none';return;}
+  el.style.display='block';
+  el.textContent=acFile.name;
+  if(!document.getElementById('ac-titulo').value.trim()){
+    document.getElementById('ac-titulo').value=acFile.name.replace(/\.[^.]+$/,'');
+  }
+}
+
+async function publicarAcervo(){
+  const curso_id  = document.getElementById('ac-curso').value;
+  const categoria = document.getElementById('ac-categoria').value;
+  const titulo    = document.getElementById('ac-titulo').value.trim();
+  const desc      = document.getElementById('ac-desc').value.trim();
+
+  if(!curso_id){toast('Selecione o curso.','error');return;}
+  if(!titulo){toast('Informe o título.','error');return;}
+  if(!acFile){toast('Selecione o arquivo PDF.','error');return;}
+
+  const btn=document.getElementById('btnAcervo');
+  btn.disabled=true;btn.textContent='Publicando...';
+
+  const ext  = (acFile.name.split('.').pop()||'pdf').toLowerCase();
+  const path = curso_id+'/acervo/'+Date.now()+'.'+ext;
+
+  const {error:upErr}=await sb.storage.from('materiais')
+    .upload(path,acFile,{upsert:false,contentType:acFile.type});
+  if(upErr){toast('Erro no upload: '+upErr.message,'error');btn.disabled=false;btn.textContent='Publicar';return;}
+
+  const {data:pub}=sb.storage.from('materiais').getPublicUrl(path);
+  const {error:dbErr}=await sb.from('materiais').insert({
+    titulo, curso_id, disciplina_id:null, tipo:'pdf',
+    categoria, url:pub.publicUrl, descricao:desc||null
+  });
+
+  btn.disabled=false;btn.textContent='Publicar';
+  if(dbErr){toast('Erro: '+dbErr.message,'error');return;}
+
+  toast('Publicado no acervo.','success');
+  document.getElementById('acInput').value='';
+  document.getElementById('acFileName').style.display='none';
+  document.getElementById('ac-titulo').value='';
+  document.getElementById('ac-desc').value='';
+  acFile=null;
+  await carregarAcervo();
+}
+
+async function carregarAcervo(){
+  const el=document.getElementById('acervo-lista');
+  const fCurso=document.getElementById('filtro-curso-acervo')?.value;
+
+  let q=sb.from('materiais').select('*')
+    .neq('categoria','material')
+    .order('curso_id').order('categoria').order('created_at',{ascending:false});
+  if(fCurso) q=q.eq('curso_id',fCurso);
+
+  const {data,error}=await q;
+  if(error){el.innerHTML='<div class="empty">Erro ao carregar.</div>';return;}
+  if(!data||!data.length){
+    el.innerHTML='<div class="empty">Nenhum documento publicado no acervo.</div>';
+    return;
+  }
+
+  const grupos={};
+  data.forEach(m=>{
+    const c=cursosCache.find(x=>x.id===m.curso_id);
+    const k=(c?c.nome:'Sem curso')+'||'+m.categoria;
+    (grupos[k]=grupos[k]||[]).push(m);
+  });
+
+  let html='';
+  Object.keys(grupos).forEach(k=>{
+    const [curso,cat]=k.split('||');
+    html+=`<div class="sec-title">${curso} · ${AC_LABELS[cat]||cat}</div><div class="doc-grid">`;
+    grupos[k].forEach(m=>{
+      html+=`<div class="doc-card">
+        <div class="doc-titulo">${m.titulo}</div>
+        <div class="doc-meta">${m.descricao?m.descricao+' · ':''}${dataBR(m.created_at)}</div>
+        <div class="doc-acoes">
+          <a class="link-btn" href="${m.url}" target="_blank" rel="noopener">Abrir</a>
+          <button class="link-btn danger" onclick="excluirAcervo('${m.id}')">Excluir</button>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+async function excluirAcervo(id){
+  if(!confirm('Remover este item do acervo?'))return;
+  const {error}=await sb.from('materiais').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Item removido.','success');
+  await carregarAcervo();
 }
 
 async function carregarMateriais(){
