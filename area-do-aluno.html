@@ -89,6 +89,17 @@
   .nota-ring{width:86px;height:86px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--secondary) 0% 80%,var(--border) 80% 100%);display:flex;align-items:center;justify-content:center;position:relative;}
   .nota-ring::before{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--white);}
   .nota-ring-val{position:relative;z-index:1;font-size:1.4rem;font-weight:700;color:var(--primary);}
+  /* ---------- Acervo e documentos ---------- */
+  .sec-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin:24px 0 12px;}
+  .sec-title:first-child{margin-top:0;}
+  .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+  .doc-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s,transform .15s;}
+  .doc-card:hover{border-color:var(--secondary);box-shadow:0 4px 14px rgba(20,93,160,.1);transform:translateY(-1px);}
+  .doc-icon{font-size:1.4rem;margin-bottom:10px;}
+  .doc-titulo{font-size:.88rem;font-weight:600;color:var(--primary);line-height:1.4;margin-bottom:5px;word-break:break-word;}
+  .doc-desc{font-size:.75rem;color:var(--gray);line-height:1.5;margin-bottom:12px;flex:1;}
+  .doc-abrir{align-self:flex-start;font-size:.76rem;font-weight:600;color:var(--secondary);text-decoration:none;background:none;border:none;cursor:pointer;padding:0;}
+  .doc-abrir:hover{text-decoration:underline;}
   .decl-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid var(--border);transition:background .15s;}
   .decl-item:last-child{border-bottom:none;}
   .decl-item:hover{background:#f8fafc;}
@@ -214,7 +225,9 @@
       <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
       <div class="nav-label">Financeiro</div>
       <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
+      <div class="nav-item" onclick="showTab('acervo',this)">📚 &nbsp;Acervo do curso</div>
       <div class="nav-label">Documentos</div>
+      <div class="nav-item" onclick="showTab('meusdocs',this)">🗂 &nbsp;Meus documentos</div>
       <div class="nav-item" onclick="showTab('declaracoes',this)">☰ &nbsp;Declarações</div>
     </nav>
 
@@ -342,6 +355,18 @@
       </div>
 
       <!-- DECLARAÇÕES -->
+      <div class="tab-content" id="tab-acervo">
+        <div class="page-title">Acervo do curso</div>
+        <div class="page-sub">Ementas, normas para artigos científicos, regulamentos e cronogramas</div>
+        <div id="acervo-aluno"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <div class="tab-content" id="tab-meusdocs">
+        <div class="page-title">Meus documentos</div>
+        <div class="page-sub">Arquivo institucional da sua matrícula</div>
+        <div id="docs-aluno"><div class="loading">Carregando...</div></div>
+      </div>
+
       <div class="tab-content" id="tab-declaracoes">
         <div class="page-title">Declarações</div>
         <div class="page-sub">Emissão instantânea em PDF</div>
@@ -441,7 +466,8 @@ function iniciarDashboard(){
   showTab('home',document.querySelector('.nav-item'));
   Promise.all([
     carregarMateriais(), carregarDisciplinas(), carregarNotas(),
-    carregarFinanceiro(), carregarAtividades(), carregarProgresso()
+    carregarFinanceiro(), carregarAtividades(), carregarProgresso(),
+    carregarAcervoAluno(), carregarDocsAluno()
   ]);
 }
 
@@ -917,6 +943,105 @@ async function carregarProgresso(){
   document.getElementById('prog-bar').style.width = pct+'%';
   document.getElementById('prog-desc').textContent =
     tot ? `${conc} de ${tot} disciplinas concluídas` : 'Nenhuma disciplina cadastrada ainda';
+}
+
+/* ==========================================================================
+   ACERVO DO CURSO
+   ========================================================================== */
+
+const AC_LABELS={
+  ementa:'Ementa do curso', normas:'Normas de artigos científicos',
+  regulamento:'Regulamento', edital:'Editais', cronograma:'Cronograma'
+};
+const AC_ICONS={ementa:'◈',normas:'✎',regulamento:'§',edital:'▣',cronograma:'▤'};
+
+async function carregarAcervoAluno(){
+  if(!estudante)return;
+  const el=document.getElementById('acervo-aluno');
+
+  const {data,error}=await sb.from('materiais').select('*')
+    .eq('curso_id',estudante.curso_id)
+    .neq('categoria','material')
+    .order('categoria').order('created_at',{ascending:false});
+
+  if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar o acervo.</div></div>';return;}
+  if(!data||!data.length){
+    el.innerHTML='<div class="card"><div class="empty">Nenhum documento publicado no acervo deste curso.</div></div>';
+    return;
+  }
+
+  const grupos={};
+  data.forEach(m=>{(grupos[m.categoria]=grupos[m.categoria]||[]).push(m);});
+
+  let html='';
+  Object.keys(grupos).forEach(cat=>{
+    html+=`<div class="sec-title">${AC_LABELS[cat]||cat}</div><div class="doc-grid">`;
+    grupos[cat].forEach(m=>{
+      html+=`<div class="doc-card">
+        <div class="doc-icon">${AC_ICONS[cat]||'▪'}</div>
+        <div class="doc-titulo">${m.titulo}</div>
+        <div class="doc-desc">${m.descricao||'Documento oficial do curso'}</div>
+        <a class="doc-abrir" href="${m.url}" target="_blank" rel="noopener">Abrir documento →</a>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+/* ==========================================================================
+   MEUS DOCUMENTOS
+   ========================================================================== */
+
+const DOC_LABELS={
+  rg:'RG / Identidade', cpf:'CPF', diploma:'Diploma',
+  historico:'Histórico escolar', comprovante_residencia:'Comprovante de residência',
+  certidao:'Certidão', foto:'Foto', contrato:'Contrato', outro:'Outros'
+};
+
+async function carregarDocsAluno(){
+  if(!estudante)return;
+  const el=document.getElementById('docs-aluno');
+
+  const {data:mats}=await sb.from('matriculas').select('id').eq('estudante_id',estudante.id);
+  const ids=(mats||[]).map(m=>m.id);
+  if(!ids.length){
+    el.innerHTML='<div class="card"><div class="empty">Nenhum documento disponível.</div></div>';
+    return;
+  }
+
+  const {data,error}=await sb.from('matricula_documentos')
+    .select('*').in('matricula_id',ids).order('enviado_em',{ascending:false});
+
+  if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar.</div></div>';return;}
+  if(!data||!data.length){
+    el.innerHTML='<div class="card"><div class="empty">Nenhum documento disponível no momento.</div></div>';
+    return;
+  }
+
+  const grupos={};
+  data.forEach(d=>{(grupos[d.tipo]=grupos[d.tipo]||[]).push(d);});
+
+  let html='';
+  Object.keys(grupos).forEach(tipo=>{
+    html+=`<div class="sec-title">${DOC_LABELS[tipo]||tipo}</div><div class="doc-grid">`;
+    grupos[tipo].forEach(d=>{
+      html+=`<div class="doc-card">
+        <div class="doc-icon">🗂</div>
+        <div class="doc-titulo">${d.titulo||d.nome_arquivo}</div>
+        <div class="doc-desc">Enviado em ${dataBR(d.enviado_em)}</div>
+        <button class="doc-abrir" onclick="abrirMeuDoc('${d.path}')">Abrir documento →</button>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+async function abrirMeuDoc(path){
+  const {data,error}=await sb.storage.from('documentos').createSignedUrl(path,300);
+  if(error||!data){toast('Não foi possível abrir o arquivo.','erro');return;}
+  window.open(data.signedUrl,'_blank');
 }
 
 function emitirDeclaracao(tipo){
