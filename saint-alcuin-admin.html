@@ -143,6 +143,27 @@
   .sec-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin:22px 0 10px;}
   .sec-title:first-child{margin-top:0;}
 
+  /* ---------- Agrupamento por curso ---------- */
+  .grupo-curso{margin-bottom:26px;}
+  .grupo-curso:last-child{margin-bottom:0;}
+  .grupo-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:9px;margin-bottom:12px;border-bottom:2px solid var(--primary);}
+  .grupo-nome{font-size:.95rem;font-weight:700;color:var(--primary);letter-spacing:-.01em;}
+  .grupo-meta{font-size:.72rem;color:var(--gray);font-variant-numeric:tabular-nums;}
+  .grupo-alerta{color:#854d0e;font-weight:700;}
+  .grupo-disc{font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin:14px 0 7px;}
+  .grupo-curso .table-wrap{box-shadow:none;border:1px solid var(--border);}
+
+  /* ---------- Linhas de pesquisa ---------- */
+  .linha-lista{display:flex;flex-direction:column;gap:10px;}
+  .linha-card{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;border:1px solid var(--border);border-left:3px solid var(--secondary);border-radius:8px;padding:16px 18px;background:var(--white);transition:box-shadow .15s;}
+  .linha-card:hover{box-shadow:0 2px 10px rgba(20,93,160,.08);}
+  .linha-card.inativa{opacity:.5;border-left-color:var(--gray);}
+  .linha-corpo{flex:1;min-width:0;}
+  .linha-nome{font-size:.9rem;font-weight:700;color:var(--primary);line-height:1.4;margin-bottom:5px;}
+  .linha-desc{font-size:.78rem;color:var(--text);line-height:1.6;margin-bottom:6px;}
+  .linha-coord{font-size:.72rem;color:var(--gray);}
+  .linha-acoes{display:flex;gap:12px;flex-shrink:0;padding-top:2px;}
+
   @media(max-width:1100px){
     .kpi-grid,.mini-grid{grid-template-columns:repeat(2,1fr);}
     .dash-cols{grid-template-columns:1fr;}
@@ -179,6 +200,7 @@
       <div class="nav-item" onclick="showTab('financeiro',this)">💰 Financeiro</div>
       <div class="nav-item" onclick="showTab('documentos',this)">🗂 Documentos</div>
       <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
+      <div class="nav-item" onclick="showTab('linhas',this)">🔬 Linhas de pesquisa</div>
       <div class="nav-item" onclick="showTab('acervo',this)">📚 Acervo do curso</div>
       <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">✍️ Para corrigir</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
@@ -429,13 +451,13 @@
               <select id="doc-tipo">
                 <option value="rg">RG / Identidade</option>
                 <option value="cpf">CPF</option>
-                <option value="diploma">Diploma de Graduação</option>
-                <option value="historico">Histórico de Graduação</option>
+                <option value="diploma">Diploma de graduação</option>
+                <option value="historico">Histórico de graduação</option>
                 <option value="comprovante_residencia">Comprovante de residência</option>
-                <option value="certidao">Certidão de Casamento</option>
+                <option value="certidao">Certidão de casamento</option>
                 <option value="foto">Foto</option>
                 <option value="contrato">Contrato</option>
-                <option value="outro">Outros</option>
+                <option value="outro">Outro</option>
               </select>
             </div>
           </div>
@@ -461,6 +483,47 @@
         </div>
       </div>
 
+      <!-- ============ LINHAS DE PESQUISA ============ -->
+      <div class="tab" id="tab-linhas">
+        <div class="page-title">Linhas de pesquisa</div>
+        <div class="page-sub">Eixos temáticos de cada programa — o aluno escolhe a linha ao definir o trabalho final</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title" id="lp-form-title">Nova linha de pesquisa</div></div>
+          <input type="hidden" id="lp-id"/>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Curso *</label>
+              <select id="lp-curso"><option value="">Selecione o curso</option></select>
+            </div>
+            <div class="form-group">
+              <label>Coordenador <span style="font-weight:400;color:var(--gray)">(opcional)</span></label>
+              <input type="text" id="lp-coord" placeholder="Nome do professor responsável"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Título da linha *</label>
+            <input type="text" id="lp-nome" placeholder="Ex.: Currículo, Cultura e Formação Docente"/>
+          </div>
+          <div class="form-group">
+            <label>Descrição <span style="font-weight:400;color:var(--gray)">(opcional)</span></label>
+            <textarea id="lp-desc" rows="3" placeholder="Objeto de estudo, temas abrangidos, metodologias predominantes..."></textarea>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-primary" id="btnLinha" onclick="salvarLinha()">Cadastrar linha</button>
+            <button class="btn btn-outline" id="btnCancelarLinha" onclick="limparFormLinha()" style="display:none;">Cancelar edição</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Linhas cadastradas</div>
+            <span class="card-hint" id="lp-hint"></span>
+          </div>
+          <div id="lista-linhas"><div class="loading">Carregando...</div></div>
+        </div>
+      </div>
+
       <!-- ============ ACERVO DO CURSO ============ -->
       <div class="tab" id="tab-acervo">
         <div class="page-title">Acervo do curso</div>
@@ -478,6 +541,7 @@
               <select id="ac-categoria">
                 <option value="ementa">Ementa do curso</option>
                 <option value="normas">Normas de artigos científicos</option>
+                <option value="estrutura">Estrutura da dissertação/tese</option>
                 <option value="regulamento">Regulamento</option>
                 <option value="edital">Edital</option>
                 <option value="cronograma">Cronograma</option>
@@ -581,13 +645,12 @@
           </select>
         </div>
 
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr><th>Aluno</th><th>Disciplina</th><th>Atividade</th><th>Enviado em</th><th>Nota</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody id="tabela-correcoes"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
-          </table>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Entregas</div>
+            <span class="card-hint" id="corr-hint"></span>
+          </div>
+          <div id="lista-correcoes"><div class="loading">Carregando...</div></div>
         </div>
       </div>
 
@@ -614,11 +677,17 @@
           </div>
         </div>
 
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Atividade</th><th>Disciplina</th><th>Prazo</th><th>Anexos</th><th>Entregas</th><th></th></tr></thead>
-            <tbody id="tabela-atividades"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
-          </table>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Atividades publicadas</div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span class="card-hint" id="ativ-hint"></span>
+              <select id="filtro-curso-ativ" onchange="renderAtividadesLista()" style="max-width:230px;background:var(--light);border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.8rem;">
+                <option value="">Todos os cursos</option>
+              </select>
+            </div>
+          </div>
+          <div id="lista-atividades"><div class="loading">Carregando...</div></div>
         </div>
       </div>
 
@@ -704,11 +773,12 @@
           <select id="filtro-curso-disc" onchange="carregarDisciplinas()"><option value="">Todos</option></select>
         </div>
 
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Disciplina</th><th>Curso</th><th>Professor</th><th>Carga</th><th>Semestre</th><th>Notas</th><th></th></tr></thead>
-            <tbody id="tabela-disciplinas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
-          </table>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Disciplinas cadastradas</div>
+            <span class="card-hint" id="disc-hint"></span>
+          </div>
+          <div id="lista-disciplinas"><div class="loading">Carregando...</div></div>
         </div>
       </div>
 
@@ -1025,7 +1095,7 @@ async function iniciarApp(){
   await Promise.all([
     carregarDashboard(), carregarAlunos(), carregarMateriais(),
     carregarNotas(), carregarMatriculas(), carregarCursosTabela(),
-    carregarAtividades(), carregarCorrecoes(), carregarAcervo()
+    carregarAtividades(), carregarCorrecoes(), carregarAcervo(), carregarLinhas()
   ]);
 }
 
@@ -1041,7 +1111,7 @@ async function carregarCursos(){
   if(!data)return;
   cursosCache=data;
   document.getElementById('st-cursos').textContent=data.length;
-  ['a-curso','m-curso','d-curso','at-curso','ac-curso','filtro-curso-mat','filtro-curso-disc','filtro-curso-acervo'].forEach(id=>{
+  ['a-curso','m-curso','d-curso','at-curso','ac-curso','lp-curso','filtro-curso-mat','filtro-curso-disc','filtro-curso-acervo'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
     const val=el.value;
@@ -1523,15 +1593,143 @@ async function adicionarMaterial(){
 }
 
 /* ==========================================================================
+   LINHAS DE PESQUISA
+   ========================================================================== */
+
+let linhasCache=[];
+
+function limparFormLinha(){
+  ['lp-id','lp-nome','lp-desc','lp-coord'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('lp-curso').value='';
+  document.getElementById('lp-form-title').textContent='Nova linha de pesquisa';
+  document.getElementById('btnLinha').textContent='Cadastrar linha';
+  document.getElementById('btnCancelarLinha').style.display='none';
+}
+
+async function salvarLinha(){
+  const id       = document.getElementById('lp-id').value;
+  const curso_id = document.getElementById('lp-curso').value;
+  const nome     = document.getElementById('lp-nome').value.trim();
+  const desc     = document.getElementById('lp-desc').value.trim();
+  const coord    = document.getElementById('lp-coord').value.trim();
+
+  if(!curso_id){toast('Selecione o curso.','error');return;}
+  if(!nome){toast('Informe o título da linha.','error');return;}
+
+  const btn=document.getElementById('btnLinha');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const payload={curso_id,nome,descricao:desc||null,coordenador:coord||null};
+  const {error} = id
+    ? await sb.from('linhas_pesquisa').update(payload).eq('id',id)
+    : await sb.from('linhas_pesquisa').insert(payload);
+
+  btn.disabled=false;
+  if(error){
+    const dup = error.message.includes('duplicate') || error.code==='23505';
+    toast(dup?'Já existe uma linha com este título neste curso.':'Erro: '+error.message,'error');
+    btn.textContent = id?'Salvar alterações':'Cadastrar linha';
+    return;
+  }
+
+  toast(id?'Linha atualizada.':'Linha cadastrada.','success');
+  limparFormLinha();
+  await carregarLinhas();
+}
+
+async function carregarLinhas(){
+  const {data,error}=await sb.from('linhas_pesquisa').select('*').order('nome');
+  linhasCache=data||[];
+
+  const el=document.getElementById('lista-linhas');
+  const hint=document.getElementById('lp-hint');
+
+  if(error){el.innerHTML='<div class="empty">Erro ao carregar.</div>';return;}
+  if(!linhasCache.length){
+    el.innerHTML='<div class="empty">Nenhuma linha de pesquisa cadastrada.</div>';
+    if(hint)hint.textContent='';
+    return;
+  }
+  if(hint)hint.textContent=linhasCache.length+' linha(s)';
+
+  const porCurso={};
+  linhasCache.forEach(l=>{
+    const c=cursosCache.find(x=>x.id===l.curso_id);
+    const nome=c?c.nome:'Curso removido';
+    (porCurso[nome]=porCurso[nome]||[]).push(l);
+  });
+
+  let html='';
+  Object.keys(porCurso).sort().forEach(curso=>{
+    const lista=porCurso[curso];
+    html+=`<div class="grupo-curso">
+      <div class="grupo-head">
+        <span class="grupo-nome">${curso}</span>
+        <span class="grupo-meta">${lista.length} linha${lista.length===1?'':'s'}</span>
+      </div>
+      <div class="linha-lista">`;
+
+    lista.forEach(l=>{
+      const i=linhasCache.indexOf(l);
+      html+=`<div class="linha-card${l.ativa===false?' inativa':''}">
+        <div class="linha-corpo">
+          <div class="linha-nome">${l.nome}</div>
+          ${l.descricao?'<div class="linha-desc">'+l.descricao+'</div>':''}
+          ${l.coordenador?'<div class="linha-coord">Coordenação: '+l.coordenador+'</div>':''}
+        </div>
+        <div class="linha-acoes">
+          <button class="link-btn" onclick="editarLinha(${i})">Editar</button>
+          <button class="link-btn" onclick="alternarLinha('${l.id}',${l.ativa===false})">${l.ativa===false?'Reativar':'Desativar'}</button>
+          <button class="link-btn danger" onclick="excluirLinha('${l.id}')">Excluir</button>
+        </div>
+      </div>`;
+    });
+
+    html+='</div></div>';
+  });
+
+  el.innerHTML=html;
+}
+
+function editarLinha(i){
+  const l=linhasCache[i];
+  if(!l)return;
+  document.getElementById('lp-id').value    = l.id;
+  document.getElementById('lp-curso').value = l.curso_id;
+  document.getElementById('lp-nome').value  = l.nome;
+  document.getElementById('lp-desc').value  = l.descricao||'';
+  document.getElementById('lp-coord').value = l.coordenador||'';
+  document.getElementById('lp-form-title').textContent='Editando linha de pesquisa';
+  document.getElementById('btnLinha').textContent='Salvar alterações';
+  document.getElementById('btnCancelarLinha').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function alternarLinha(id,reativar){
+  const {error}=await sb.from('linhas_pesquisa').update({ativa:reativar}).eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast(reativar?'Linha reativada.':'Linha desativada.','success');
+  await carregarLinhas();
+}
+
+async function excluirLinha(id){
+  if(!confirm('Excluir esta linha de pesquisa? Trabalhos vinculados a ela ficarão sem linha.'))return;
+  const {error}=await sb.from('linhas_pesquisa').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Linha excluída.','success');
+  await carregarLinhas();
+}
+
+/* ==========================================================================
    DOCUMENTOS DO ALUNO
    ========================================================================== */
 
 let docFiles=[], acFile=null;
 
 const ARQ_LABELS={
-  rg:'RG / Identidade', cpf:'CPF', diploma:'Diploma',
-  historico:'Histórico escolar', comprovante_residencia:'Comprovante de residência',
-  certidao:'Certidão', foto:'Foto', contrato:'Contrato', outro:'Outro'
+  rg:'RG / Identidade', cpf:'CPF', diploma:'Diploma de graduação',
+  historico:'Histórico de graduação', comprovante_residencia:'Comprovante de residência',
+  certidao:'Certidão de casamento', foto:'Foto', contrato:'Contrato', outro:'Outro'
 };
 
 function onDocSelected(e){
@@ -1671,6 +1869,7 @@ async function excluirDoc(id,path){
 
 const AC_LABELS={
   ementa:'Ementa do curso', normas:'Normas de artigos científicos',
+  estrutura:'Estrutura da dissertação/tese',
   regulamento:'Regulamento', edital:'Edital', cronograma:'Cronograma'
 };
 
@@ -1780,10 +1979,12 @@ async function carregarMateriais(){
   let q=sb.from('vw_materiais').select('*').order('curso_nome').order('grupo').order('ordem').order('created_at');
   if(fCurso) q=q.eq('curso_id',fCurso);
   if(fTipo)  q=q.eq('tipo',fTipo);
-  const {data}=await q;
+  const {data:raw}=await q;
+  const acervoIds=new Set((await sb.from('materiais').select('id').neq('categoria','material')).data?.map(m=>m.id)||[]);
+  const data=(raw||[]).filter(m=>!acervoIds.has(m.id));
 
   const el=document.getElementById('lista-materiais');
-  if(!data?.length){el.innerHTML='<div class="empty" style="background:#fff;border-radius:8px;">Nenhum material.</div>';return;}
+  if(!data.length){el.innerHTML='<div class="empty" style="background:#fff;border-radius:8px;">Nenhum material.</div>';return;}
 
   const grupos={};
   data.forEach(m=>{
@@ -1877,22 +2078,94 @@ async function carregarAtividades(){
   const {data}=await sb.from('vw_atividades').select('*').order('criado_em',{ascending:false});
   ativCache=data||[];
 
-  const tbody=document.getElementById('tabela-atividades');
-  if(!data?.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhuma atividade criada.</td></tr>';return;}
+  const sel=document.getElementById('filtro-curso-ativ');
+  if(sel){
+    const val=sel.value;
+    sel.innerHTML='<option value="">Todos os cursos</option>';
+    cursosCache.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.nome; o.textContent=c.nome;
+      sel.appendChild(o);
+    });
+    if(val)sel.value=val;
+  }
+  renderAtividadesLista();
+}
 
-  tbody.innerHTML=data.map(function(a,i){
-    return '<tr>'+
-      '<td><strong>'+a.titulo+'</strong>'+(a.enunciado?'<div style="font-size:.72rem;color:var(--gray);">'+a.enunciado.slice(0,70)+(a.enunciado.length>70?'…':'')+'</div>':'')+'</td>'+
-      '<td>'+a.disciplina_nome+'<div style="font-size:.7rem;color:var(--gray);">'+(a.curso_nome||'—')+'</div></td>'+
-      '<td>'+dataBR(a.prazo)+'</td>'+
-      '<td>'+(a.total_anexos||0)+'</td>'+
-      '<td>'+(a.total_entregas||0)+' '+(a.pendentes_correcao?'<span class="badge badge-yellow">'+a.pendentes_correcao+' a corrigir</span>':'')+'</td>'+
-      '<td style="white-space:nowrap;">'+
-        '<button class="btn btn-primary btn-sm" onclick="abrirAnexos('+i+')">Anexos</button> '+
-        '<button class="btn btn-outline btn-sm" onclick="editarAtividade('+i+')">Editar</button> '+
-        '<button class="btn btn-danger btn-sm" onclick="excluirAtividade(\''+a.id+'\')">Excluir</button>'+
-      '</td></tr>';
-  }).join('');
+function renderAtividadesLista(){
+  const el=document.getElementById('lista-atividades');
+  const hint=document.getElementById('ativ-hint');
+  const filtro=document.getElementById('filtro-curso-ativ')?.value||'';
+
+  if(!ativCache.length){
+    el.innerHTML='<div class="empty">Nenhuma atividade criada.</div>';
+    if(hint)hint.textContent='';
+    return;
+  }
+
+  const visiveis = filtro
+    ? ativCache.filter(a=>(a.curso_nome||'')===filtro)
+    : ativCache;
+
+  if(!visiveis.length){
+    el.innerHTML='<div class="empty">Nenhuma atividade neste curso.</div>';
+    if(hint)hint.textContent='';
+    return;
+  }
+
+  const pend = visiveis.reduce((s,a)=>s+(a.pendentes_correcao||0),0);
+  if(hint) hint.textContent = visiveis.length+' atividade(s)'+(pend?' · '+pend+' a corrigir':'');
+
+  // agrupa por curso e, dentro dele, por disciplina
+  const porCurso={};
+  visiveis.forEach(a=>{
+    const c=a.curso_nome||'Sem curso';
+    const d=a.disciplina_nome||'Sem disciplina';
+    porCurso[c]=porCurso[c]||{};
+    (porCurso[c][d]=porCurso[c][d]||[]).push(a);
+  });
+
+  let html='';
+  Object.keys(porCurso).sort().forEach(curso=>{
+    const discs=porCurso[curso];
+    const totalCurso=Object.values(discs).reduce((s,arr)=>s+arr.length,0);
+    const pendCurso=Object.values(discs).flat().reduce((s,a)=>s+(a.pendentes_correcao||0),0);
+
+    html+=`<div class="grupo-curso">
+      <div class="grupo-head">
+        <span class="grupo-nome">${curso}</span>
+        <span class="grupo-meta">${totalCurso} atividade${totalCurso===1?'':'s'}${pendCurso?' · <b class="grupo-alerta">'+pendCurso+' a corrigir</b>':''}</span>
+      </div>`;
+
+    Object.keys(discs).sort().forEach(disc=>{
+      html+=`<div class="grupo-disc">${disc}</div>
+      <div class="table-wrap" style="margin-bottom:10px;">
+        <table class="data-table">
+          <thead><tr><th>Atividade</th><th>Prazo</th><th style="text-align:center">Anexos</th><th style="text-align:center">Entregas</th><th></th></tr></thead>
+          <tbody>`;
+
+      discs[disc].forEach(a=>{
+        const i=ativCache.indexOf(a);
+        const venceu = a.prazo && a.prazo < hojeISO();
+        html+=`<tr>
+          <td><strong>${a.titulo}</strong>${a.enunciado?'<div style="font-size:.72rem;color:var(--gray);">'+a.enunciado.slice(0,70)+(a.enunciado.length>70?'…':'')+'</div>':''}</td>
+          <td${venceu?' style="color:#c1121f"':''}>${dataBR(a.prazo)}</td>
+          <td style="text-align:center">${a.total_anexos||0}</td>
+          <td style="text-align:center">${a.total_entregas||0}${a.pendentes_correcao?' <span class="badge badge-yellow">'+a.pendentes_correcao+' a corrigir</span>':''}</td>
+          <td style="white-space:nowrap;text-align:right;">
+            <button class="btn btn-primary btn-sm" onclick="abrirAnexos(${i})">Anexos</button>
+            <button class="btn btn-outline btn-sm" onclick="editarAtividade(${i})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="excluirAtividade('${a.id}')">Excluir</button>
+          </td>
+        </tr>`;
+      });
+
+      html+='</tbody></table></div>';
+    });
+    html+='</div>';
+  });
+
+  el.innerHTML=html;
 }
 
 function editarAtividade(idx){
@@ -1996,7 +2269,7 @@ async function carregarCorrecoes(){
   const filtro=document.getElementById('filtro-correcao')?.value ?? 'enviado';
 
   let q=sb.from('entregas')
-    .select('*, estudantes(nome,matricula), atividades(titulo, disciplinas(nome))')
+    .select('*, estudantes(nome,matricula,curso_id), atividades(titulo, disciplinas(nome,curso_id))')
     .order('enviado_em',{ascending:false});
   if(filtro) q=q.eq('status',filtro);
   const {data}=await q;
@@ -2012,23 +2285,60 @@ async function carregarCorrecoes(){
   document.getElementById('nav-corrigir').innerHTML =
     '✍️ Para corrigir' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
 
-  const tbody=document.getElementById('tabela-correcoes');
-  if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma entrega.</td></tr>';return;}
+  const el=document.getElementById('lista-correcoes');
+  const hint=document.getElementById('corr-hint');
 
-  tbody.innerHTML=data.map(function(e,i){
-    const corrigido = e.status==='corrigido';
-    return '<tr>'+
-      '<td><strong>'+(e.estudantes?.nome||'—')+'</strong>'+(e.estudantes?.matricula?'<div style="font-size:.7rem;color:var(--gray);">'+e.estudantes.matricula+'</div>':'')+'</td>'+
-      '<td>'+(e.atividades?.disciplinas?.nome||'—')+'</td>'+
-      '<td>'+(e.atividades?.titulo||'—')+'</td>'+
-      '<td>'+dataBR(e.enviado_em)+'</td>'+
-      '<td>'+(e.nota!=null?'<strong>'+e.nota+'</strong>':'—')+'</td>'+
-      '<td><span class="badge badge-'+(corrigido?'green':'yellow')+'">'+(corrigido?'Corrigido':'Aguardando')+'</span></td>'+
-      '<td style="white-space:nowrap;">'+
-        '<button class="btn btn-outline btn-sm" onclick="baixarAnexo(\''+e.path+'\')">Baixar</button> '+
-        '<button class="btn btn-primary btn-sm" onclick="abrirCorrecao('+i+')">'+(corrigido?'Rever':'Corrigir')+'</button>'+
-      '</td></tr>';
-  }).join('');
+  if(!data?.length){
+    el.innerHTML='<div class="empty">Nenhuma entrega neste filtro.</div>';
+    if(hint)hint.textContent='';
+    return;
+  }
+  if(hint)hint.textContent=data.length+' entrega(s)';
+
+  const porCurso={};
+  data.forEach(e=>{
+    const cid=e.atividades?.disciplinas?.curso_id || e.estudantes?.curso_id;
+    const c=cursosCache.find(x=>x.id===cid);
+    const nome=c?c.nome:'Sem curso';
+    (porCurso[nome]=porCurso[nome]||[]).push(e);
+  });
+
+  let html='';
+  Object.keys(porCurso).sort().forEach(curso=>{
+    const lista=porCurso[curso];
+    const aguardando=lista.filter(e=>e.status!=='corrigido').length;
+
+    html+=`<div class="grupo-curso">
+      <div class="grupo-head">
+        <span class="grupo-nome">${curso}</span>
+        <span class="grupo-meta">${lista.length} entrega${lista.length===1?'':'s'}${aguardando?' · <b class="grupo-alerta">'+aguardando+' aguardando</b>':''}</span>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Aluno</th><th>Disciplina</th><th>Atividade</th><th>Enviado em</th><th style="text-align:center">Nota</th><th>Status</th><th></th></tr></thead>
+          <tbody>`;
+
+    lista.forEach(e=>{
+      const i=correcoesCache.indexOf(e);
+      const corrigido=e.status==='corrigido';
+      html+=`<tr>
+        <td><strong>${e.estudantes?.nome||'—'}</strong>${e.estudantes?.matricula?'<div style="font-size:.7rem;color:var(--gray);">'+e.estudantes.matricula+'</div>':''}</td>
+        <td>${e.atividades?.disciplinas?.nome||'—'}</td>
+        <td>${e.atividades?.titulo||'—'}</td>
+        <td>${dataBR(e.enviado_em)}</td>
+        <td style="text-align:center">${e.nota!=null?'<strong>'+e.nota+'</strong>':'—'}</td>
+        <td><span class="badge badge-${corrigido?'green':'yellow'}">${corrigido?'Corrigido':'Aguardando'}</span></td>
+        <td style="white-space:nowrap;text-align:right;">
+          <button class="btn btn-outline btn-sm" onclick="baixarAnexo('${e.path}')">Baixar</button>
+          <button class="btn btn-primary btn-sm" onclick="abrirCorrecao(${i})">${corrigido?'Rever':'Corrigir'}</button>
+        </td>
+      </tr>`;
+    });
+
+    html+='</tbody></table></div></div>';
+  });
+
+  el.innerHTML=html;
 }
 
 function abrirCorrecao(idx){
@@ -2156,29 +2466,61 @@ async function carregarDisciplinas(){
   const {data}=await q;
   discCache=data||[];
 
-  // conta quantas notas cada disciplina já tem
   const {data:notas}=await sb.from('notas').select('disciplina_id,media');
 
-  const tbody=document.getElementById('tabela-disciplinas');
-  if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma disciplina.</td></tr>';return;}
+  const el=document.getElementById('lista-disciplinas');
+  const hint=document.getElementById('disc-hint');
 
-  tbody.innerHTML=data.map((d,i)=>{
-    const doDisc=(notas||[]).filter(n=>n.disciplina_id===d.id);
-    const comMedia=doDisc.filter(n=>n.media!==null).length;
-    return `<tr>
-      <td><strong>${d.nome}</strong></td>
-      <td>${d.cursos?.nome||'—'}</td>
-      <td>${d.professor||'—'}</td>
-      <td>${d.carga_horaria?d.carga_horaria+'h':'—'}</td>
-      <td>${d.semestre||'—'}</td>
-      <td>${doDisc.length? `<span class="badge badge-green">${comMedia}/${doDisc.length} c/ média</span>` : '<span class="badge badge-gray">Sem notas</span>'}</td>
-      <td style="white-space:nowrap;">
-        <button class="btn btn-primary btn-sm" onclick="abrirTurma(${i})">Lançar notas</button>
-        <button class="btn btn-outline btn-sm" onclick="editarDisciplina(${i})">Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="excluirDisciplina('${d.id}','${(d.nome||'').replace(/'/g,'')}')">Excluir</button>
-      </td>
-    </tr>`;
-  }).join('');
+  if(!data?.length){
+    el.innerHTML='<div class="empty">Nenhuma disciplina cadastrada.</div>';
+    if(hint)hint.textContent='';
+    return;
+  }
+  if(hint)hint.textContent=data.length+' disciplina(s)';
+
+  const porCurso={};
+  data.forEach(d=>{
+    const c=d.cursos?.nome||'Sem curso';
+    (porCurso[c]=porCurso[c]||[]).push(d);
+  });
+
+  let html='';
+  Object.keys(porCurso).sort().forEach(curso=>{
+    const lista=porCurso[curso];
+    const carga=lista.reduce((s,d)=>s+(d.carga_horaria||0),0);
+
+    html+=`<div class="grupo-curso">
+      <div class="grupo-head">
+        <span class="grupo-nome">${curso}</span>
+        <span class="grupo-meta">${lista.length} disciplina${lista.length===1?'':'s'}${carga?' · '+carga+'h':''}</span>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Disciplina</th><th>Professor</th><th style="text-align:center">Carga</th><th style="text-align:center">Semestre</th><th>Notas</th><th></th></tr></thead>
+          <tbody>`;
+
+    lista.forEach(d=>{
+      const i=discCache.indexOf(d);
+      const doDisc=(notas||[]).filter(n=>n.disciplina_id===d.id);
+      const comMedia=doDisc.filter(n=>n.media!==null).length;
+      html+=`<tr>
+        <td><strong>${d.nome}</strong></td>
+        <td>${d.professor||'—'}</td>
+        <td style="text-align:center">${d.carga_horaria?d.carga_horaria+'h':'—'}</td>
+        <td style="text-align:center">${d.semestre||'—'}</td>
+        <td>${doDisc.length?'<span class="badge badge-green">'+comMedia+'/'+doDisc.length+' c/ média</span>':'<span class="badge badge-gray">Sem notas</span>'}</td>
+        <td style="white-space:nowrap;text-align:right;">
+          <button class="btn btn-primary btn-sm" onclick="abrirTurma(${i})">Lançar notas</button>
+          <button class="btn btn-outline btn-sm" onclick="editarDisciplina(${i})">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="excluirDisciplina('${d.id}','${(d.nome||'').replace(/'/g,'')}')">Excluir</button>
+        </td>
+      </tr>`;
+    });
+
+    html+='</tbody></table></div></div>';
+  });
+
+  el.innerHTML=html;
 }
 
 function limparFormDisc(){
@@ -2563,8 +2905,9 @@ async function salvarEdicao(){
 let matriculasCache=[], matAtual=null;
 
 const DOC_LABELS = {
-  rg:'RG', cpf:'CPF', diploma:'Diploma', historico:'Histórico',
-  comprovante_residencia:'Comprovante de residência', foto:'Foto', outro:'Outro'
+  rg:'RG', cpf:'CPF', diploma:'Diploma de graduação', historico:'Histórico de graduação',
+  comprovante_residencia:'Comprovante de residência', certidao:'Certidão de casamento',
+  foto:'Foto', outro:'Outro'
 };
 
 async function carregarMatriculas(){
