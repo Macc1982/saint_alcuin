@@ -194,21 +194,21 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)">Dashboard</div>
-      <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas">Matrículas</div>
-      <div class="nav-item" onclick="showTab('alunos',this)">Alunos</div>
-      <div class="nav-item" onclick="showTab('financeiro',this)">Financeiro</div>
-      <div class="nav-item" onclick="showTab('documentos',this)">Documentos</div>
-      <div class="nav-item" onclick="showTab('materiais',this)">Materiais</div>
-      <div class="nav-item" onclick="showTab('linhas',this)">Linhas de pesquisa</div>
-      <div class="nav-item" onclick="showTab('acervo',this)">Acervo do curso</div>
-      <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">Para corrigir</div>
-      <div class="nav-item" onclick="showTab('notas',this)">Notas</div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)">📊 Dashboard</div>
+      <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas">📝 Matrículas</div>
+      <div class="nav-item" onclick="showTab('alunos',this)">👤 Alunos</div>
+      <div class="nav-item" onclick="showTab('financeiro',this)">💰 Financeiro</div>
+      <div class="nav-item" onclick="showTab('documentos',this)">🗂 Documentos</div>
+      <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
+      <div class="nav-item" onclick="showTab('linhas',this)">🔬 Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('acervo',this)">📚 Acervo do curso</div>
+      <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">✍️ Para corrigir</div>
+      <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
       <div class="nav-label">Cursos</div>
-      <div class="nav-item" onclick="showTab('cursos',this)">Cursos</div>
-      <div class="nav-item" onclick="showTab('disciplinas',this)">Disciplinas</div>
-      <div class="nav-item" onclick="showTab('atividades',this)">Atividades</div>
-      <div class="nav-item" onclick="showTab('trilha',this)">Trilha do aluno</div>
+      <div class="nav-item" onclick="showTab('cursos',this)">🎓 Cursos</div>
+      <div class="nav-item" onclick="showTab('disciplinas',this)">◈ Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)">📋 Atividades</div>
+      <div class="nav-item" onclick="showTab('trilha',this)">🧭 Trilha do aluno</div>
     </nav>
     <div class="main">
 
@@ -538,7 +538,7 @@
             </div>
             <div class="form-group">
               <label>Categoria</label>
-              <select id="ac-categoria">
+              <select id="ac-categoria" onchange="onCategoriaAcervo()">
                 <option value="linhas">Linhas de pesquisa</option>
                 <option value="ementa">Ementa do curso</option>
                 <option value="normas">Normas de artigos científicos</option>
@@ -549,6 +549,7 @@
               </select>
             </div>
           </div>
+          <div class="fin-hint" id="ac-aviso">Documento único por curso — publicar substitui o anterior.</div>
           <div class="form-group">
             <label>Título</label>
             <input id="ac-titulo" placeholder="Ex.: Normas ABNT para submissão de artigos"/>
@@ -1875,6 +1876,13 @@ const AC_LABELS={
   regulamento:'Regulamento', edital:'Edital', cronograma:'Cronograma'
 };
 
+function onCategoriaAcervo(){
+  const cat=document.getElementById('ac-categoria').value;
+  const av=document.getElementById('ac-aviso');
+  if(!av)return;
+  av.style.display = cat==='linhas' ? 'block' : 'none';
+}
+
 function onAcSelected(e){
   acFile=(e.target.files||[])[0]||null;
   const el=document.getElementById('acFileName');
@@ -1896,6 +1904,15 @@ async function publicarAcervo(){
   if(!titulo){toast('Informe o título.','error');return;}
   if(!acFile){toast('Selecione o arquivo PDF.','error');return;}
 
+  // Linhas de pesquisa: arquivo único por curso — substitui o anterior
+  let anteriores=[];
+  if(categoria==='linhas'){
+    const {data:ant}=await sb.from('materiais').select('id,url')
+      .eq('curso_id',curso_id).eq('categoria','linhas');
+    anteriores=ant||[];
+    if(anteriores.length && !confirm('Já existe um documento de linhas de pesquisa para este curso.\n\nO anterior será substituído. Continuar?')) return;
+  }
+
   const btn=document.getElementById('btnAcervo');
   btn.disabled=true;btn.textContent='Publicando...';
 
@@ -1912,10 +1929,19 @@ async function publicarAcervo(){
     categoria, url:pub.publicUrl, descricao:desc||null
   });
 
-  btn.disabled=false;btn.textContent='Publicar';
-  if(dbErr){toast('Erro: '+dbErr.message,'error');return;}
+  if(dbErr){toast('Erro: '+dbErr.message,'error');btn.disabled=false;btn.textContent='Publicar';return;}
 
-  toast('Publicado no acervo.','success');
+  // remove o anterior só depois que o novo entrou
+  if(anteriores.length){
+    for(const a of anteriores){
+      await sb.from('materiais').delete().eq('id',a.id);
+      const p=(a.url||'').split('/materiais/')[1];
+      if(p) await sb.storage.from('materiais').remove([decodeURIComponent(p)]);
+    }
+  }
+
+  btn.disabled=false;btn.textContent='Publicar';
+  toast(anteriores.length?'Documento substituído.':'Publicado no acervo.','success');
   document.getElementById('acInput').value='';
   document.getElementById('acFileName').style.display='none';
   document.getElementById('ac-titulo').value='';
@@ -2285,7 +2311,7 @@ async function carregarCorrecoes(){
 
   const pend=cnt('enviado');
   document.getElementById('nav-corrigir').innerHTML =
-    'Para corrigir' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
+    '✍️ Para corrigir' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
 
   const el=document.getElementById('lista-correcoes');
   const hint=document.getElementById('corr-hint');
@@ -2954,7 +2980,7 @@ async function carregarMatriculas(){
   // Badge no menu (inscrições aguardando)
   const pend=cnt('inscrito');
   document.getElementById('nav-matriculas').innerHTML =
-    'Matrículas' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
+    '📝 Matrículas' + (pend ? ' <span class="nav-badge alerta">'+pend+'</span>' : '');
 
   const tbody=document.getElementById('tabela-matriculas');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma inscrição.</td></tr>';return;}
