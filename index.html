@@ -496,7 +496,7 @@
     btn.textContent = 'Enviando...';
 
     // Registra a inscrição no banco → aparece no painel da coordenação
-    const { error } = await sb.from('matriculas').insert({
+    const { error } = await sb.from('inscricoes').insert({
       nome:      nome,
       email:     email,
       telefone:  whats,
