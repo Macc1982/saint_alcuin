@@ -99,6 +99,34 @@
   .linha-desc{font-size:.82rem;color:var(--text);line-height:1.65;margin-bottom:8px;}
   .linha-coord{font-size:.75rem;color:var(--gray);}
 
+  /* ---------- Trabalho em grupo ---------- */
+  .grupo-pergunta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+                  margin-bottom:12px;padding:14px 18px;background:#f6f8fb;
+                  border:1px solid var(--border);border-radius:10px;}
+  .grupo-label{font-size:.84rem;font-weight:600;color:var(--primary);}
+  .grupo-opcoes{display:flex;gap:8px;}
+  .grupo-opt{font-family:inherit;font-size:.8rem;font-weight:600;padding:8px 22px;
+             border:1.5px solid var(--border);border-radius:8px;background:var(--white);
+             color:var(--gray);cursor:pointer;transition:all .15s;min-width:74px;}
+  .grupo-opt:hover{border-color:var(--secondary);color:var(--secondary);}
+  .grupo-opt.ativo{background:var(--secondary);border-color:var(--secondary);color:#fff;}
+  .grupo-tag{display:inline-block;margin-top:10px;padding:5px 13px;background:#eef4fb;
+             color:var(--secondary);border-radius:20px;font-size:.72rem;font-weight:600;}
+  .grupo-tag.solo{background:#f3f4f6;color:var(--gray);}
+
+  /* ---------- Documento em destaque ---------- */
+  .destaque{display:block;text-decoration:none;background:var(--white);border:1px solid var(--border);
+            border-left:4px solid var(--primary);border-radius:12px;padding:30px 34px;margin-bottom:8px;
+            transition:border-color .18s,box-shadow .18s,transform .18s;}
+  .destaque:hover{border-color:var(--secondary);border-left-color:var(--secondary);
+                  box-shadow:0 6px 22px rgba(20,93,160,.12);transform:translateY(-2px);}
+  .destaque-tag{font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+                color:var(--secondary);margin-bottom:12px;}
+  .destaque-titulo{font-size:1.3rem;font-weight:700;color:var(--primary);line-height:1.3;
+                   letter-spacing:-.015em;margin-bottom:10px;}
+  .destaque-desc{font-size:.86rem;color:var(--text);line-height:1.65;margin-bottom:18px;max-width:60ch;}
+  .destaque-acao{font-size:.82rem;font-weight:600;color:var(--secondary);}
+
   /* ---------- Acervo e documentos ---------- */
   .sec-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin:24px 0 12px;}
   .sec-title:first-child{margin-top:0;}
@@ -226,20 +254,20 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)">⌂ &nbsp;Início</div>
-      <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat">📄 &nbsp;Materiais</div>
-      <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas">▶ &nbsp;Videoaulas</div>
+      <div class="nav-item active" onclick="showTab('home',this)">Início</div>
+      <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat">Materiais</div>
+      <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas">Videoaulas</div>
       <div class="nav-label">Acadêmico</div>
-      <div class="nav-item" onclick="showTab('disciplinas',this)">◈ &nbsp;Disciplinas</div>
-      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">📋 &nbsp;Atividades</div>
-      <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
+      <div class="nav-item" onclick="showTab('disciplinas',this)">Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">Atividades</div>
+      <div class="nav-item" onclick="showTab('notas',this)">Notas</div>
+      <div class="nav-item" onclick="showTab('linhas',this)">Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('acervo',this)">Acervo do curso</div>
       <div class="nav-label">Financeiro</div>
-      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
-      <div class="nav-item" onclick="showTab('linhas',this)">🔬 &nbsp;Linhas de pesquisa</div>
-      <div class="nav-item" onclick="showTab('acervo',this)">📚 &nbsp;Acervo do curso</div>
+      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">Pagamentos</div>
       <div class="nav-label">Documentos</div>
-      <div class="nav-item" onclick="showTab('meusdocs',this)">🗂 &nbsp;Meus documentos</div>
-      <div class="nav-item" onclick="showTab('declaracoes',this)">☰ &nbsp;Declarações</div>
+      <div class="nav-item" onclick="showTab('meusdocs',this)">Meus documentos</div>
+      <div class="nav-item" onclick="showTab('declaracoes',this)">Declarações</div>
     </nav>
 
     <div class="dash-main">
@@ -587,8 +615,8 @@ async function carregarMateriais(){
   const videos=todos.filter(m=>m.tipo==='video');
 
   document.getElementById('st-mat').textContent=todos.length;
-  document.getElementById('nav-mat').innerHTML='📄 &nbsp;Materiais <span class="nav-badge">'+pdfs.length+'</span>';
-  document.getElementById('nav-aulas').innerHTML='▶ &nbsp;Videoaulas <span class="nav-badge">'+videos.length+'</span>';
+  document.getElementById('nav-mat').innerHTML='Materiais <span class="nav-badge">'+pdfs.length+'</span>';
+  document.getElementById('nav-aulas').innerHTML='Videoaulas <span class="nav-badge">'+videos.length+'</span>';
 
   document.getElementById('lista-pdfs').innerHTML   = renderGrupos(pdfs,'pdf');
   document.getElementById('lista-videos').innerHTML = renderGrupos(videos,'video');
@@ -702,10 +730,10 @@ async function carregarFinanceiro(){
   if(atrasadas.length){
     alerta.style.display='block';
     alerta.innerHTML = `<strong>Atenção:</strong> você tem ${atrasadas.length} parcela${atrasadas.length>1?'s':''} em atraso. Regularize para manter seu acesso ativo.`;
-    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
+    document.getElementById('nav-fin').innerHTML='Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
   } else {
     alerta.style.display='none';
-    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos';
+    document.getElementById('nav-fin').innerHTML='Pagamentos';
   }
 
   // Próxima a vencer (em aberto, não atrasada, mais próxima)
@@ -758,7 +786,7 @@ async function carregarAtividades(){
   if(!trilha.length){
     document.getElementById('lista-atividades').innerHTML=
       '<div class="empty" style="background:#fff;border-radius:8px;">Nenhuma atividade na sua trilha ainda.</div>';
-    document.getElementById('nav-ativ').innerHTML='📋 &nbsp;Atividades';
+    document.getElementById('nav-ativ').innerHTML='Atividades';
     return;
   }
 
@@ -778,7 +806,7 @@ async function carregarAtividades(){
   // badge: quantas liberadas ainda não entregues
   const pendentes = atividadesCache.filter(t=>t.estado==='liberada').length;
   document.getElementById('nav-ativ').innerHTML =
-    '📋 &nbsp;Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
+    'Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
 
   renderAtividades();
 }
@@ -842,20 +870,35 @@ function renderAtividades(){
           (t.entrega_path?'<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+t.entrega_path+'\')">Ver envio</button>':'')+
         '</div>';
         if(t.feedback){ secEntrega+='<div class="feedback-box"><strong>Feedback do professor:</strong>\n'+t.feedback+'</div>'; }
+        secEntrega+='<div class="grupo-tag'+(t.em_grupo?'':' solo')+'">'+(t.em_grupo?'Trabalho em grupo':'Trabalho individual')+'</div>';
       } else if(est==='entregue'){
-        secEntrega+='<div class="entrega-box">'+
+        secEntrega+='<div class="grupo-pergunta">'+
+          '<div class="grupo-label">Este trabalho foi feito em grupo?</div>'+
+          '<div class="grupo-opcoes">'+
+            '<button class="grupo-opt'+(t.em_grupo===false?' ativo':'')+'" id="gopt-nao-'+i+'" onclick="marcarGrupo('+i+',false)">Não</button>'+
+            '<button class="grupo-opt'+(t.em_grupo===true?' ativo':'')+'" id="gopt-sim-'+i+'" onclick="marcarGrupo('+i+',true)">Sim</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="entrega-box">'+
           '<div style="font-size:1.4rem;">📄</div>'+
           '<div style="flex:1;min-width:0;">'+
             '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+(t.entrega_arquivo||'Seu envio')+'</div>'+
             '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(t.enviado_em)+' · aguardando correção</div>'+
           '</div>'+
           (t.entrega_path?'<button class="btn btn-outline" style="font-size:.76rem;" onclick="baixarAnexo(\''+t.entrega_path+'\')">Ver</button>':'')+
-          '<button class="btn btn-secondary" style="font-size:.76rem;" onclick="escolherTrabalho('+i+')">Trocar arquivo</button>'+
+          '<button class="btn btn-secondary" style="font-size:.76rem;" id="btn-env-'+i+'" onclick="escolherTrabalho('+i+')">Trocar arquivo</button>'+
         '</div>';
       } else {
-        secEntrega+='<div class="entrega-box">'+
+        secEntrega+='<div class="grupo-pergunta">'+
+          '<div class="grupo-label">Este trabalho foi feito em grupo?</div>'+
+          '<div class="grupo-opcoes">'+
+            '<button class="grupo-opt" id="gopt-nao-'+i+'" onclick="marcarGrupo('+i+',false)">Não</button>'+
+            '<button class="grupo-opt" id="gopt-sim-'+i+'" onclick="marcarGrupo('+i+',true)">Sim</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="entrega-box">'+
           '<div style="flex:1;font-size:.84rem;color:var(--gray);">Envie seu trabalho em PDF, DOC ou DOCX (até '+MAX_MB_TRAB+' MB).</div>'+
-          '<button class="btn btn-secondary" style="font-size:.8rem;" onclick="escolherTrabalho('+i+')">Enviar trabalho</button>'+
+          '<button class="btn btn-secondary" style="font-size:.8rem;" id="btn-env-'+i+'" onclick="escolherTrabalho('+i+')" disabled>Enviar trabalho</button>'+
         '</div>';
       }
       secEntrega+='<input type="file" id="trab-'+i+'" accept=".pdf,.doc,.docx" onchange="enviarTrabalho('+i+',event)"/>';
@@ -897,6 +940,18 @@ async function baixarAnexo(path){
   window.open(data.signedUrl,'_blank');
 }
 
+const grupoEscolha = {};
+
+function marcarGrupo(i, valor){
+  grupoEscolha[i] = valor;
+  const sim = document.getElementById('gopt-sim-'+i);
+  const nao = document.getElementById('gopt-nao-'+i);
+  if(sim) sim.classList.toggle('ativo', valor === true);
+  if(nao) nao.classList.toggle('ativo', valor === false);
+  const btn = document.getElementById('btn-env-'+i);
+  if(btn) btn.disabled = false;
+}
+
 function escolherTrabalho(i){
   document.getElementById('trab-'+i).click();
 }
@@ -910,6 +965,13 @@ async function enviarTrabalho(i, ev){
 
   if(file.size > MAX_MB_TRAB*1024*1024){
     toast('Arquivo muito grande (máx. '+MAX_MB_TRAB+' MB).','error');
+    ev.target.value='';
+    return;
+  }
+
+  const emGrupo = grupoEscolha[i] !== undefined ? grupoEscolha[i] : atividadesCache[i].em_grupo;
+  if(emGrupo === undefined || emGrupo === null){
+    toast('Informe se o trabalho foi feito em grupo antes de enviar.','erro');
     ev.target.value='';
     return;
   }
@@ -934,6 +996,7 @@ async function enviarTrabalho(i, ev){
     url:  path,
     path: path,
     status: 'enviado',
+    em_grupo: emGrupo,
     enviado_em: new Date().toISOString()
   },{onConflict:'atividade_id,aluno_id'});
 
@@ -974,26 +1037,39 @@ async function carregarLinhasAluno(){
   if(!estudante)return;
   const el=document.getElementById('linhas-aluno');
 
-  const {data,error}=await sb.from('linhas_pesquisa').select('*')
-    .eq('curso_id',estudante.curso_id).order('nome');
+  const {data,error}=await sb.from('materiais').select('*')
+    .eq('curso_id',estudante.curso_id)
+    .eq('categoria','linhas')
+    .order('created_at',{ascending:false});
 
   if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar.</div></div>';return;}
-
-  const ativas=(data||[]).filter(l=>l.ativa!==false);
-  if(!ativas.length){
-    el.innerHTML='<div class="card"><div class="empty">Nenhuma linha de pesquisa cadastrada para este curso ainda.</div></div>';
+  if(!data||!data.length){
+    el.innerHTML='<div class="card"><div class="empty">O documento de linhas de pesquisa deste curso ainda não foi publicado.</div></div>';
     return;
   }
 
-  el.innerHTML='<div class="linha-lista">'+ativas.map(l=>`
-    <div class="linha-card">
-      <div class="linha-num">${String(ativas.indexOf(l)+1).padStart(2,'0')}</div>
-      <div class="linha-corpo">
-        <div class="linha-nome">${l.nome}</div>
-        ${l.descricao?'<div class="linha-desc">'+l.descricao+'</div>':''}
-        ${l.coordenador?'<div class="linha-coord">Coordenação: '+l.coordenador+'</div>':''}
-      </div>
-    </div>`).join('')+'</div>';
+  const principal=data[0];
+  const outros=data.slice(1);
+
+  let html=`
+    <a class="destaque" href="${principal.url}" target="_blank" rel="noopener">
+      <div class="destaque-tag">Documento oficial</div>
+      <div class="destaque-titulo">${principal.titulo}</div>
+      <div class="destaque-desc">${principal.descricao||'Eixos temáticos do programa. Sua dissertação deve vincular-se a uma das linhas descritas neste documento.'}</div>
+      <div class="destaque-acao">Abrir documento &rarr;</div>
+    </a>`;
+
+  if(outros.length){
+    html+='<div class="sec-title">Outros documentos</div><div class="doc-grid">'+
+      outros.map(m=>`
+        <div class="doc-card">
+          <div class="doc-titulo">${m.titulo}</div>
+          <div class="doc-desc">${m.descricao||'Documento complementar'}</div>
+          <a class="doc-abrir" href="${m.url}" target="_blank" rel="noopener">Abrir documento &rarr;</a>
+        </div>`).join('')+'</div>';
+  }
+
+  el.innerHTML=html;
 }
 
 /* ==========================================================================
@@ -1001,11 +1077,12 @@ async function carregarLinhasAluno(){
    ========================================================================== */
 
 const AC_LABELS={
+  linhas:'Linhas de pesquisa',
   ementa:'Ementa do curso', normas:'Normas de artigos científicos',
   estrutura:'Estrutura da dissertação/tese',
   regulamento:'Regulamento', edital:'Editais', cronograma:'Cronograma'
 };
-const AC_ICONS={ementa:'◈',normas:'✎',estrutura:'❑',regulamento:'§',edital:'▣',cronograma:'▤'};
+const AC_ICONS={linhas:'◉',ementa:'◈',normas:'✎',estrutura:'❑',regulamento:'§',edital:'▣',cronograma:'▤'};
 
 async function carregarAcervoAluno(){
   if(!estudante)return;
@@ -1014,6 +1091,7 @@ async function carregarAcervoAluno(){
   const {data,error}=await sb.from('materiais').select('*')
     .eq('curso_id',estudante.curso_id)
     .neq('categoria','material')
+    .neq('categoria','linhas')
     .order('categoria').order('created_at',{ascending:false});
 
   if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar o acervo.</div></div>';return;}
