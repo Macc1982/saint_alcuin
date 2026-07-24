@@ -82,7 +82,7 @@
   .upload-icon{font-size:2rem;margin-bottom:8px;}
   .upload-text{font-size:.82rem;color:var(--gray);}
   .upload-text strong{color:var(--secondary);}
-  #fileInput,#docInput,#acInput,#videoInput{display:none;}
+  #fileInput,#docInput,#acInput,#videoInput,#bibInput{display:none;}
   .loading{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   .empty{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   /* ---- Financeiro ---- */
@@ -210,6 +210,7 @@
       <div class="nav-item" onclick="showTab('documentos',this)">🗂 Documentos</div>
       <div class="nav-item" onclick="showTab('materiais',this)">📄 Materiais</div>
       <div class="nav-item" onclick="showTab('linhas',this)">🔬 Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('biblioteca',this)">📖 Biblioteca</div>
       <div class="nav-item" onclick="showTab('acervo',this)">📚 Acervo do curso</div>
       <div class="nav-item" onclick="showTab('corrigir',this)" id="nav-corrigir">✍️ Para corrigir</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ Notas</div>
@@ -530,6 +531,147 @@
             <span class="card-hint" id="lp-hint"></span>
           </div>
           <div id="lista-linhas"><div class="loading">Carregando...</div></div>
+        </div>
+      </div>
+
+      <!-- ============ BIBLIOTECA ============ -->
+      <div class="tab" id="tab-biblioteca">
+        <div class="page-title">Biblioteca</div>
+        <div class="page-sub">Acervo digital da instituição — obras em domínio público e material licenciado</div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title" id="bib-form-title">Nova obra</div></div>
+          <input type="hidden" id="bib-id"/>
+
+          <div class="fin-hint">
+            Publique apenas obras em <strong>domínio público</strong>, sob licença aberta ou com autorização do detentor.
+            Sem arquivo, a obra entra como <strong>referência de leitura</strong> — visível na estante, sem PDF.
+          </div>
+
+          <div class="form-row">
+            <div class="form-group"><label>Título *</label><input type="text" id="bib-titulo" placeholder="Ex: Émile Durkheim"/></div>
+            <div class="form-group"><label>Subtítulo</label><input type="text" id="bib-subtitulo" placeholder="Ex: Coleção Educadores"/></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group"><label>Autor / teórico *</label><input type="text" id="bib-autor" placeholder="Ex: Émile Durkheim"/></div>
+            <div class="form-group"><label>Organizador, comentarista ou tradutor</label><input type="text" id="bib-organizador" placeholder="Ex: Jean-Claude Filloux"/></div>
+          </div>
+
+          <div class="form-row-4">
+            <div class="form-group"><label>Ano da edição</label><input type="number" id="bib-ano" placeholder="2010"/></div>
+            <div class="form-group"><label>Ano do original</label><input type="number" id="bib-ano-orig" placeholder="1922"/></div>
+            <div class="form-group"><label>Páginas</label><input type="number" id="bib-paginas" placeholder="140"/></div>
+            <div class="form-group"><label>Tipo *</label>
+              <select id="bib-tipo">
+                <option value="livro">Livro</option>
+                <option value="capitulo">Capítulo</option>
+                <option value="artigo">Artigo</option>
+                <option value="tese">Tese</option>
+                <option value="dissertacao">Dissertação</option>
+                <option value="periodico">Periódico</option>
+                <option value="documento">Documento</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group"><label>Editora</label><input type="text" id="bib-editora" placeholder="Ex: MEC / Fundação Joaquim Nabuco"/></div>
+            <div class="form-group"><label>Coleção</label><input type="text" id="bib-colecao" placeholder="Ex: Coleção Educadores (MEC/UNESCO)"/></div>
+            <div class="form-group"><label>Área</label><input type="text" id="bib-area" placeholder="Ex: Sociologia da Educação" list="areas-bib"/>
+              <datalist id="areas-bib">
+                <option value="Filosofia da Educação"></option>
+                <option value="Sociologia da Educação"></option>
+                <option value="Psicologia da Educação"></option>
+                <option value="História da Educação"></option>
+                <option value="Didática e Currículo"></option>
+                <option value="Política Educacional"></option>
+                <option value="Metodologia da Pesquisa"></option>
+                <option value="Educação Inclusiva"></option>
+              </datalist>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Palavras-chave <span style="font-weight:400;color:var(--gray)">(separadas por vírgula)</span></label>
+            <input type="text" id="bib-tags" placeholder="sociologia, moral, educação e sociedade"/>
+          </div>
+
+          <div class="form-group">
+            <label>Resumo</label>
+            <textarea id="bib-resumo" rows="3" placeholder="Breve apresentação da obra e sua relevância para o programa"></textarea>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group"><label>Licença</label>
+              <select id="bib-licenca">
+                <option value="Domínio público">Domínio público</option>
+                <option value="CC BY">CC BY</option>
+                <option value="CC BY-SA">CC BY-SA</option>
+                <option value="CC BY-NC">CC BY-NC</option>
+                <option value="Autorizado">Autorizado pelo detentor</option>
+                <option value="Referência">Referência (sem distribuição)</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Fonte</label><input type="text" id="bib-fonte" placeholder="Ex: Portal Domínio Público (MEC)"/></div>
+            <div class="form-group"><label>Link da fonte</label><input type="url" id="bib-url-fonte" placeholder="https://dominiopublico.gov.br/..."/></div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group"><label>Disponível para</label>
+              <select id="bib-curso"><option value="">Todos os cursos</option></select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:12px;">
+              <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer;">
+                <input type="checkbox" id="bib-destaque" style="width:auto;"/> Exibir em destaque na estante
+              </label>
+            </div>
+          </div>
+
+          <div class="sec-title" style="margin-top:6px;">Arquivo</div>
+          <div class="form-row">
+            <div class="form-group"><label>Origem do arquivo</label>
+              <select id="bib-origem" onchange="onOrigemBib()">
+                <option value="upload">Enviar PDF (hospedado por nós)</option>
+                <option value="link">Link externo</option>
+                <option value="nenhum">Sem arquivo — apenas referência</option>
+              </select>
+            </div>
+            <div class="form-group" id="bib-campo-link" style="display:none;">
+              <label>URL do PDF</label><input type="url" id="bib-url" placeholder="https://..."/>
+            </div>
+          </div>
+
+          <div id="bib-campo-upload">
+            <div class="upload-area" onclick="document.getElementById('bibInput').click()">
+              <div class="upload-icon">📖</div>
+              <div class="upload-text"><strong>Escolher PDF</strong> da obra</div>
+              <div class="upload-text" id="bibFileName" style="display:none;margin-top:8px;color:var(--secondary);font-weight:600;"></div>
+            </div>
+            <input type="file" id="bibInput" accept=".pdf" onchange="onBibSelected(event)"/>
+          </div>
+
+          <div class="form-group" style="max-width:420px;margin-top:14px;">
+            <label>Capa <span style="font-weight:400;color:var(--gray)">(opcional — sem imagem, a capa é gerada)</span></label>
+            <input type="url" id="bib-capa" placeholder="https://... (URL da imagem)"/>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-primary" id="btnBib" onclick="salvarObra()">Adicionar à biblioteca</button>
+            <button class="btn btn-outline" id="btnCancelarBib" onclick="limparFormBib()" style="display:none;">Cancelar edição</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Acervo</div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span class="card-hint" id="bib-hint"></span>
+              <input type="text" id="bib-busca" oninput="renderBiblioteca()" placeholder="Buscar por título ou autor"
+                     style="max-width:230px;background:var(--light);border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.8rem;"/>
+            </div>
+          </div>
+          <div id="bib-lista"><div class="loading">Carregando...</div></div>
         </div>
       </div>
 
@@ -1203,7 +1345,7 @@ async function iniciarApp(){
   await Promise.all([
     carregarDashboard(), carregarAlunos(), carregarMateriais(),
     carregarNotas(), carregarMatriculas(), carregarCursosTabela(),
-    carregarAtividades(), carregarCorrecoes(), carregarAcervo(), carregarLinhas()
+    carregarAtividades(), carregarCorrecoes(), carregarAcervo(), carregarLinhas(), carregarBiblioteca()
   ]);
 }
 
@@ -1219,7 +1361,7 @@ async function carregarCursos(){
   if(!data)return;
   cursosCache=data;
   document.getElementById('st-cursos').textContent=data.length;
-  ['a-curso','m-curso','d-curso','at-curso','ac-curso','lp-curso','filtro-curso-mat','filtro-curso-disc','filtro-curso-acervo'].forEach(id=>{
+  ['a-curso','m-curso','d-curso','at-curso','ac-curso','lp-curso','filtro-curso-mat','filtro-curso-disc','filtro-curso-acervo','bib-curso'].forEach(id=>{
     const el=document.getElementById(id);
     if(!el)return;
     const val=el.value;
@@ -1753,6 +1895,214 @@ async function adicionarMaterial(){
   if(falhas) toast(falhas+' arquivo(s) falharam.','error');
 
   await Promise.all([carregarMateriais(),carregarDashboard()]);
+}
+
+/* ==========================================================================
+   BIBLIOTECA
+   ========================================================================== */
+
+let bibCache=[], bibFile=null;
+
+function onOrigemBib(){
+  const o=document.getElementById('bib-origem').value;
+  document.getElementById('bib-campo-upload').style.display = o==='upload' ? 'block':'none';
+  document.getElementById('bib-campo-link').style.display   = o==='link'   ? 'block':'none';
+}
+
+function onBibSelected(e){
+  bibFile=(e.target.files||[])[0]||null;
+  const el=document.getElementById('bibFileName');
+  if(!bibFile){el.style.display='none';return;}
+  el.style.display='block';
+  el.textContent=bibFile.name+'  ·  '+(bibFile.size/1048576).toFixed(1)+' MB';
+}
+
+function limparFormBib(){
+  ['bib-id','bib-titulo','bib-subtitulo','bib-autor','bib-organizador','bib-ano','bib-ano-orig',
+   'bib-paginas','bib-editora','bib-colecao','bib-area','bib-tags','bib-resumo',
+   'bib-fonte','bib-url-fonte','bib-url','bib-capa'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('bib-tipo').value='livro';
+  document.getElementById('bib-licenca').value='Domínio público';
+  document.getElementById('bib-curso').value='';
+  document.getElementById('bib-destaque').checked=false;
+  document.getElementById('bib-origem').value='upload';
+  document.getElementById('bibInput').value='';
+  document.getElementById('bibFileName').style.display='none';
+  bibFile=null; onOrigemBib();
+  document.getElementById('bib-form-title').textContent='Nova obra';
+  document.getElementById('btnBib').textContent='Adicionar à biblioteca';
+  document.getElementById('btnCancelarBib').style.display='none';
+}
+
+async function salvarObra(){
+  const id     = document.getElementById('bib-id').value;
+  const titulo = document.getElementById('bib-titulo').value.trim();
+  const autor  = document.getElementById('bib-autor').value.trim();
+  const origem = document.getElementById('bib-origem').value;
+
+  if(!titulo){toast('Informe o título da obra.','error');return;}
+  if(!autor){toast('Informe o autor.','error');return;}
+
+  const btn=document.getElementById('btnBib');
+  btn.disabled=true;
+
+  let arquivo_url=null, arquivo_path=null;
+  if(origem==='upload' && bibFile){
+    btn.textContent='Enviando PDF...';
+    const path='obras/'+Date.now()+'.pdf';
+    const {error:upErr}=await sb.storage.from('biblioteca')
+      .upload(path,bibFile,{upsert:false,contentType:'application/pdf'});
+    if(upErr){toast('Erro no envio: '+upErr.message,'error');btn.disabled=false;btn.textContent='Adicionar à biblioteca';return;}
+    const {data:pub}=sb.storage.from('biblioteca').getPublicUrl(path);
+    arquivo_url=pub.publicUrl; arquivo_path=path;
+  } else if(origem==='link'){
+    arquivo_url=document.getElementById('bib-url').value.trim()||null;
+  }
+
+  const tags=document.getElementById('bib-tags').value.trim();
+  const payload={
+    titulo, autor,
+    subtitulo:      document.getElementById('bib-subtitulo').value.trim()||null,
+    organizador:    document.getElementById('bib-organizador').value.trim()||null,
+    ano:            parseInt(document.getElementById('bib-ano').value,10)||null,
+    ano_original:   parseInt(document.getElementById('bib-ano-orig').value,10)||null,
+    paginas:        parseInt(document.getElementById('bib-paginas').value,10)||null,
+    tipo:           document.getElementById('bib-tipo').value,
+    editora:        document.getElementById('bib-editora').value.trim()||null,
+    colecao:        document.getElementById('bib-colecao').value.trim()||null,
+    area:           document.getElementById('bib-area').value.trim()||null,
+    palavras_chave: tags ? tags.split(',').map(s=>s.trim()).filter(Boolean) : null,
+    resumo:         document.getElementById('bib-resumo').value.trim()||null,
+    licenca:        document.getElementById('bib-licenca').value||null,
+    fonte:          document.getElementById('bib-fonte').value.trim()||null,
+    url_fonte:      document.getElementById('bib-url-fonte').value.trim()||null,
+    capa_url:       document.getElementById('bib-capa').value.trim()||null,
+    curso_id:       document.getElementById('bib-curso').value||null,
+    destaque:       document.getElementById('bib-destaque').checked
+  };
+  if(arquivo_url){ payload.arquivo_url=arquivo_url; payload.arquivo_path=arquivo_path; }
+  if(origem==='nenhum' && id){ payload.arquivo_url=null; payload.arquivo_path=null; }
+
+  btn.textContent='Salvando...';
+  const {error} = id
+    ? await sb.from('biblioteca').update(payload).eq('id',id)
+    : await sb.from('biblioteca').insert(payload);
+
+  btn.disabled=false;
+  btn.textContent = id?'Salvar alterações':'Adicionar à biblioteca';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast(id?'Obra atualizada.':'Obra adicionada à biblioteca.','success');
+  limparFormBib();
+  await carregarBiblioteca();
+}
+
+async function carregarBiblioteca(){
+  const {data,error}=await sb.from('biblioteca').select('*')
+    .order('destaque',{ascending:false}).order('autor').order('titulo');
+  bibCache=data||[];
+  if(error){document.getElementById('bib-lista').innerHTML='<div class="empty">Erro ao carregar.</div>';return;}
+  renderBiblioteca();
+}
+
+function renderBiblioteca(){
+  const el   = document.getElementById('bib-lista');
+  const hint = document.getElementById('bib-hint');
+  const q    = (document.getElementById('bib-busca')?.value||'').toLowerCase().trim();
+
+  const lista = q
+    ? bibCache.filter(o => (o.titulo+' '+o.autor+' '+(o.organizador||'')+' '+(o.area||'')).toLowerCase().includes(q))
+    : bibCache;
+
+  if(!bibCache.length){
+    el.innerHTML='<div class="empty">Nenhuma obra cadastrada.</div>';
+    if(hint)hint.textContent=''; return;
+  }
+  if(!lista.length){ el.innerHTML='<div class="empty">Nenhuma obra encontrada.</div>'; return; }
+
+  const semArquivo=bibCache.filter(o=>!o.arquivo_url).length;
+  if(hint) hint.textContent = bibCache.length+' obra(s)'+(semArquivo?' · '+semArquivo+' sem arquivo':'');
+
+  const porArea={};
+  lista.forEach(o=>{ (porArea[o.area||'Sem área definida'] = porArea[o.area||'Sem área definida'] || []).push(o); });
+
+  let html='';
+  Object.keys(porArea).sort().forEach(area=>{
+    const obras=porArea[area];
+    html+='<div class="grupo-curso">'+
+      '<div class="grupo-head"><span class="grupo-nome">'+area+'</span>'+
+      '<span class="grupo-meta">'+obras.length+' obra'+(obras.length===1?'':'s')+'</span></div>'+
+      '<div class="table-wrap"><table class="data-table"><tbody>';
+
+    obras.forEach(o=>{
+      const i=bibCache.indexOf(o);
+      html+='<tr>'+
+        '<td style="width:38px;">'+(o.destaque?'★':'')+'</td>'+
+        '<td><strong>'+o.titulo+'</strong>'+
+          (o.subtitulo?'<div style="font-size:.72rem;color:var(--gray);">'+o.subtitulo+'</div>':'')+
+          '<div style="font-size:.74rem;color:var(--gray);margin-top:2px;">'+o.autor+
+          (o.organizador?' · org. '+o.organizador:'')+(o.ano?' · '+o.ano:'')+'</div></td>'+
+        '<td style="width:120px;"><span class="badge badge-'+(o.licenca==='Domínio público'?'green':'blue')+'">'+(o.licenca||'—')+'</span></td>'+
+        '<td style="width:110px;">'+(o.arquivo_url
+            ? '<span class="badge badge-green">Com PDF</span>'
+            : '<span class="badge badge-gray">Referência</span>')+'</td>'+
+        '<td style="width:210px;white-space:nowrap;text-align:right;">'+
+          (o.arquivo_url?'<a class="btn btn-outline btn-sm" href="'+o.arquivo_url+'" target="_blank">Abrir</a> ':'')+
+          '<button class="btn btn-outline btn-sm" onclick="editarObra('+i+')">Editar</button> '+
+          '<button class="btn btn-danger btn-sm" onclick="excluirObra(\''+o.id+'\',\''+(o.arquivo_path||'')+'\')">Excluir</button>'+
+        '</td></tr>';
+    });
+
+    html+='</tbody></table></div></div>';
+  });
+
+  el.innerHTML=html;
+}
+
+function editarObra(i){
+  const o=bibCache[i]; if(!o)return;
+  document.getElementById('bib-id').value          = o.id;
+  document.getElementById('bib-titulo').value      = o.titulo||'';
+  document.getElementById('bib-subtitulo').value   = o.subtitulo||'';
+  document.getElementById('bib-autor').value       = o.autor||'';
+  document.getElementById('bib-organizador').value = o.organizador||'';
+  document.getElementById('bib-ano').value         = o.ano||'';
+  document.getElementById('bib-ano-orig').value    = o.ano_original||'';
+  document.getElementById('bib-paginas').value     = o.paginas||'';
+  document.getElementById('bib-tipo').value        = o.tipo||'livro';
+  document.getElementById('bib-editora').value     = o.editora||'';
+  document.getElementById('bib-colecao').value     = o.colecao||'';
+  document.getElementById('bib-area').value        = o.area||'';
+  document.getElementById('bib-tags').value        = (o.palavras_chave||[]).join(', ');
+  document.getElementById('bib-resumo').value      = o.resumo||'';
+  document.getElementById('bib-licenca').value     = o.licenca||'Domínio público';
+  document.getElementById('bib-fonte').value       = o.fonte||'';
+  document.getElementById('bib-url-fonte').value   = o.url_fonte||'';
+  document.getElementById('bib-capa').value        = o.capa_url||'';
+  document.getElementById('bib-curso').value       = o.curso_id||'';
+  document.getElementById('bib-destaque').checked  = !!o.destaque;
+
+  if(o.arquivo_path){ document.getElementById('bib-origem').value='upload'; }
+  else if(o.arquivo_url){ document.getElementById('bib-origem').value='link';
+                          document.getElementById('bib-url').value=o.arquivo_url; }
+  else { document.getElementById('bib-origem').value='nenhum'; }
+  onOrigemBib();
+
+  document.getElementById('bib-form-title').textContent='Editando obra';
+  document.getElementById('btnBib').textContent='Salvar alterações';
+  document.getElementById('btnCancelarBib').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function excluirObra(id,path){
+  if(!confirm('Remover esta obra da biblioteca?'))return;
+  if(path) await sb.storage.from('biblioteca').remove([path]);
+  const {error}=await sb.from('biblioteca').delete().eq('id',id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Obra removida.','success');
+  await carregarBiblioteca();
 }
 
 /* ==========================================================================
