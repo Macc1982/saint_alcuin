@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin — Saint Alcuin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
   :root{--primary:#0b2a4a;--secondary:#145da0;--text:#2b2b2b;--light:#f5f7fa;--white:#fff;--gray:#6b7280;--border:#dde3ea;--green:#166534;--green-bg:#dcfce7;--red-bg:#fee2e2;--red-text:#991b1b;--yellow-bg:#fef9c3;--yellow-txt:#854d0e;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -82,7 +83,7 @@
   .upload-icon{font-size:2rem;margin-bottom:8px;}
   .upload-text{font-size:.82rem;color:var(--gray);}
   .upload-text strong{color:var(--secondary);}
-  #fileInput,#docInput,#acInput,#videoInput,#bibInput{display:none;}
+  #fileInput,#docInput,#acInput,#videoInput,#bibInput,#capaInput{display:none;}
   .loading{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   .empty{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   /* ---- Financeiro ---- */
@@ -152,6 +153,16 @@
   .grupo-alerta{color:#854d0e;font-weight:700;}
   .grupo-disc{font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin:14px 0 7px;}
   .grupo-curso .table-wrap{box-shadow:none;border:1px solid var(--border);}
+
+  /* ---------- Extração de capa ---------- */
+  .capa-extracao{display:flex;gap:22px;align-items:flex-start;margin-top:16px;
+                 padding:18px;background:var(--light);border:1px solid var(--border);border-radius:10px;}
+  .capa-previa{width:118px;aspect-ratio:2/3;flex-shrink:0;border-radius:6px;overflow:hidden;
+               background:var(--white);border:1px solid var(--border);
+               display:flex;align-items:center;justify-content:center;}
+  .capa-previa img{width:100%;height:100%;object-fit:cover;}
+  .capa-previa-vazia{font-size:.68rem;color:var(--gray);text-align:center;padding:0 10px;line-height:1.45;}
+  .capa-controles{flex:1;min-width:0;}
 
   /* ---------- Drag and drop da trilha ---------- */
   .trilha-tabela tbody tr{cursor:default;transition:background .12s;}
@@ -651,9 +662,30 @@
             <input type="file" id="bibInput" accept=".pdf" onchange="onBibSelected(event)"/>
           </div>
 
-          <div class="form-group" style="max-width:420px;margin-top:14px;">
-            <label>Capa <span style="font-weight:400;color:var(--gray)">(opcional — sem imagem, a capa é gerada)</span></label>
-            <input type="url" id="bib-capa" placeholder="https://... (URL da imagem)"/>
+          <div class="capa-extracao">
+            <div class="capa-previa" id="bib-previa">
+              <div class="capa-previa-vazia">A capa aparece aqui</div>
+            </div>
+            <div class="capa-controles">
+              <div class="form-group" style="margin-bottom:10px;">
+                <label>Capa da obra</label>
+                <div style="font-size:.76rem;color:var(--gray);line-height:1.55;">
+                  Ao escolher o PDF, a capa é extraída automaticamente.
+                  Na Coleção Educadores ela está na <strong>página 3</strong>.
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+                <div class="form-group" style="max-width:110px;margin-bottom:0;">
+                  <label>Página</label>
+                  <input type="number" id="bib-pag-capa" value="3" min="1" style="text-align:center;"/>
+                </div>
+                <button class="btn btn-outline btn-sm" type="button" onclick="extrairCapa()" id="btnExtrair" disabled>Extrair capa</button>
+                <button class="btn btn-outline btn-sm" type="button" onclick="document.getElementById('capaInput').click()">Enviar imagem</button>
+                <button class="btn btn-outline btn-sm" type="button" onclick="limparCapa()">Sem capa</button>
+              </div>
+              <input type="file" id="capaInput" accept="image/*" onchange="onCapaManual(event)"/>
+              <input type="hidden" id="bib-capa"/>
+            </div>
           </div>
 
           <div style="display:flex;gap:10px;margin-top:16px;">
@@ -1901,7 +1933,12 @@ async function adicionarMaterial(){
    BIBLIOTECA
    ========================================================================== */
 
-let bibCache=[], bibFile=null;
+let bibCache=[], bibFile=null, capaBlob=null;
+
+if(window.pdfjsLib){
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
 
 function onOrigemBib(){
   const o=document.getElementById('bib-origem').value;
@@ -1912,9 +1949,68 @@ function onOrigemBib(){
 function onBibSelected(e){
   bibFile=(e.target.files||[])[0]||null;
   const el=document.getElementById('bibFileName');
-  if(!bibFile){el.style.display='none';return;}
+  const btn=document.getElementById('btnExtrair');
+  if(!bibFile){el.style.display='none';if(btn)btn.disabled=true;return;}
   el.style.display='block';
   el.textContent=bibFile.name+'  ·  '+(bibFile.size/1048576).toFixed(1)+' MB';
+  if(btn) btn.disabled=false;
+  extrairCapa();
+}
+
+async function extrairCapa(){
+  if(!bibFile){toast('Escolha o PDF primeiro.','error');return;}
+  if(!window.pdfjsLib){toast('Leitor de PDF indisponível.','error');return;}
+
+  const pagina=parseInt(document.getElementById('bib-pag-capa').value,10)||3;
+  const previa=document.getElementById('bib-previa');
+  previa.innerHTML='<div class="capa-previa-vazia">Extraindo...</div>';
+
+  try{
+    const buf = await bibFile.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+    const n   = Math.min(Math.max(pagina,1), pdf.numPages);
+    const pg  = await pdf.getPage(n);
+
+    const escala = 1100 / pg.getViewport({scale:1}).width;
+    const vp = pg.getViewport({scale:escala});
+
+    const cv = document.createElement('canvas');
+    cv.width = vp.width; cv.height = vp.height;
+    await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+
+    // recorta para 2:3 mantendo o topo
+    const alvoH = Math.min(cv.height, Math.round(cv.width * 1.5));
+    const corte = document.createElement('canvas');
+    corte.width = cv.width; corte.height = alvoH;
+    corte.getContext('2d').drawImage(cv, 0, 0, cv.width, alvoH, 0, 0, cv.width, alvoH);
+
+    capaBlob = await new Promise(r => corte.toBlob(r, 'image/jpeg', 0.88));
+    previa.innerHTML = '<img src="'+corte.toDataURL('image/jpeg',0.7)+'" alt="Capa"/>';
+    document.getElementById('bib-capa').value='';
+    toast('Capa extraída da página '+n+'.','success');
+  }catch(err){
+    console.error('[capa]',err);
+    previa.innerHTML='<div class="capa-previa-vazia">Não foi possível extrair</div>';
+    capaBlob=null;
+    toast('Não foi possível extrair a capa deste PDF.','error');
+  }
+}
+
+function onCapaManual(e){
+  const f=(e.target.files||[])[0];
+  if(!f)return;
+  capaBlob=f;
+  const r=new FileReader();
+  r.onload=()=>{ document.getElementById('bib-previa').innerHTML='<img src="'+r.result+'" alt="Capa"/>'; };
+  r.readAsDataURL(f);
+  document.getElementById('bib-capa').value='';
+}
+
+function limparCapa(){
+  capaBlob=null;
+  document.getElementById('bib-capa').value='';
+  document.getElementById('capaInput').value='';
+  document.getElementById('bib-previa').innerHTML='<div class="capa-previa-vazia">Capa gerada pelo sistema</div>';
 }
 
 function limparFormBib(){
@@ -1930,7 +2026,10 @@ function limparFormBib(){
   document.getElementById('bib-origem').value='upload';
   document.getElementById('bibInput').value='';
   document.getElementById('bibFileName').style.display='none';
-  bibFile=null; onOrigemBib();
+  document.getElementById('capaInput').value='';
+  document.getElementById('bib-previa').innerHTML='<div class="capa-previa-vazia">A capa aparece aqui</div>';
+  document.getElementById('btnExtrair').disabled=true;
+  bibFile=null; capaBlob=null; onOrigemBib();
   document.getElementById('bib-form-title').textContent='Nova obra';
   document.getElementById('btnBib').textContent='Adicionar à biblioteca';
   document.getElementById('btnCancelarBib').style.display='none';
@@ -1961,6 +2060,19 @@ async function salvarObra(){
     arquivo_url=document.getElementById('bib-url').value.trim()||null;
   }
 
+  // capa extraída ou enviada
+  let capa_url=document.getElementById('bib-capa').value.trim()||null;
+  if(capaBlob){
+    btn.textContent='Enviando capa...';
+    const cpath='capas/'+Date.now()+'.jpg';
+    const {error:cErr}=await sb.storage.from('biblioteca')
+      .upload(cpath,capaBlob,{upsert:false,contentType:'image/jpeg'});
+    if(!cErr){
+      const {data:cpub}=sb.storage.from('biblioteca').getPublicUrl(cpath);
+      capa_url=cpub.publicUrl;
+    } else { console.error('[capa upload]',cErr); }
+  }
+
   const tags=document.getElementById('bib-tags').value.trim();
   const payload={
     titulo, autor,
@@ -1978,7 +2090,7 @@ async function salvarObra(){
     licenca:        document.getElementById('bib-licenca').value||null,
     fonte:          document.getElementById('bib-fonte').value.trim()||null,
     url_fonte:      document.getElementById('bib-url-fonte').value.trim()||null,
-    capa_url:       document.getElementById('bib-capa').value.trim()||null,
+    capa_url:       capa_url,
     curso_id:       document.getElementById('bib-curso').value||null,
     destaque:       document.getElementById('bib-destaque').checked
   };
@@ -2081,6 +2193,10 @@ function editarObra(i){
   document.getElementById('bib-fonte').value       = o.fonte||'';
   document.getElementById('bib-url-fonte').value   = o.url_fonte||'';
   document.getElementById('bib-capa').value        = o.capa_url||'';
+  document.getElementById('bib-previa').innerHTML  = o.capa_url
+    ? '<img src="'+o.capa_url+'" alt="Capa"/>'
+    : '<div class="capa-previa-vazia">Capa gerada pelo sistema</div>';
+  capaBlob=null;
   document.getElementById('bib-curso').value       = o.curso_id||'';
   document.getElementById('bib-destaque').checked  = !!o.destaque;
 
