@@ -898,7 +898,9 @@ async function carregarAtividades(){
 
   // A trilha do aluno (view já traz estado + entrega de cada atividade)
   const {data}=await sb.from('vw_trilha_aluno').select('*')
-    .eq('aluno_id',estudante.id).order('posicao');
+    .eq('aluno_id',estudante.id)
+    .neq('estado','dispensada')
+    .order('posicao');
 
   const trilha=data||[];
 
