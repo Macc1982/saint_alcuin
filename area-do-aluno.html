@@ -89,6 +89,86 @@
   .nota-ring{width:86px;height:86px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--secondary) 0% 80%,var(--border) 80% 100%);display:flex;align-items:center;justify-content:center;position:relative;}
   .nota-ring::before{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--white);}
   .nota-ring-val{position:relative;z-index:1;font-size:1.4rem;font-weight:700;color:var(--primary);}
+  /* ---------- Biblioteca ---------- */
+  .bib-barra{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:26px;}
+  .bib-busca{flex:1;min-width:220px;max-width:420px;background:var(--white);
+             border:1.5px solid var(--border);border-radius:10px;padding:11px 16px;
+             font-size:.86rem;font-family:inherit;color:var(--text);outline:none;transition:border-color .15s;}
+  .bib-busca:focus{border-color:var(--secondary);}
+  .bib-filtro{background:var(--white);border:1.5px solid var(--border);border-radius:10px;
+              padding:11px 14px;font-size:.84rem;font-family:inherit;color:var(--text);
+              cursor:pointer;outline:none;min-width:190px;}
+
+  .estante-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+                 gap:26px 22px;margin-bottom:34px;}
+
+  .livro{cursor:pointer;}
+  .capa{position:relative;aspect-ratio:2/3;border-radius:6px;overflow:hidden;
+        display:flex;flex-direction:column;background:var(--primary);
+        box-shadow:0 3px 12px rgba(11,42,74,.22),0 1px 3px rgba(0,0,0,.14);
+        transition:transform .2s,box-shadow .2s;}
+  .livro:hover .capa{transform:translateY(-5px);
+                     box-shadow:0 12px 28px rgba(11,42,74,.3),0 3px 8px rgba(0,0,0,.16);}
+  .capa img{width:100%;height:100%;object-fit:cover;}
+  .capa-gerada::before{content:'';position:absolute;left:0;top:0;bottom:0;width:9px;
+                       background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,.06));z-index:1;}
+  .capa-topo{height:4px;background:#E00000;}
+  .capa-corpo{flex:1;display:flex;flex-direction:column;justify-content:center;
+              padding:18px 15px 12px 21px;text-align:center;}
+  .capa-titulo{font-family:Georgia,'Times New Roman',serif;font-size:.92rem;font-weight:600;
+               color:#fff;line-height:1.26;letter-spacing:-.01em;
+               display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
+  .capa-rule{width:24px;height:1.5px;background:#E00000;margin:10px auto;}
+  .capa-autor{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+              color:rgba(255,255,255,.6);line-height:1.45;
+              display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .capa-pe{display:flex;align-items:center;justify-content:space-between;padding:0 12px 11px 20px;}
+  .capa-marca{font-family:Georgia,serif;font-size:.6rem;font-weight:700;letter-spacing:.14em;
+              color:#E00000;background:rgba(255,255,255,.94);padding:2px 6px;border-radius:3px;}
+  .capa-pe span:last-child{font-size:.58rem;color:rgba(255,255,255,.4);
+                           letter-spacing:.06em;font-variant-numeric:tabular-nums;}
+
+  .livro-info{margin-top:10px;}
+  .livro-titulo{font-size:.8rem;font-weight:600;color:var(--primary);line-height:1.35;
+                display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .livro-autor{font-size:.71rem;color:var(--gray);margin-top:3px;
+               white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* painel lateral */
+  .painel-bg{position:fixed;inset:0;background:rgba(11,42,74,.4);z-index:600;
+             display:none;justify-content:flex-end;backdrop-filter:blur(2px);}
+  .painel-bg.aberto{display:flex;}
+  .painel{width:100%;max-width:430px;background:var(--white);height:100%;overflow-y:auto;
+          padding:34px 32px 40px;position:relative;
+          box-shadow:-8px 0 32px rgba(0,0,0,.16);}
+  .painel-fechar{position:absolute;top:18px;right:20px;background:none;border:none;
+                 font-size:1.7rem;line-height:1;color:var(--gray);cursor:pointer;padding:4px 8px;}
+  .painel-fechar:hover{color:var(--primary);}
+  .painel-capa{width:132px;margin-bottom:22px;}
+  .painel-capa .capa{box-shadow:0 6px 20px rgba(11,42,74,.24);}
+  .painel-capa .capa:hover{transform:none;}
+  .painel-titulo{font-family:Georgia,serif;font-size:1.35rem;font-weight:700;color:var(--primary);
+                 line-height:1.28;letter-spacing:-.015em;margin-bottom:6px;}
+  .painel-sub{font-size:.86rem;color:var(--gray);line-height:1.5;margin-bottom:16px;}
+  .painel-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+  .obra-tag{font-size:.68rem;background:#eef4fb;color:var(--secondary);
+            padding:3px 10px;border-radius:20px;font-weight:500;}
+  .painel-resumo{font-size:.85rem;line-height:1.68;color:var(--text);margin-bottom:22px;}
+  .painel-ficha{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;
+                padding:18px 0;border-top:1px solid var(--border);
+                border-bottom:1px solid var(--border);margin-bottom:22px;}
+  .ficha-item dt{font-size:.62rem;letter-spacing:.13em;text-transform:uppercase;
+                 color:var(--gray);font-weight:600;margin-bottom:3px;}
+  .ficha-item dd{font-size:.83rem;color:var(--primary);font-weight:500;}
+  .painel-acao{margin-bottom:16px;}
+  .obra-sem-arquivo{font-size:.8rem;color:var(--gray);line-height:1.6;background:#f6f8fb;
+                    border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .obra-sem-arquivo a{color:var(--secondary);font-weight:600;text-decoration:none;}
+  .painel-fonte{font-size:.72rem;color:var(--gray);line-height:1.6;}
+  .painel-fonte a{color:var(--secondary);text-decoration:none;}
+
+  @media(max-width:640px){ .painel{max-width:100%;padding:28px 22px 36px;} }
+
   /* ---------- Videoaulas ---------- */
   .disc-bloco{margin-bottom:34px;}
   .disc-bloco:last-child{margin-bottom:0;}
@@ -304,6 +384,7 @@
       <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">📋 &nbsp;Atividades</div>
       <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
       <div class="nav-item" onclick="showTab('linhas',this)">🔬 &nbsp;Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('biblioteca',this)">📖 &nbsp;Biblioteca</div>
       <div class="nav-item" onclick="showTab('acervo',this)">📚 &nbsp;Acervo do curso</div>
       <div class="nav-label">Financeiro</div>
       <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
@@ -442,6 +523,18 @@
         <div id="linhas-aluno"><div class="loading">Carregando...</div></div>
       </div>
 
+      <div class="tab-content" id="tab-biblioteca">
+        <div class="page-title">Biblioteca</div>
+        <div class="page-sub">Acervo digital da instituição — clássicos do pensamento educacional</div>
+
+        <div class="bib-barra">
+          <input type="text" id="bib-q" class="bib-busca" oninput="renderEstante()" placeholder="Buscar por título, autor ou tema"/>
+          <select id="bib-f-area" class="bib-filtro" onchange="renderEstante()"><option value="">Todas as áreas</option></select>
+        </div>
+
+        <div id="estante"><div class="loading">Carregando acervo...</div></div>
+      </div>
+
       <div class="tab-content" id="tab-acervo">
         <div class="page-title">Acervo do curso</div>
         <div class="page-sub">Ementas, normas para artigos científicos, regulamentos e cronogramas</div>
@@ -467,6 +560,21 @@
 
     </div>
   </div>
+</div>
+
+<!-- PAINEL DA OBRA -->
+<div class="painel-bg" id="painel-obra" onclick="if(event.target===this)fecharObra()">
+  <aside class="painel">
+    <button class="painel-fechar" onclick="fecharObra()" title="Fechar">×</button>
+    <div class="painel-capa" id="obra-capa"></div>
+    <h2 class="painel-titulo" id="obra-titulo">—</h2>
+    <div class="painel-sub" id="obra-sub">—</div>
+    <div class="painel-tags" id="obra-tags"></div>
+    <div class="painel-resumo" id="obra-resumo"></div>
+    <dl class="painel-ficha" id="obra-ficha"></dl>
+    <div class="painel-acao" id="obra-acao"></div>
+    <div class="painel-fonte" id="obra-fonte"></div>
+  </aside>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -554,7 +662,7 @@ function iniciarDashboard(){
   Promise.all([
     carregarMateriais(), carregarDisciplinas(), carregarNotas(),
     carregarFinanceiro(), carregarAtividades(), carregarProgresso(),
-    carregarAcervoAluno(), carregarDocsAluno(), carregarLinhasAluno()
+    carregarAcervoAluno(), carregarDocsAluno(), carregarLinhasAluno(), carregarEstante()
   ]);
 }
 
@@ -1148,6 +1256,147 @@ async function carregarProgresso(){
   document.getElementById('prog-bar').style.width = pct+'%';
   document.getElementById('prog-desc').textContent =
     tot ? `${conc} de ${tot} disciplinas concluídas` : 'Nenhuma disciplina cadastrada ainda';
+}
+
+/* ==========================================================================
+   BIBLIOTECA
+   ========================================================================== */
+
+let estanteCache=[];
+
+async function carregarEstante(){
+  if(!estudante)return;
+  const {data,error}=await sb.from('biblioteca').select('*')
+    .eq('ativo',true)
+    .or('curso_id.is.null,curso_id.eq.'+estudante.curso_id)
+    .order('destaque',{ascending:false}).order('autor').order('titulo');
+
+  estanteCache=data||[];
+  if(error){document.getElementById('estante').innerHTML='<div class="card"><div class="empty">Erro ao carregar o acervo.</div></div>';return;}
+
+  const sel=document.getElementById('bib-f-area');
+  if(sel){
+    const areas=[...new Set(estanteCache.map(o=>o.area).filter(Boolean))].sort();
+    sel.innerHTML='<option value="">Todas as áreas</option>'+
+      areas.map(a=>'<option value="'+a+'">'+a+'</option>').join('');
+  }
+  renderEstante();
+}
+
+function capaHTML(o){
+  if(o.capa_url){
+    return '<div class="capa"><img src="'+o.capa_url+'" alt="'+o.titulo.replace(/"/g,'')+'"/></div>';
+  }
+  const ano = o.ano_original || o.ano || '';
+  return '<div class="capa capa-gerada">'+
+    '<div class="capa-topo"></div>'+
+    '<div class="capa-corpo">'+
+      '<div class="capa-titulo">'+o.titulo+'</div>'+
+      '<div class="capa-rule"></div>'+
+      '<div class="capa-autor">'+o.autor+'</div>'+
+    '</div>'+
+    '<div class="capa-pe"><span class="capa-marca">SAY</span><span>'+ano+'</span></div>'+
+  '</div>';
+}
+
+function renderEstante(){
+  const el = document.getElementById('estante');
+  const q  = (document.getElementById('bib-q')?.value||'').toLowerCase().trim();
+  const fa = document.getElementById('bib-f-area')?.value||'';
+
+  if(!estanteCache.length){
+    el.innerHTML='<div class="card"><div class="empty">O acervo ainda está sendo montado.</div></div>';
+    return;
+  }
+
+  let lista=estanteCache;
+  if(fa) lista=lista.filter(o=>o.area===fa);
+  if(q)  lista=lista.filter(o=>{
+    const alvo=(o.titulo+' '+o.autor+' '+(o.organizador||'')+' '+(o.area||'')+' '+
+                (o.resumo||'')+' '+(o.palavras_chave||[]).join(' ')).toLowerCase();
+    return alvo.includes(q);
+  });
+
+  if(!lista.length){
+    el.innerHTML='<div class="card"><div class="empty">Nenhuma obra encontrada para esta busca.</div></div>';
+    return;
+  }
+
+  const destaques = (!q && !fa) ? lista.filter(o=>o.destaque) : [];
+  const resto     = destaques.length ? lista.filter(o=>!o.destaque) : lista;
+
+  let html='';
+  if(destaques.length){
+    html+='<div class="sec-title">Destaques</div><div class="estante-grade">'+
+      destaques.map(livroHTML).join('')+'</div>';
+  }
+
+  const porArea={};
+  resto.forEach(o=>{ (porArea[o.area||'Outras obras'] = porArea[o.area||'Outras obras'] || []).push(o); });
+
+  Object.keys(porArea).sort().forEach(area=>{
+    html+='<div class="sec-title">'+area+'</div><div class="estante-grade">'+
+      porArea[area].map(livroHTML).join('')+'</div>';
+  });
+
+  el.innerHTML=html;
+}
+
+function livroHTML(o){
+  const i=estanteCache.indexOf(o);
+  return '<div class="livro" onclick="abrirObra('+i+')">'+
+    capaHTML(o)+
+    '<div class="livro-info">'+
+      '<div class="livro-titulo">'+o.titulo+'</div>'+
+      '<div class="livro-autor">'+o.autor+'</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function abrirObra(i){
+  const o=estanteCache[i]; if(!o)return;
+
+  const ficha=[
+    o.organizador ? ['Organização', o.organizador] : null,
+    o.ano_original ? ['Obra original', o.ano_original] : null,
+    o.ano ? ['Edição', o.ano] : null,
+    o.editora ? ['Editora', o.editora] : null,
+    o.colecao ? ['Coleção', o.colecao] : null,
+    o.paginas ? ['Páginas', o.paginas] : null,
+    o.area ? ['Área', o.area] : null,
+    o.licenca ? ['Licença', o.licenca] : null,
+  ].filter(Boolean);
+
+  document.getElementById('obra-capa').innerHTML  = capaHTML(o);
+  document.getElementById('obra-titulo').textContent = o.titulo;
+  document.getElementById('obra-sub').textContent =
+    (o.subtitulo?o.subtitulo+' · ':'')+o.autor;
+  document.getElementById('obra-resumo').innerHTML =
+    o.resumo ? '<p>'+o.resumo+'</p>' : '';
+  document.getElementById('obra-ficha').innerHTML =
+    ficha.map(([k,v])=>'<div class="ficha-item"><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('');
+
+  const tags=document.getElementById('obra-tags');
+  tags.innerHTML = (o.palavras_chave||[]).map(t=>'<span class="obra-tag">'+t+'</span>').join('');
+
+  const acao=document.getElementById('obra-acao');
+  if(o.arquivo_url){
+    acao.innerHTML='<a class="btn btn-primary" href="'+o.arquivo_url+'" target="_blank" rel="noopener" style="width:100%;text-align:center;">Ler obra</a>';
+  } else {
+    acao.innerHTML='<div class="obra-sem-arquivo">Obra indicada como leitura. '+
+      (o.url_fonte?'<a href="'+o.url_fonte+'" target="_blank" rel="noopener">Consultar na fonte</a>':'Consulte na biblioteca da instituição.')+'</div>';
+  }
+
+  const fonte=document.getElementById('obra-fonte');
+  fonte.innerHTML = o.fonte
+    ? 'Fonte: '+(o.url_fonte?'<a href="'+o.url_fonte+'" target="_blank" rel="noopener">'+o.fonte+'</a>':o.fonte)
+    : '';
+
+  document.getElementById('painel-obra').classList.add('aberto');
+}
+
+function fecharObra(){
+  document.getElementById('painel-obra').classList.remove('aberto');
 }
 
 /* ==========================================================================
