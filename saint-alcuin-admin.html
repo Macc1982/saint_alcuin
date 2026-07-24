@@ -153,6 +153,15 @@
   .grupo-disc{font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin:14px 0 7px;}
   .grupo-curso .table-wrap{box-shadow:none;border:1px solid var(--border);}
 
+  /* ---------- Drag and drop da trilha ---------- */
+  .trilha-tabela tbody tr{cursor:default;transition:background .12s;}
+  .trilha-tabela .drag-handle{cursor:grab;color:#c2cad4;font-size:1rem;text-align:center;
+                              user-select:none;letter-spacing:-2px;}
+  .trilha-tabela .drag-handle:active{cursor:grabbing;}
+  .trilha-tabela tbody tr:hover .drag-handle{color:var(--secondary);}
+  .trilha-tabela tbody tr.arrastando{opacity:.35;background:#eef4fb;}
+  .trilha-tabela tbody tr.alvo td{border-top:2px solid var(--secondary);}
+
   /* ---------- Linhas de pesquisa ---------- */
   .linha-lista{display:flex;flex-direction:column;gap:10px;}
   .linha-card{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;border:1px solid var(--border);border-left:3px solid var(--secondary);border-radius:8px;padding:16px 18px;background:var(--white);transition:box-shadow .15s;}
@@ -2997,7 +3006,7 @@ async function moverAtividade(i,dir){
 }
 
 // ---- Progresso individual do aluno ----
-let trilhaCache=[];
+let trilhaCache=[], mostrarDispensadas=false;
 
 async function carregarTrilhaAluno(){
   const alunoId=document.getElementById('trilha-aluno').value;
@@ -3012,16 +3021,23 @@ async function carregarTrilhaAluno(){
 
   const proxBloqueada = trilhaCache.find(t=>t.estado==='bloqueada');
   const dispensadas   = trilhaCache.filter(t=>t.estado==='dispensada').length;
+  const visiveis      = mostrarDispensadas ? trilhaCache : trilhaCache.filter(t=>t.estado!=='dispensada');
 
   el.innerHTML =
-    '<div style="margin-bottom:14px;display:flex;align-items:center;gap:14px;">'+
+    '<div style="margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'+
       '<button class="btn btn-primary" onclick="abrirLiberar(\''+alunoId+'\',null,\'proxima\')" '+(proxBloqueada?'':'disabled')+'>'+
         (proxBloqueada?'🔓 Liberar próxima etapa':'Tudo liberado')+
       '</button>'+
-      (dispensadas?'<span style="font-size:.78rem;color:var(--gray);">'+dispensadas+' atividade(s) dispensada(s) para este aluno</span>':'')+
+      (dispensadas
+        ? '<label style="display:flex;align-items:center;gap:7px;font-size:.78rem;color:var(--gray);cursor:pointer;">'+
+            '<input type="checkbox" '+(mostrarDispensadas?'checked':'')+' onchange="alternarDispensadas(this.checked)" style="width:auto;cursor:pointer;"/>'+
+            'Mostrar '+dispensadas+' dispensada(s)'+
+          '</label>'
+        : '')+
+      '<span style="font-size:.75rem;color:var(--gray);margin-left:auto;">Arraste as linhas para reordenar a trilha do curso</span>'+
     '</div>'+
-    '<div class="table-wrap"><table class="data-table"><thead><tr><th style="width:44px;">#</th><th>Atividade</th><th>Disciplina</th><th>Estado</th><th>Prazo</th><th>Nota</th><th></th></tr></thead><tbody>'+
-    trilhaCache.map(function(t){
+    '<div class="table-wrap"><table class="data-table trilha-tabela"><thead><tr><th style="width:34px;"></th><th style="width:44px;">#</th><th>Atividade</th><th>Disciplina</th><th>Estado</th><th>Prazo</th><th>Nota</th><th></th></tr></thead><tbody id="trilha-tbody">'+
+    visiveis.map(function(t){
       const est=t.estado;
       const [cls,lbl,icon] =
         est==='concluida'  ? ['badge-green','Concluída','✓'] :
@@ -3041,7 +3057,8 @@ async function carregarTrilhaAluno(){
              '<button class="btn btn-danger btn-sm" onclick="dispensarAtiv(\''+t.aluno_id+'\',\''+t.atividade_id+'\')">Dispensar</button>';
       }
       const dim = est==='dispensada' ? ' style="opacity:.5"' : '';
-      return '<tr'+dim+'>'+
+      return '<tr draggable="true" data-ativ="'+t.atividade_id+'"'+dim+'>'+
+        '<td class="drag-handle" title="Arraste para reordenar">⣿</td>'+
         '<td>'+t.posicao+'</td>'+
         '<td><strong>'+t.titulo+'</strong></td>'+
         '<td>'+t.disciplina_nome+'</td>'+
@@ -3051,6 +3068,71 @@ async function carregarTrilhaAluno(){
         '<td style="white-space:nowrap;">'+acao+'</td>'+
       '</tr>';
     }).join('')+'</tbody></table></div>';
+
+  ativarDragTrilha();
+}
+
+function alternarDispensadas(v){
+  mostrarDispensadas=v;
+  carregarTrilhaAluno();
+}
+
+function ativarDragTrilha(){
+  const tbody=document.getElementById('trilha-tbody');
+  if(!tbody)return;
+  let origem=null;
+
+  tbody.querySelectorAll('tr').forEach(tr=>{
+    tr.addEventListener('dragstart',e=>{
+      origem=tr;
+      tr.classList.add('arrastando');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain','');
+    });
+    tr.addEventListener('dragend',()=>{
+      tr.classList.remove('arrastando');
+      tbody.querySelectorAll('tr').forEach(x=>x.classList.remove('alvo'));
+      origem=null;
+    });
+    tr.addEventListener('dragover',e=>{
+      e.preventDefault();
+      if(!origem||origem===tr)return;
+      e.dataTransfer.dropEffect='move';
+      const r=tr.getBoundingClientRect();
+      const depois=(e.clientY-r.top)>r.height/2;
+      tbody.querySelectorAll('tr').forEach(x=>x.classList.remove('alvo'));
+      tr.classList.add('alvo');
+      tbody.insertBefore(origem, depois ? tr.nextSibling : tr);
+    });
+    tr.addEventListener('drop',async e=>{
+      e.preventDefault();
+      tbody.querySelectorAll('tr').forEach(x=>x.classList.remove('alvo'));
+      await salvarOrdemTrilha();
+    });
+  });
+}
+
+async function salvarOrdemTrilha(){
+  const tbody=document.getElementById('trilha-tbody');
+  if(!tbody)return;
+  const ids=[...tbody.querySelectorAll('tr')].map(tr=>tr.dataset.ativ);
+
+  [...tbody.querySelectorAll('tr')].forEach((tr,i)=>{
+    const c=tr.children[1]; if(c) c.textContent=i+1;
+  });
+
+  try{
+    await Promise.all(ids.map((id,i)=>
+      sb.from('atividades').update({ordem_trilha:i+1}).eq('id',id)
+    ));
+  }catch(e){
+    toast('Erro ao salvar a ordem.','error');
+    return;
+  }
+
+  toast('Ordem da trilha atualizada.','success');
+  await carregarTrilhaAluno();
+  if(document.getElementById('trilha-curso')?.value) await carregarOrdemTrilha();
 }
 
 // Abre o modal de prazo ao liberar (próxima ou específica)
