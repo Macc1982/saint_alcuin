@@ -1081,6 +1081,57 @@
   </div>
 </div>
 
+<!-- MODAL: EDITAR MATERIAL / VIDEOAULA -->
+<div class="modal-bg" id="modal-material">
+  <div class="modal-box wide" style="max-height:88vh;overflow-y:auto;">
+    <div class="modal-title" id="em-tipo-titulo">Editar material</div>
+    <div class="modal-sub" id="em-sub">—</div>
+    <input type="hidden" id="em-id"/>
+
+    <div class="form-group">
+      <label>Título *</label>
+      <input type="text" id="em-titulo" placeholder="Ex: Aula 1 — A Relação entre Ciência e Pesquisa"/>
+    </div>
+
+    <div class="form-group">
+      <label>Descrição <span style="font-weight:400;color:var(--gray)">(o que a aula cobre)</span></label>
+      <textarea id="em-desc" rows="3" placeholder="Breve resumo do conteúdo abordado"></textarea>
+    </div>
+
+    <div class="form-group" id="em-bloco-aviso">
+      <label>Aviso ao aluno <span style="font-weight:400;color:var(--gray)">(faixa destacada acima do vídeo)</span></label>
+      <input type="text" id="em-aviso" placeholder="Ex: Vídeo de apoio à disciplina de Metodologia Científica"/>
+    </div>
+
+    <div id="em-bloco-credito">
+      <div class="fin-hint">Crédito exibido abaixo do player, conforme exige a licença.</div>
+      <div class="form-row-3">
+        <div class="form-group"><label>Autor original</label><input type="text" id="em-autor"/></div>
+        <div class="form-group"><label>Instituição</label><input type="text" id="em-inst"/></div>
+        <div class="form-group"><label>Licença</label>
+          <select id="em-licenca">
+            <option value="">— Conteúdo próprio —</option>
+            <option value="CC BY">CC BY</option>
+            <option value="CC BY-SA">CC BY-SA</option>
+            <option value="CC BY-ND">CC BY-ND</option>
+            <option value="CC0">CC0</option>
+            <option value="Autorizado">Autorizado pelo autor</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="max-width:380px;">
+        <label>Link do original</label>
+        <input type="url" id="em-orig-url" placeholder="https://youtube.com/watch?v=..."/>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-outline" onclick="fecharModal('modal-material')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMaterial()" id="btnSalvarMat">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPA_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbGVwbHlkaHd4anlmbGVqZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTE2MDIsImV4cCI6MjA5MjcyNzYwMn0.AzBzKl3lEEEt9eOdqJ_xRezohbW1qglPjOvhGSxwpUs';
@@ -2084,6 +2135,7 @@ async function carregarAcervo(){
         <div class="doc-meta">${m.descricao?m.descricao+' · ':''}${dataBR(m.created_at)}</div>
         <div class="doc-acoes">
           <a class="link-btn" href="${m.url}" target="_blank" rel="noopener">Abrir</a>
+          <button class="link-btn" onclick="abrirEditarMaterial('${m.id}')">Editar</button>
           <button class="link-btn danger" onclick="excluirAcervo('${m.id}')">Excluir</button>
         </div>
       </div>`;
@@ -2140,13 +2192,66 @@ async function carregarMateriais(){
                 (m.licenca?' <span class="badge badge-blue">'+m.licenca+'</span>':'')+'</div>':'')+'</td>'+
             '<td style="width:110px;"><span class="badge badge-'+(m.tipo==='pdf'?'blue':'green')+'">'+(m.tipo||'').toUpperCase()+'</span></td>'+
             '<td style="width:110px;">'+(m.created_at?new Date(m.created_at).toLocaleDateString('pt-BR'):'—')+'</td>'+
-            '<td style="width:180px;white-space:nowrap;">'+
+            '<td style="width:250px;white-space:nowrap;text-align:right;">'+
               '<a href="'+m.url+'" target="_blank" class="btn btn-outline btn-sm">Abrir</a> '+
+              '<button class="btn btn-outline btn-sm" onclick="abrirEditarMaterial(\''+m.id+'\')">Editar</button> '+
               '<button class="btn btn-danger btn-sm" onclick="excluirMaterial(\''+m.id+'\')">Excluir</button>'+
             '</td></tr>';
         }).join('')+
       '</tbody></table></div>';
   }).join('');
+}
+
+async function abrirEditarMaterial(id){
+  const {data:m,error}=await sb.from('materiais').select('*').eq('id',id).single();
+  if(error||!m){toast('Não foi possível carregar o material.','error');return;}
+
+  const ehVideo = m.tipo==='video';
+  document.getElementById('em-id').value          = m.id;
+  document.getElementById('em-titulo').value      = m.titulo||'';
+  document.getElementById('em-desc').value        = m.descricao||'';
+  document.getElementById('em-aviso').value       = m.aviso||'';
+  document.getElementById('em-autor').value       = m.autor_original||'';
+  document.getElementById('em-inst').value        = m.instituicao_origem||'';
+  document.getElementById('em-licenca').value     = m.licenca||'';
+  document.getElementById('em-orig-url').value    = m.url_original||'';
+
+  document.getElementById('em-tipo-titulo').textContent = ehVideo?'Editar videoaula':'Editar material';
+  const c = cursosCache.find(x=>x.id===m.curso_id);
+  const d = discCache.find(x=>x.id===m.disciplina_id);
+  document.getElementById('em-sub').textContent =
+    [c?c.nome:null, d?d.nome:'Material geral do curso'].filter(Boolean).join(' · ');
+
+  document.getElementById('em-bloco-aviso').style.display   = ehVideo?'block':'none';
+  document.getElementById('em-bloco-credito').style.display = 'block';
+
+  abrirModal('modal-material');
+}
+
+async function salvarMaterial(){
+  const id     = document.getElementById('em-id').value;
+  const titulo = document.getElementById('em-titulo').value.trim();
+  if(!titulo){toast('Informe o título.','error');return;}
+
+  const btn=document.getElementById('btnSalvarMat');
+  btn.disabled=true;btn.textContent='Salvando...';
+
+  const {error}=await sb.from('materiais').update({
+    titulo,
+    descricao:          document.getElementById('em-desc').value.trim()||null,
+    aviso:              document.getElementById('em-aviso').value.trim()||null,
+    autor_original:     document.getElementById('em-autor').value.trim()||null,
+    instituicao_origem: document.getElementById('em-inst').value.trim()||null,
+    licenca:            document.getElementById('em-licenca').value||null,
+    url_original:       document.getElementById('em-orig-url').value.trim()||null
+  }).eq('id',id);
+
+  btn.disabled=false;btn.textContent='Salvar alterações';
+  if(error){toast('Erro: '+error.message,'error');return;}
+
+  toast('Material atualizado.','success');
+  fecharModal('modal-material');
+  await carregarMateriais();
 }
 
 async function excluirMaterial(id){
