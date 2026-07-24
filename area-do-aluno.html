@@ -116,8 +116,10 @@
   .capa-corpo{flex:1;display:flex;flex-direction:column;justify-content:center;
               padding:18px 15px 12px 21px;text-align:center;}
   .capa-titulo{font-family:Georgia,'Times New Roman',serif;font-size:.92rem;font-weight:600;
-               color:#fff;line-height:1.26;letter-spacing:-.01em;
+               color:#fff;line-height:1.26;letter-spacing:-.01em;word-break:break-word;
                display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
+  .capa-titulo.t-sm{font-size:.8rem;line-height:1.3;-webkit-line-clamp:6;}
+  .capa-titulo.t-xs{font-size:.7rem;line-height:1.34;-webkit-line-clamp:7;}
   .capa-rule{width:24px;height:1.5px;background:#E00000;margin:10px auto;}
   .capa-autor{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
               color:rgba(255,255,255,.6);line-height:1.45;
@@ -1288,12 +1290,14 @@ function capaHTML(o){
     return '<div class="capa"><img src="'+o.capa_url+'" alt="'+o.titulo.replace(/"/g,'')+'"/></div>';
   }
   const ano = o.ano_original || o.ano || '';
+  const n   = (o.titulo||'').length;
+  const cls = n>44 ? ' t-xs' : n>28 ? ' t-sm' : '';
   return '<div class="capa capa-gerada">'+
     '<div class="capa-topo"></div>'+
     '<div class="capa-corpo">'+
-      '<div class="capa-titulo">'+o.titulo+'</div>'+
+      '<div class="capa-titulo'+cls+'">'+o.titulo+'</div>'+
       '<div class="capa-rule"></div>'+
-      '<div class="capa-autor">'+o.autor+'</div>'+
+      '<div class="capa-autor">'+(o.organizador||o.autor)+'</div>'+
     '</div>'+
     '<div class="capa-pe"><span class="capa-marca">SAY</span><span>'+ano+'</span></div>'+
   '</div>';
@@ -1344,11 +1348,13 @@ function renderEstante(){
 
 function livroHTML(o){
   const i=estanteCache.indexOf(o);
+  const mesmo = o.autor && o.autor.trim().toLowerCase() === o.titulo.trim().toLowerCase();
+  const linha2 = mesmo ? (o.organizador || o.colecao || '') : o.autor;
   return '<div class="livro" onclick="abrirObra('+i+')">'+
     capaHTML(o)+
     '<div class="livro-info">'+
       '<div class="livro-titulo">'+o.titulo+'</div>'+
-      '<div class="livro-autor">'+o.autor+'</div>'+
+      (linha2?'<div class="livro-autor">'+linha2+'</div>':'')+
     '</div>'+
   '</div>';
 }
@@ -1369,8 +1375,11 @@ function abrirObra(i){
 
   document.getElementById('obra-capa').innerHTML  = capaHTML(o);
   document.getElementById('obra-titulo').textContent = o.titulo;
-  document.getElementById('obra-sub').textContent =
-    (o.subtitulo?o.subtitulo+' · ':'')+o.autor;
+  const sub=[];
+  if(o.subtitulo) sub.push(o.subtitulo);
+  if(o.autor && o.autor.trim().toLowerCase() !== o.titulo.trim().toLowerCase()) sub.push(o.autor);
+  document.getElementById('obra-sub').textContent = sub.join(' · ');
+  document.getElementById('obra-sub').style.display = sub.length ? 'block' : 'none';
   document.getElementById('obra-resumo').innerHTML =
     o.resumo ? '<p>'+o.resumo+'</p>' : '';
   document.getElementById('obra-ficha').innerHTML =
