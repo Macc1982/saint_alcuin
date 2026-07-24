@@ -82,7 +82,7 @@
   .upload-icon{font-size:2rem;margin-bottom:8px;}
   .upload-text{font-size:.82rem;color:var(--gray);}
   .upload-text strong{color:var(--secondary);}
-  #fileInput,#docInput,#acInput{display:none;}
+  #fileInput,#docInput,#acInput,#videoInput{display:none;}
   .loading{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   .empty{color:var(--gray);font-size:.82rem;padding:20px;text-align:center;}
   /* ---- Financeiro ---- */
@@ -611,8 +611,54 @@
 
           <div id="campo-video" style="display:none;">
             <div class="form-row">
-              <div class="form-group"><label>Título *</label><input type="text" id="m-titulo" placeholder="Ex: Aula 1 — Introdução"/></div>
+              <div class="form-group"><label>Título *</label><input type="text" id="m-titulo" placeholder="Ex: Aula 1 — Ciência, Conhecimento e Pesquisa Científica"/></div>
+              <div class="form-group"><label>Origem do vídeo *</label>
+                <select id="m-origem" onchange="onOrigemVideo()">
+                  <option value="upload">Arquivo próprio (upload)</option>
+                  <option value="url">Link externo (YouTube, Vimeo)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="video-upload">
+              <div class="upload-area" onclick="document.getElementById('videoInput').click()">
+                <div class="upload-icon">🎬</div>
+                <div class="upload-text"><strong>Escolher vídeo</strong> · MP4 (H.264) — recomendado até 300 MB</div>
+                <div class="upload-text" id="videoFileName" style="display:none;margin-top:8px;color:var(--secondary);font-weight:600;"></div>
+              </div>
+              <input type="file" id="videoInput" accept="video/mp4,video/quicktime" onchange="onVideoSelected(event)"/>
+            </div>
+
+            <div id="video-url" style="display:none;">
               <div class="form-group"><label>URL do vídeo *</label><input type="url" id="m-url" placeholder="https://youtube.com/watch?v=..."/></div>
+            </div>
+
+            <div class="form-group">
+              <label>Aviso ao aluno <span style="font-weight:400;color:var(--gray)">(opcional)</span></label>
+              <input type="text" id="m-aviso" placeholder="Ex: Vídeo de apoio à disciplina de Metodologia Científica"/>
+            </div>
+
+            <div class="fin-hint">
+              <strong>Conteúdo de terceiros?</strong> A licença Creative Commons exige atribuição —
+              o crédito aparecerá para o aluno abaixo do player.
+            </div>
+            <div class="form-row-3">
+              <div class="form-group"><label>Autor original</label><input type="text" id="m-autor" placeholder="Ex: Profa. Dra. Glicia Vieira dos Santos"/></div>
+              <div class="form-group"><label>Instituição de origem</label><input type="text" id="m-inst" placeholder="Ex: EaD/UFES"/></div>
+              <div class="form-group"><label>Licença</label>
+                <select id="m-licenca">
+                  <option value="">— Conteúdo próprio —</option>
+                  <option value="CC BY">CC BY — uso comercial e adaptação livres</option>
+                  <option value="CC BY-SA">CC BY-SA — derivado herda a licença</option>
+                  <option value="CC BY-ND">CC BY-ND — sem adaptação</option>
+                  <option value="CC0">CC0 — domínio público</option>
+                  <option value="Autorizado">Autorizado pelo autor</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="max-width:340px;">
+              <label>Link do original <span style="font-weight:400;color:var(--gray)">(opcional)</span></label>
+              <input type="url" id="m-orig-url" placeholder="https://youtube.com/watch?v=..."/>
             </div>
           </div>
 
@@ -1533,6 +1579,26 @@ function onFileSelected(e){
   } else { el.style.display='none'; }
 }
 
+let videoFile=null;
+
+function onOrigemVideo(){
+  const o=document.getElementById('m-origem').value;
+  document.getElementById('video-upload').style.display = o==='upload' ? 'block':'none';
+  document.getElementById('video-url').style.display    = o==='url'    ? 'block':'none';
+}
+
+function onVideoSelected(e){
+  videoFile=(e.target.files||[])[0]||null;
+  const el=document.getElementById('videoFileName');
+  if(!videoFile){el.style.display='none';return;}
+  const mb=(videoFile.size/1048576).toFixed(0);
+  el.style.display='block';
+  el.textContent=videoFile.name+'  ·  '+mb+' MB';
+  if(!document.getElementById('m-titulo').value.trim()){
+    document.getElementById('m-titulo').value=videoFile.name.replace(/\.[^.]+$/,'');
+  }
+}
+
 async function adicionarMaterial(){
   const curso_id      = document.getElementById('m-curso').value;
   const disciplina_id = document.getElementById('m-disciplina').value || null;
@@ -1546,14 +1612,49 @@ async function adicionarMaterial(){
 
   if(tipo === 'video'){
     const titulo = document.getElementById('m-titulo').value.trim();
-    const url    = document.getElementById('m-url').value.trim();
-    if(!titulo || !url){toast('Informe o título e a URL do vídeo.','error');btn.disabled=false;return;}
+    const origem = document.getElementById('m-origem').value;
+    if(!titulo){toast('Informe o título da aula.','error');btn.disabled=false;return;}
+
+    const extras = {
+      aviso:              document.getElementById('m-aviso').value.trim()||null,
+      autor_original:     document.getElementById('m-autor').value.trim()||null,
+      instituicao_origem: document.getElementById('m-inst').value.trim()||null,
+      licenca:            document.getElementById('m-licenca').value||null,
+      url_original:       document.getElementById('m-orig-url').value.trim()||null
+    };
+
+    let url;
+    if(origem==='url'){
+      url = document.getElementById('m-url').value.trim();
+      if(!url){toast('Informe a URL do vídeo.','error');btn.disabled=false;return;}
+    } else {
+      if(!videoFile){toast('Selecione o arquivo de vídeo.','error');btn.disabled=false;return;}
+      btn.textContent='Enviando vídeo...';
+      const ext  = (videoFile.name.split('.').pop()||'mp4').toLowerCase();
+      const path = curso_id+'/aulas/'+Date.now()+'.'+ext;
+      const {error:upErr}=await sb.storage.from('materiais')
+        .upload(path,videoFile,{upsert:false,contentType:videoFile.type||'video/mp4'});
+      if(upErr){toast('Erro no envio: '+upErr.message,'error');btn.disabled=false;btn.textContent='Adicionar';return;}
+      const {data:pub}=sb.storage.from('materiais').getPublicUrl(path);
+      url = pub.publicUrl;
+    }
+
     btn.textContent='Salvando...';
-    const {error}=await sb.from('materiais').insert({titulo,curso_id,disciplina_id,tipo:'video',url,descricao:desc||null});
+    const {error}=await sb.from('materiais').insert(
+      Object.assign({titulo,curso_id,disciplina_id,tipo:'video',url,descricao:desc||null}, extras)
+    );
+
     btn.disabled=false;btn.textContent='Adicionar';
     if(error){toast('Erro: '+error.message,'error');return;}
+
     toast('Videoaula adicionada!','success');
-    ['m-titulo','m-url','m-desc'].forEach(id=>document.getElementById(id).value='');
+    ['m-titulo','m-url','m-desc','m-aviso','m-autor','m-inst','m-orig-url'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('m-licenca').value='';
+    document.getElementById('videoInput').value='';
+    document.getElementById('videoFileName').style.display='none';
+    videoFile=null;
     await carregarMateriais();
     return;
   }
@@ -2033,7 +2134,10 @@ async function carregarMateriais(){
         itens.map(function(m){
           return '<tr>'+
             '<td style="width:44px;">'+(m.tipo==='pdf'?'📄':'▶')+'</td>'+
-            '<td><strong>'+m.titulo+'</strong>'+(m.descricao?'<div style="font-size:.72rem;color:var(--gray);">'+m.descricao+'</div>':'')+'</td>'+
+            '<td><strong>'+m.titulo+'</strong>'+(m.descricao?'<div style="font-size:.72rem;color:var(--gray);">'+m.descricao+'</div>':'')+
+              (m.autor_original||m.licenca?'<div style="font-size:.7rem;color:var(--gray);margin-top:3px;">'+
+                [m.autor_original,m.instituicao_origem].filter(Boolean).join(' · ')+
+                (m.licenca?' <span class="badge badge-blue">'+m.licenca+'</span>':'')+'</div>':'')+'</td>'+
             '<td style="width:110px;"><span class="badge badge-'+(m.tipo==='pdf'?'blue':'green')+'">'+(m.tipo||'').toUpperCase()+'</span></td>'+
             '<td style="width:110px;">'+(m.created_at?new Date(m.created_at).toLocaleDateString('pt-BR'):'—')+'</td>'+
             '<td style="width:180px;white-space:nowrap;">'+
