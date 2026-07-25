@@ -94,13 +94,18 @@
   .tabela-notas-full td:last-child{text-align:right;}
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
   .stats-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-  .stat-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:18px 20px;border-top:3px solid var(--secondary);}
+  .stat-card{background:var(--white);border-radius:12px;box-shadow:0 6px 20px rgba(11,42,74,.05);padding:18px 20px;border-top:3px solid var(--secondary);border-left:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
   .stat-card.green{border-top-color:var(--green);}
   .stat-card.red{border-top-color:#c1121f;}
   .stat-card.yellow{border-top-color:#d97706;}
-  .stat-value{font-size:1.8rem;font-weight:700;color:var(--primary);line-height:1;margin-bottom:3px;}
+  .cor-stats .stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cor-stats .stat-ic{width:18px;height:18px;stroke:#c2cad4;stroke-width:1.8;fill:none;}
+  .cor-stats .stat-card.yellow .stat-ic{stroke:#e0b878;}
+  .cor-stats .stat-card.green .stat-ic{stroke:#86c19b;}
+  .cor-stats .stat-value{margin-bottom:0;}
+  .stat-value{font-size:1.9rem;font-weight:700;color:var(--primary);line-height:1;margin-bottom:3px;font-variant-numeric:tabular-nums;}
   .stat-value.sm{font-size:1.25rem;}
-  .stat-label{font-size:.68rem;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;}
+  .stat-label{font-size:.66rem;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
   .table-wrap{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;margin-bottom:18px;}
   .data-table{width:100%;border-collapse:collapse;}
   .data-table th{text-align:left;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);padding:11px 14px;background:var(--light);border-bottom:1px solid var(--border);}
@@ -204,7 +209,8 @@
   /* ---------- Agrupamento por curso ---------- */
   .grupo-curso{margin-bottom:26px;}
   .grupo-curso:last-child{margin-bottom:0;}
-  .grupo-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:9px;margin-bottom:12px;border-bottom:2px solid var(--primary);}
+  .grupo-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 0 12px;margin-bottom:14px;position:relative;}
+  .grupo-head::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;background:var(--primary);border-radius:2px;}
   .grupo-nome{font-size:.95rem;font-weight:700;color:var(--primary);letter-spacing:-.01em;}
   .grupo-meta{font-size:.72rem;color:var(--gray);font-variant-numeric:tabular-nums;}
   .grupo-alerta{color:#854d0e;font-weight:700;}
@@ -941,14 +947,14 @@
         <div class="page-title">Para corrigir</div>
         <div class="page-sub">Trabalhos enviados pelos alunos, aguardando correção</div>
 
-        <div class="stats-row">
-          <div class="stat-card yellow"><div class="stat-value" id="cr-pendentes">—</div><div class="stat-label">Aguardando correção</div></div>
-          <div class="stat-card green"><div class="stat-value" id="cr-corrigidas">—</div><div class="stat-label">Corrigidas</div></div>
-          <div class="stat-card"><div class="stat-value" id="cr-total">—</div><div class="stat-label">Total de entregas</div></div>
+        <div class="stats-row cor-stats">
+          <div class="stat-card yellow"><div class="stat-top"><span class="stat-label">Aguardando correção</span><svg class="stat-ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="stat-value" id="cr-pendentes">—</div></div>
+          <div class="stat-card green"><div class="stat-top"><span class="stat-label">Corrigidas</span><svg class="stat-ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="stat-value" id="cr-corrigidas">—</div></div>
+          <div class="stat-card"><div class="stat-top"><span class="stat-label">Total de entregas</span><svg class="stat-ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="stat-value" id="cr-total">—</div></div>
         </div>
 
-        <div class="form-group" style="max-width:280px;margin-bottom:16px;">
-          <label>Mostrar</label>
+        <div class="filtro-barra">
+          <svg class="filtro-ic" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
           <select id="filtro-correcao" onchange="carregarCorrecoes()">
             <option value="enviado">Aguardando correção</option>
             <option value="corrigido">Já corrigidas</option>
