@@ -41,8 +41,9 @@
   .tb-menu-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:.82rem;color:var(--text);cursor:pointer;transition:background .15s;}
   .tb-menu-item svg{width:17px;height:17px;stroke:var(--gray);stroke-width:1.8;fill:none;flex-shrink:0;}
   .tb-menu-item:hover{background:var(--light);}
-  .tb-menu-item.sair{color:var(--vermelho);}
-  .tb-menu-item.sair svg{stroke:var(--vermelho);}
+  .tb-menu-item.sair{color:#c1121f;font-weight:600;}
+  .tb-menu-item.sair svg{stroke:#c1121f;}
+  .tb-menu-item.sair:hover{background:#fdecec;}
 
   .sidebar{width:232px;background:var(--white);border-right:1px solid var(--border);padding:16px 12px;flex-shrink:0;overflow-y:auto;}
   .nav-item{display:flex;align-items:center;gap:11px;padding:0 12px;height:40px;font-size:.83rem;cursor:pointer;color:var(--text);border-radius:8px;position:relative;transition:background .15s,color .15s;margin-bottom:2px;}
@@ -82,6 +83,15 @@
   .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
   .card-title{font-size:1rem;font-weight:700;color:var(--primary);}
   .card-subtitle{font-size:.74rem;color:var(--gray);margin-top:2px;font-weight:400;}
+  .campos-nota input{text-align:center;font-variant-numeric:tabular-nums;font-size:1rem;font-weight:600;}
+  .nota-acao{display:flex;align-items:center;justify-content:flex-end;gap:16px;margin-top:4px;}
+  .media-preview{font-size:.85rem;color:var(--primary);font-weight:600;font-variant-numeric:tabular-nums;}
+  .filtro-barra{display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin-bottom:16px;max-width:320px;}
+  .filtro-ic{width:16px;height:16px;stroke:var(--gray);stroke-width:1.7;fill:none;flex-shrink:0;}
+  .filtro-barra select{border:none;background:none;font-size:.84rem;color:var(--text);flex:1;outline:none;cursor:pointer;padding:2px 0;}
+  .tabela-notas-full td:nth-child(3),.tabela-notas-full td:nth-child(4),.tabela-notas-full td:nth-child(5),.tabela-notas-full td:nth-child(6){text-align:center;font-variant-numeric:tabular-nums;}
+  .tabela-notas-full td:nth-child(6){font-weight:600;color:var(--primary);}
+  .tabela-notas-full td:last-child{text-align:right;}
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
   .stats-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
   .stat-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:18px 20px;border-top:3px solid var(--secondary);}
@@ -1027,20 +1037,23 @@
             <div class="form-group"><label>Aluno *</label><select id="n-aluno" onchange="onAlunoChange()"><option value="">Selecione o aluno</option></select></div>
             <div class="form-group"><label>Disciplina *</label><select id="n-disc"><option value="">Selecione a disciplina</option></select></div>
           </div>
-          <div class="form-row-3">
+          <div class="form-row-3 campos-nota">
             <div class="form-group"><label>Nota 1</label><input type="number" id="n-1" min="0" max="10" step="0.1" placeholder="0.0" oninput="calcMedia()"/></div>
             <div class="form-group"><label>Nota 2</label><input type="number" id="n-2" min="0" max="10" step="0.1" placeholder="0.0" oninput="calcMedia()"/></div>
             <div class="form-group"><label>Trabalho</label><input type="number" id="n-t" min="0" max="10" step="0.1" placeholder="0.0" oninput="calcMedia()"/></div>
           </div>
-          <div style="display:flex;align-items:center;gap:16px;">
+          <div class="nota-acao">
+            <span id="media-preview" class="media-preview"></span>
             <button class="btn btn-primary" onclick="lancarNota()">Salvar nota</button>
-            <span id="media-preview" style="font-size:.82rem;color:var(--gray);"></span>
           </div>
         </div>
-        <div class="form-group" style="max-width:280px;margin-bottom:16px;"><label>Filtrar por aluno</label><select id="filtro-aluno-nota" onchange="carregarNotas()"><option value="">Todos</option></select></div>
+        <div class="filtro-barra">
+          <svg class="filtro-ic" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
+          <select id="filtro-aluno-nota" onchange="carregarNotas()"><option value="">Todos os alunos</option></select>
+        </div>
         <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Aluno</th><th>Disciplina</th><th>N1</th><th>N2</th><th>Trab.</th><th>Média</th><th>Situação</th></tr></thead>
+          <table class="data-table tabela-notas-full">
+            <thead><tr><th>Aluno</th><th>Disciplina</th><th style="text-align:center">N1</th><th style="text-align:center">N2</th><th style="text-align:center">Trab.</th><th style="text-align:center">Média</th><th style="text-align:right">Situação</th></tr></thead>
             <tbody id="tabela-notas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
           </table>
         </div>
