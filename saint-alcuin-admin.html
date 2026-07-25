@@ -81,6 +81,7 @@
   .card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:22px;margin-bottom:18px;}
   .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
   .card-title{font-size:1rem;font-weight:700;color:var(--primary);}
+  .card-subtitle{font-size:.74rem;color:var(--gray);margin-top:2px;font-weight:400;}
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
   .stats-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
   .stat-card{background:var(--white);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:18px 20px;border-top:3px solid var(--secondary);}
@@ -155,19 +156,26 @@
   .empty-state-t{font-size:.92rem;font-weight:600;color:var(--primary);margin-bottom:4px;}
   .empty-state-s{font-size:.78rem;color:var(--gray);}
   .card-hint{font-size:.72rem;color:var(--gray);}
-  .bar-track{height:6px;background:#eef2f6;border-radius:4px;overflow:hidden;margin-top:6px;display:flex;}
+  .bar-track{height:6px;background:#eef2f6;border-radius:4px;overflow:hidden;margin-top:8px;display:flex;}
   .bar-seg{height:100%;}
   .bar-pago{background:#15803d;}
   .bar-aberto{background:var(--secondary);}
   .bar-venc{background:#c1121f;}
-  .fin-linha{padding:14px 0;border-bottom:1px solid var(--border);}
+  .fin-linha{padding:16px 0;border-bottom:1px solid var(--border);}
   .fin-linha:last-child{border-bottom:none;}
+  .fin-linha:first-child{padding-top:4px;}
   .fin-topo{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}
-  .fin-nome{font-size:.85rem;font-weight:600;color:var(--primary);}
-  .fin-total{font-size:.78rem;color:var(--gray);font-variant-numeric:tabular-nums;}
-  .fin-nums{display:flex;gap:16px;margin-top:7px;font-size:.72rem;font-variant-numeric:tabular-nums;}
+  .fin-nome{font-size:.86rem;font-weight:600;color:var(--primary);}
+  .fin-total{font-size:.86rem;font-weight:600;color:var(--primary);font-variant-numeric:tabular-nums;}
+  .fin-nums{display:flex;gap:18px;margin-top:9px;font-size:.72rem;font-variant-numeric:tabular-nums;}
   .fin-nums span{display:flex;align-items:center;gap:5px;color:var(--gray);}
   .fin-nums i{width:7px;height:7px;border-radius:2px;display:inline-block;font-style:normal;}
+  .dash-alunos td{padding:13px 14px;}
+  .dash-curso-nome{font-weight:500;color:var(--primary);}
+  .dash-qtd{font-variant-numeric:tabular-nums;font-size:.95rem;}
+  .nivel-badge{font-size:.68rem;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.01em;}
+  .nivel-dout{background:#eaf1f9;color:var(--primary);}
+  .nivel-mestr{background:#e8f0fa;color:var(--secondary);}
 
   /* ---------- Documentos / Acervo ---------- */
   .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;}
@@ -331,11 +339,11 @@
 
         <div class="dash-cols">
           <div class="card">
-            <div class="card-header"><div class="card-title">Financeiro por curso</div></div>
+            <div class="card-header"><div><div class="card-title">Financeiro por curso</div><div class="card-subtitle">Composição de recebido, a vencer e vencido</div></div></div>
             <div id="dash-fin"><div class="loading">Carregando...</div></div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title">Alunos por curso</div></div>
+            <div class="card-header"><div><div class="card-title">Alunos por curso</div><div class="card-subtitle">Matrículas ativas por programa</div></div></div>
             <div id="dash-cursos"><div class="loading">Carregando...</div></div>
           </div>
         </div>
@@ -1427,10 +1435,13 @@ async function fazerLogin(){
 
 function toggleMenuPerfil(e){
   e.stopPropagation();
-  document.getElementById('tb-menu').classList.toggle('aberto');
+  const m=document.getElementById('tb-menu');
+  m.classList.toggle('aberto');
 }
-document.addEventListener('click',()=>{
-  document.getElementById('tb-menu')?.classList.remove('aberto');
+document.addEventListener('click',(e)=>{
+  const menu=document.getElementById('tb-menu');
+  const user=e.target.closest('.tb-user');
+  if(!user && menu) menu.classList.remove('aberto');
 });
 
 async function carregarPerfilAdmin(){
@@ -1583,10 +1594,13 @@ async function carregarDashboard(){
   if(!cursosCache.length){
     el.innerHTML='<div class="empty">Nenhum curso cadastrado.</div>';
   }else{
-    let html='<table class="data-table"><thead><tr><th>Curso</th><th>Nível</th><th style="text-align:right">Alunos</th></tr></thead><tbody>';
+    let html='<table class="data-table dash-alunos"><thead><tr><th>Curso</th><th style="text-align:center">Nível</th><th style="text-align:right">Alunos</th></tr></thead><tbody>';
     cursosCache.forEach(c=>{
       const qtd=al.filter(a=>a.curso_id===c.id).length;
-      html+=`<tr><td>${c.nome}</td><td><span class="badge badge-blue">${c.nivel||'—'}</span></td><td style="text-align:right"><strong>${qtd}</strong></td></tr>`;
+      const niv=(c.nivel||'').toLowerCase();
+      const nivLabel = niv.includes('doutor') ? 'Doutorado' : niv.includes('mestr') ? 'Mestrado' : (c.nivel||'—');
+      const nivCls   = niv.includes('doutor') ? 'nivel-dout' : 'nivel-mestr';
+      html+=`<tr><td class="dash-curso-nome">${c.nome}</td><td style="text-align:center"><span class="nivel-badge ${nivCls}">${nivLabel}</span></td><td style="text-align:right"><strong class="dash-qtd">${qtd}</strong></td></tr>`;
     });
     html+='</tbody></table>';
     el.innerHTML=html;
