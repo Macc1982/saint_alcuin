@@ -254,6 +254,11 @@
   /* ---------- Acervo e documentos ---------- */
   .sec-title{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin:24px 0 12px;}
   .sec-title:first-child{margin-top:0;}
+  .estante-area{display:flex;align-items:baseline;gap:12px;margin:30px 0 18px;
+                padding-bottom:9px;border-bottom:2px solid #E00000;}
+  .estante-area:first-child{margin-top:0;}
+  .estante-area b{font-size:1.2rem;font-weight:700;color:var(--primary);letter-spacing:-.015em;}
+  .estante-area small{font-size:.72rem;color:var(--gray);font-weight:500;}
   .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
   .doc-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s,transform .15s;}
   .doc-card:hover{border-color:var(--secondary);box-shadow:0 4px 14px rgba(20,93,160,.1);transform:translateY(-1px);}
@@ -1331,16 +1336,17 @@ function renderEstante(){
 
   let html='';
   if(destaques.length){
-    html+='<div class="sec-title">Destaques</div><div class="estante-grade">'+
-      destaques.map(livroHTML).join('')+'</div>';
+    html+='<div class="estante-area"><b>Destaques</b><small>'+destaques.length+' obra'+(destaques.length===1?'':'s')+'</small></div>'+
+      '<div class="estante-grade">'+destaques.map(livroHTML).join('')+'</div>';
   }
 
   const porArea={};
   resto.forEach(o=>{ (porArea[o.area||'Outras obras'] = porArea[o.area||'Outras obras'] || []).push(o); });
 
   Object.keys(porArea).sort().forEach(area=>{
-    html+='<div class="sec-title">'+area+'</div><div class="estante-grade">'+
-      porArea[area].map(livroHTML).join('')+'</div>';
+    const obras=porArea[area];
+    html+='<div class="estante-area"><b>'+area+'</b><small>'+obras.length+' obra'+(obras.length===1?'':'s')+'</small></div>'+
+      '<div class="estante-grade">'+obras.map(livroHTML).join('')+'</div>';
   });
 
   el.innerHTML=html;
