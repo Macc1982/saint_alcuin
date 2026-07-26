@@ -11,7 +11,10 @@
   body{background:var(--light);color:var(--text);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;}
   .screen{display:none;min-height:100vh;flex-direction:column;}
   .screen.active{display:flex;}
-  .site-header{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+  .site-header{background:var(--primary);color:#fff;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .site-header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:#E00000;}
+  .btn-sair{display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);font-size:.76rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;font-family:inherit;}
+  .btn-sair:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4);color:#fff;}
   .header-brand-name{font-size:1rem;font-weight:700;}
   .header-brand-sub{font-size:.58rem;opacity:.72;letter-spacing:.1em;text-transform:uppercase;}
   .btn{font-family:"Segoe UI",sans-serif;font-size:.82rem;font-weight:600;padding:9px 22px;border-radius:6px;cursor:pointer;border:none;transition:all .18s;}
@@ -33,13 +36,18 @@
   .login-error{background:var(--red-bg);border:1px solid #fca5a5;color:var(--red-text);font-size:.78rem;padding:10px 14px;border-radius:6px;margin-bottom:14px;display:none;text-align:center;}
   #screen-dashboard{background:var(--light);}
   .dash-body{display:grid;grid-template-columns:210px 1fr;flex:1;}
-  .sidebar{background:var(--white);border-right:1px solid var(--border);padding:20px 0;}
-  .nav-label{font-size:.6rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gray);padding:8px 20px 4px;}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:.82rem;color:var(--text);transition:all .15s;border-left:3px solid transparent;}
-  .nav-item:hover{background:#eef4fb;color:var(--secondary);}
-  .nav-item.active{background:#eef4fb;color:var(--secondary);border-left-color:var(--secondary);font-weight:600;}
-  .nav-badge{margin-left:auto;font-size:.6rem;background:var(--secondary);color:#fff;padding:2px 7px;border-radius:20px;font-weight:600;}
-  .nav-badge.alerta{background:#c1121f;}
+  .sidebar{background:var(--white);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto;}
+  .nav-label{font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#9aa4b1;padding:14px 12px 6px;}
+  .nav-label:first-child{padding-top:4px;}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:0 12px;height:40px;cursor:pointer;font-size:.83rem;color:var(--text);transition:background .15s,color .15s;border-radius:8px;position:relative;margin-bottom:2px;}
+  .nav-item svg{width:18px;height:18px;flex-shrink:0;stroke:var(--gray);stroke-width:1.8;fill:none;pointer-events:none;transition:stroke .15s;}
+  .nav-item:hover{background:var(--light);color:var(--primary);}
+  .nav-item:hover svg{stroke:var(--primary);}
+  .nav-item.active{background:#eaf1f9;color:var(--primary);font-weight:600;}
+  .nav-item.active svg{stroke:var(--secondary);}
+  .nav-item.active::before{content:'';position:absolute;left:-12px;top:9px;bottom:9px;width:3px;background:#E00000;border-radius:0 3px 3px 0;}
+  .nav-badge{margin-left:auto;font-size:.62rem;background:#eaf1f9;color:var(--secondary);padding:2px 8px;border-radius:20px;font-weight:600;min-width:22px;text-align:center;}
+  .nav-badge.alerta{background:#fdecec;color:#c1121f;}
   .dash-main{padding:32px 36px;overflow-y:auto;}
   .tab-content{display:none;}.tab-content.active{display:block;}
   .page-title{font-size:1.4rem;font-weight:700;color:var(--primary);margin-bottom:4px;}
@@ -336,8 +344,9 @@
   .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
   .toast.success{background:var(--green);}
   .toast.error{background:#c1121f;}
-  .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:998;transition:transform .2s;}
-  .whatsapp-float:hover{transform:scale(1.08);}
+  .whatsapp-float{position:fixed;bottom:22px;right:22px;background:#25D366;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.16);z-index:998;transition:transform .16s,box-shadow .16s;}
+  .whatsapp-float:hover{transform:scale(1.04);box-shadow:0 6px 16px rgba(0,0,0,.2);}
+  .whatsapp-float svg{width:24px;height:24px;}
   @media(max-width:860px){.dash-body{grid-template-columns:1fr;}.sidebar{display:none;}.dash-main{padding:20px 16px;}.stats-row,.stats-row-4{grid-template-columns:1fr 1fr;}.welcome-card{flex-direction:column;gap:12px;align-items:flex-start;}}
 </style>
 </head>
@@ -376,28 +385,31 @@
       </div>
       <input type="file" id="avatarInput" accept="image/*" onchange="enviarAvatar(event)"/>
 
-      <button class="btn btn-danger" onclick="fazerLogout()">Sair</button>
+      <button class="btn-sair" onclick="fazerLogout()" title="Sair do portal">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+        Sair
+      </button>
     </div>
   </header>
 
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)">⌂ &nbsp;Início</div>
-      <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat">📄 &nbsp;Materiais</div>
-      <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas">▶ &nbsp;Videoaulas</div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início</div>
+      <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
+      <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
       <div class="nav-label">Acadêmico</div>
-      <div class="nav-item" onclick="showTab('disciplinas',this)">◈ &nbsp;Disciplinas</div>
-      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ">📋 &nbsp;Atividades</div>
-      <div class="nav-item" onclick="showTab('notas',this)">◎ &nbsp;Notas</div>
-      <div class="nav-item" onclick="showTab('linhas',this)">🔬 &nbsp;Linhas de pesquisa</div>
-      <div class="nav-item" onclick="showTab('biblioteca',this)">📖 &nbsp;Biblioteca</div>
-      <div class="nav-item" onclick="showTab('acervo',this)">📚 &nbsp;Acervo do curso</div>
+      <div class="nav-item" onclick="showTab('disciplinas',this)"><svg viewBox="0 0 24 24"><path d="M2 3h20v14H2z"/><path d="M8 21h8M12 17v4"/></svg>Disciplinas</div>
+      <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Atividades</div>
+      <div class="nav-item" onclick="showTab('notas',this)"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Notas</div>
+      <div class="nav-item" onclick="showTab('linhas',this)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Linhas de pesquisa</div>
+      <div class="nav-item" onclick="showTab('biblioteca',this)"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Biblioteca</div>
+      <div class="nav-item" onclick="showTab('acervo',this)"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Acervo do curso</div>
       <div class="nav-label">Financeiro</div>
-      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin">💰 &nbsp;Pagamentos</div>
+      <div class="nav-item" onclick="showTab('financeiro',this)" id="nav-fin"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Pagamentos</div>
       <div class="nav-label">Documentos</div>
-      <div class="nav-item" onclick="showTab('meusdocs',this)">🗂 &nbsp;Meus documentos</div>
-      <div class="nav-item" onclick="showTab('declaracoes',this)">☰ &nbsp;Declarações</div>
+      <div class="nav-item" onclick="showTab('meusdocs',this)"><svg viewBox="0 0 24 24"><path d="M4 4h5l2 3h9a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Meus documentos</div>
+      <div class="nav-item" onclick="showTab('declaracoes',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg>Declarações</div>
     </nav>
 
     <div class="dash-main">
@@ -777,8 +789,8 @@ async function carregarMateriais(){
   const videos=todos.filter(m=>m.tipo==='video');
 
   document.getElementById('st-mat').textContent=todos.length;
-  document.getElementById('nav-mat').innerHTML='📄 &nbsp;Materiais <span class="nav-badge">'+pdfs.length+'</span>';
-  document.getElementById('nav-aulas').innerHTML='▶ &nbsp;Videoaulas <span class="nav-badge">'+videos.length+'</span>';
+  document.getElementById('nav-mat').innerHTML='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais <span class="nav-badge">'+pdfs.length+'</span>';
+  document.getElementById('nav-aulas').innerHTML='<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas <span class="nav-badge">'+videos.length+'</span>';
 
   document.getElementById('lista-pdfs').innerHTML   = renderGrupos(pdfs,'pdf');
   document.getElementById('lista-videos').innerHTML = renderGrupos(videos,'video');
@@ -964,10 +976,10 @@ async function carregarFinanceiro(){
   if(atrasadas.length){
     alerta.style.display='block';
     alerta.innerHTML = `<strong>Atenção:</strong> você tem ${atrasadas.length} parcela${atrasadas.length>1?'s':''} em atraso. Regularize para manter seu acesso ativo.`;
-    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
+    document.getElementById('nav-fin').innerHTML='<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Pagamentos <span class="nav-badge alerta">'+atrasadas.length+'</span>';
   } else {
     alerta.style.display='none';
-    document.getElementById('nav-fin').innerHTML='💰 &nbsp;Pagamentos';
+    document.getElementById('nav-fin').innerHTML='<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Pagamentos';
   }
 
   // Próxima a vencer (em aberto, não atrasada, mais próxima)
@@ -1022,7 +1034,7 @@ async function carregarAtividades(){
   if(!trilha.length){
     document.getElementById('lista-atividades').innerHTML=
       '<div class="empty" style="background:#fff;border-radius:8px;">Nenhuma atividade na sua trilha ainda.</div>';
-    document.getElementById('nav-ativ').innerHTML='📋 &nbsp;Atividades';
+    document.getElementById('nav-ativ').innerHTML='<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Atividades';
     return;
   }
 
@@ -1042,7 +1054,7 @@ async function carregarAtividades(){
   // badge: quantas liberadas ainda não entregues
   const pendentes = atividadesCache.filter(t=>t.estado==='liberada').length;
   document.getElementById('nav-ativ').innerHTML =
-    '📋 &nbsp;Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
+    '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Atividades' + (pendentes ? ' <span class="nav-badge alerta">'+pendentes+'</span>' : '');
 
   renderAtividades();
 }
