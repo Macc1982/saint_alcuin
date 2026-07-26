@@ -183,6 +183,45 @@
 
   @media(max-width:640px){ .painel{max-width:100%;padding:28px 22px 36px;} }
 
+  /* ---------- Lote: disciplinas, notas, financeiro, declaracoes ---------- */
+  .empty-state{text-align:center;padding:44px 24px;}
+  .empty-state svg{width:36px;height:36px;stroke:#b9c3cf;stroke-width:1.5;fill:none;margin-bottom:12px;}
+  .empty-state-t{font-size:.92rem;font-weight:600;color:var(--primary);margin-bottom:4px;}
+  .empty-state-s{font-size:.78rem;color:var(--gray);max-width:380px;margin:0 auto;line-height:1.55;}
+
+  #lista-disciplinas td{padding:15px 14px;}
+  #lista-disciplinas td:first-child{font-weight:600;color:var(--primary);}
+  #lista-disciplinas td:nth-child(3),#lista-disciplinas td:nth-child(4){font-variant-numeric:tabular-nums;}
+
+  .nota-ring{width:78px;height:78px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--secondary) 0% 80%,var(--border) 80% 100%);display:flex;align-items:center;justify-content:center;position:relative;}
+  .nota-ring::before{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--white);}
+  .nota-ring-val{position:relative;z-index:1;font-size:1.3rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;}
+  #lista-notas td{padding:14px;}
+  #lista-notas td:first-child{font-weight:600;color:var(--primary);}
+  #lista-notas td:nth-child(2),#lista-notas td:nth-child(3),#lista-notas td:nth-child(4),#lista-notas td:nth-child(5){text-align:center;font-variant-numeric:tabular-nums;}
+  #lista-notas td:nth-child(5){font-weight:600;color:var(--primary);}
+
+  .fin-alerta{background:var(--red-bg);color:var(--red-text);padding:13px 18px;border-radius:10px;font-size:.8rem;margin-bottom:16px;display:none;border:1px solid #f3d1d4;}
+  .fin-prox{background:#eef4fb;color:#1e40af;padding:13px 18px;border-radius:10px;font-size:.8rem;margin-bottom:16px;display:none;border:1px solid #d8e6f6;}
+  .fin-top-azul{border-top:3px solid var(--secondary);}
+  .fin-top-verde{border-top:3px solid var(--green);}
+  .fin-top-ambar{border-top:3px solid #d97706;}
+  .ic-verde{stroke:#86c19b!important;}
+  .ic-ambar{stroke:#e0b878!important;}
+  #lista-parcelas td{padding:14px;font-variant-numeric:tabular-nums;}
+  #lista-parcelas td:nth-child(4){font-weight:600;color:var(--primary);}
+
+  .decl-ic{width:40px;height:40px;border-radius:10px;background:#eef4fb;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .decl-ic svg{width:19px;height:19px;stroke:var(--secondary);stroke-width:1.7;fill:none;}
+  .decl-ic-off{background:#f3f4f6;}
+  .decl-ic-off svg{stroke:#9aa4b1;}
+  .decl-off .decl-title{color:var(--gray);}
+  .decl-btn{display:flex;align-items:center;gap:7px;height:37px;padding:0 15px;min-width:122px;justify-content:center;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--primary);font-size:.77rem;font-weight:600;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s;}
+  .decl-btn svg{width:14px;height:14px;stroke:var(--secondary);stroke-width:1.8;fill:none;}
+  .decl-btn:hover{border-color:var(--secondary);background:#f8fafd;}
+  .decl-btn-off{background:#f3f4f6;color:var(--gray);border-color:#f3f4f6;cursor:default;}
+  .decl-btn-off:hover{border-color:#f3f4f6;background:#f3f4f6;}
+
   /* ---------- Materiais PDF ---------- */
   .doc-linha{display:flex;align-items:center;gap:14px;padding:14px 22px;min-height:68px;border-bottom:1px solid var(--border);transition:background .14s;}
   .doc-linha:last-child{border-bottom:none;}
@@ -266,7 +305,7 @@
   /* ---------- Documento em destaque ---------- */
   .destaque{display:block;text-decoration:none;background:var(--white);border:1px solid var(--border);
             border-left:4px solid var(--primary);border-radius:12px;padding:30px 34px;margin-bottom:8px;
-            transition:border-color .18s,box-shadow .18s,transform .18s;}
+            max-width:700px;transition:border-color .18s,box-shadow .18s,transform .18s;}
   .destaque:hover{border-color:var(--secondary);border-left-color:var(--secondary);
                   box-shadow:0 6px 22px rgba(20,93,160,.12);transform:translateY(-2px);}
   .destaque-tag{font-size:.62rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
@@ -526,10 +565,10 @@
         <div class="fin-prox" id="fin-prox">—</div>
 
         <div class="stats-row-4">
-          <div class="stat-card"><div class="stat-value sm" id="al-fin-total">—</div><div class="stat-label">Valor total</div></div>
-          <div class="stat-card green"><div class="stat-value sm" id="al-fin-pago">—</div><div class="stat-label">Já pago</div></div>
-          <div class="stat-card yellow"><div class="stat-value sm" id="al-fin-aberto">—</div><div class="stat-label">Em aberto</div></div>
-          <div class="stat-card"><div class="stat-value sm" id="al-fin-parcelas">—</div><div class="stat-label">Parcelas pagas</div></div>
+          <div class="stat-card fin-top-azul"><svg class="stat-home-ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><div><div class="stat-value sm" id="al-fin-total">—</div><div class="stat-label">Valor total</div></div></div>
+          <div class="stat-card fin-top-verde"><svg class="stat-home-ic ic-verde" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><div><div class="stat-value sm" id="al-fin-pago">—</div><div class="stat-label">Já pago</div></div></div>
+          <div class="stat-card fin-top-ambar"><svg class="stat-home-ic ic-ambar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><div class="stat-value sm" id="al-fin-aberto">—</div><div class="stat-label">Em aberto</div></div></div>
+          <div class="stat-card fin-top-azul"><svg class="stat-home-ic" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div><div class="stat-value sm" id="al-fin-parcelas">—</div><div class="stat-label">Parcelas pagas</div></div></div>
         </div>
 
         <div class="card" id="fin-plano-card" style="display:none;">
@@ -590,10 +629,10 @@
         <div class="page-title">Declarações</div>
         <div class="page-sub">Emissão instantânea em PDF</div>
         <div class="card" style="padding:0;">
-          <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Declaração de Matrícula</div><div class="decl-sub">Comprova vínculo ativo com a instituição</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('matricula')">Emitir PDF</button></div>
-          <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Declaração de Frequência</div><div class="decl-sub">Frequência por disciplina</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('frequencia')">Emitir PDF</button></div>
-          <div class="decl-item"><div class="decl-icon">📋</div><div style="flex:1;"><div class="decl-title">Histórico Escolar</div><div class="decl-sub">Notas e disciplinas cursadas</div></div><button class="btn btn-outline" style="font-size:.78rem;" onclick="emitirDeclaracao('historico')">Emitir PDF</button></div>
-          <div class="decl-item" style="opacity:.5;"><div class="decl-icon">🎓</div><div style="flex:1;"><div class="decl-title">Certificado de Conclusão</div><div class="decl-sub">Disponível após conclusão do curso</div></div><button class="btn" style="font-size:.78rem;background:#f3f4f6;color:var(--gray);" disabled>Indisponível</button></div>
+          <div class="decl-item"><div class="decl-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg></div><div style="flex:1;"><div class="decl-title">Declaração de Matrícula</div><div class="decl-sub">Comprova vínculo ativo com a instituição</div></div><button class="decl-btn" onclick="emitirDeclaracao('matricula')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Emitir PDF</button></div>
+          <div class="decl-item"><div class="decl-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg></div><div style="flex:1;"><div class="decl-title">Declaração de Frequência</div><div class="decl-sub">Frequência por disciplina</div></div><button class="decl-btn" onclick="emitirDeclaracao('frequencia')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Emitir PDF</button></div>
+          <div class="decl-item"><div class="decl-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h4"/></svg></div><div style="flex:1;"><div class="decl-title">Histórico Escolar</div><div class="decl-sub">Notas e disciplinas cursadas</div></div><button class="decl-btn" onclick="emitirDeclaracao('historico')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Emitir PDF</button></div>
+          <div class="decl-item decl-off"><div class="decl-ic decl-ic-off"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5"/></svg></div><div style="flex:1;"><div class="decl-title">Certificado de Conclusão</div><div class="decl-sub">Disponível após conclusão do curso</div></div><button class="decl-btn decl-btn-off" disabled>Indisponível</button></div>
         </div>
       </div>
 
@@ -1503,7 +1542,11 @@ async function carregarAcervoAluno(){
 
   if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar o acervo.</div></div>';return;}
   if(!data||!data.length){
-    el.innerHTML='<div class="card"><div class="empty">Nenhum documento publicado no acervo deste curso.</div></div>';
+    el.innerHTML='<div class="card"><div class="empty-state">'+
+      '<svg viewBox="0 0 24 24"><path d="M4 4h5l2 3h9a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>'+
+      '<div class="empty-state-t">Nenhum documento disponível</div>'+
+      '<div class="empty-state-s">Ementas, normas, regulamentos e cronogramas do curso aparecerão aqui</div>'+
+    '</div></div>';
     return;
   }
 
@@ -1552,7 +1595,11 @@ async function carregarDocsAluno(){
 
   if(error){el.innerHTML='<div class="card"><div class="empty">Erro ao carregar.</div></div>';return;}
   if(!data||!data.length){
-    el.innerHTML='<div class="card"><div class="empty">Nenhum documento disponível no momento.</div></div>';
+    el.innerHTML='<div class="card"><div class="empty-state">'+
+      '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'+
+      '<div class="empty-state-t">Nenhum documento disponível</div>'+
+      '<div class="empty-state-s">Os documentos da sua matrícula aparecerão aqui</div>'+
+    '</div></div>';
     return;
   }
 
