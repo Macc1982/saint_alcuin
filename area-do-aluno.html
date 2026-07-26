@@ -183,6 +183,19 @@
 
   @media(max-width:640px){ .painel{max-width:100%;padding:28px 22px 36px;} }
 
+  /* ---------- Materiais PDF ---------- */
+  .doc-linha{display:flex;align-items:center;gap:14px;padding:14px 22px;min-height:68px;border-bottom:1px solid var(--border);transition:background .14s;}
+  .doc-linha:last-child{border-bottom:none;}
+  .doc-linha:hover{background:#fafbfd;}
+  .doc-ic{width:38px;height:38px;border-radius:9px;background:#eef4fb;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .doc-ic svg{width:19px;height:19px;stroke:var(--secondary);stroke-width:1.7;fill:none;}
+  .doc-info{flex:1;min-width:0;}
+  .doc-titulo{font-size:.86rem;font-weight:600;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .doc-desc{font-size:.75rem;color:var(--gray);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .doc-abrir{display:flex;align-items:center;gap:7px;height:37px;padding:0 15px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--primary);font-size:.77rem;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;transition:border-color .15s,background .15s;}
+  .doc-abrir svg{width:14px;height:14px;stroke:var(--secondary);stroke-width:1.8;fill:none;}
+  .doc-abrir:hover{border-color:var(--secondary);background:#f8fafd;}
+
   /* ---------- Videoaulas ---------- */
   .disc-bloco{margin-bottom:34px;}
   .disc-bloco:last-child{margin-bottom:0;}
@@ -453,7 +466,7 @@
       <!-- MATERIAIS PDF -->
       <div class="tab-content" id="tab-materiais">
         <div class="page-title">Materiais PDF</div>
-        <div class="page-sub">Apostilas e documentos do seu curso</div>
+        <div class="page-sub">Apostilas e documentos do seu curso<span id="mat-contador"></span></div>
         <div id="lista-pdfs"><div class="loading">Carregando...</div></div>
       </div>
 
@@ -801,6 +814,8 @@ async function carregarMateriais(){
 
   document.getElementById('lista-pdfs').innerHTML   = renderGrupos(pdfs,'pdf');
   document.getElementById('lista-videos').innerHTML = renderGrupos(videos,'video');
+  const matCont=document.getElementById('mat-contador');
+  if(matCont) matCont.textContent = pdfs.length ? ' · '+pdfs.length+' documento'+(pdfs.length===1?'':'s') : '';
 }
 
 // Agrupa por disciplina (ou "Material geral do curso")
@@ -890,17 +905,18 @@ function renderGrupos(itens,tipo){
     return '<div class="grupo-card">'+
       '<div class="grupo-head">'+
         '<div class="grupo-nome">'+nome+'</div>'+
-        '<div class="grupo-sub">'+lista.length+' documento(s)</div>'+
+        '<div class="grupo-sub">'+lista.length+' documento'+(lista.length===1?'':'s')+'</div>'+
       '</div>'+
       lista.map(function(m){
-        return '<div class="grupo-item">'+
-          '<div style="font-size:1.5rem;">📄</div>'+
-          '<div style="flex:1;min-width:0;">'+
-            '<div class="mat-title">'+m.titulo+'</div>'+
-            (m.descricao?'<div class="mat-meta">'+m.descricao+'</div>':'')+
+        return '<div class="doc-linha">'+
+          '<div class="doc-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h2"/></svg></div>'+
+          '<div class="doc-info">'+
+            '<div class="doc-titulo" title="'+m.titulo.replace(/"/g,'&quot;')+'">'+m.titulo+'</div>'+
+            (m.descricao?'<div class="doc-desc">'+m.descricao+'</div>':'')+
             creditoHTML(m)+
           '</div>'+
-          '<a href="'+m.url+'" target="_blank" class="btn btn-outline" style="font-size:.78rem;white-space:nowrap;">Abrir PDF</a>'+
+          '<a href="'+m.url+'" target="_blank" rel="noopener" class="doc-abrir">'+
+            '<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>Abrir PDF</a>'+
         '</div>';
       }).join('')+
     '</div>';
