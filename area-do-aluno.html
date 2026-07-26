@@ -292,12 +292,12 @@
                   margin-bottom:12px;padding:14px 18px;background:#f6f8fb;
                   border:1px solid var(--border);border-radius:10px;}
   .grupo-label{font-size:.84rem;font-weight:600;color:var(--primary);}
-  .grupo-opcoes{display:flex;gap:8px;}
-  .grupo-opt{font-family:inherit;font-size:.8rem;font-weight:600;padding:8px 22px;
-             border:1.5px solid var(--border);border-radius:8px;background:var(--white);
+  .grupo-opcoes{display:inline-flex;background:#eef1f5;border-radius:9px;padding:3px;gap:0;}
+  .grupo-opt{font-family:inherit;font-size:.8rem;font-weight:600;padding:7px 22px;
+             border:none;border-radius:7px;background:transparent;
              color:var(--gray);cursor:pointer;transition:all .15s;min-width:74px;}
-  .grupo-opt:hover{border-color:var(--secondary);color:var(--secondary);}
-  .grupo-opt.ativo{background:var(--secondary);border-color:var(--secondary);color:#fff;}
+  .grupo-opt:hover{color:var(--primary);}
+  .grupo-opt.ativo{background:var(--white);color:var(--primary);box-shadow:0 1px 4px rgba(11,42,74,.14);}
   .grupo-tag{display:inline-block;margin-top:10px;padding:5px 13px;background:#eef4fb;
              color:var(--secondary);border-radius:20px;font-size:.72rem;font-weight:600;}
   .grupo-tag.solo{background:#f3f4f6;color:var(--gray);}
@@ -367,20 +367,21 @@
   /* ---- Trilha (linha do tempo vertical) ---- */
   .trilha{position:relative;}
   .trilha-item{display:flex;gap:16px;}
-  .trilha-eixo{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:40px;}
-  .trilha-no{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;flex-shrink:0;z-index:1;border:3px solid #fff;box-shadow:0 0 0 1px var(--border);}
+  .trilha-eixo{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:32px;}
+  .trilha-no{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1;border:3px solid #fff;box-shadow:0 0 0 1px var(--border);}
+  .trilha-no svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.2;fill:none;}
   .trilha-no.no-ok{background:var(--green);color:#fff;box-shadow:0 0 0 1px var(--green);}
   .trilha-no.no-env{background:#d97706;color:#fff;box-shadow:0 0 0 1px #d97706;}
   .trilha-no.no-atual{background:var(--secondary);color:#fff;box-shadow:0 0 0 4px rgba(20,93,160,.2);animation:pulseNo 2s infinite;}
   .trilha-no.no-lock{background:#e5e7eb;color:#9ca3af;}
   @keyframes pulseNo{0%,100%{box-shadow:0 0 0 4px rgba(20,93,160,.18);}50%{box-shadow:0 0 0 7px rgba(20,93,160,.08);}}
-  .trilha-linha{width:3px;flex:1;background:var(--border);margin:2px 0;min-height:24px;}
+  .trilha-linha{width:2px;flex:1;background:var(--border);margin:2px 0;min-height:24px;}
   .trilha-conteudo{flex:1;min-width:0;padding-bottom:22px;}
 
-  .ativ-card{background:var(--white);border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.07);overflow:hidden;border-left:4px solid var(--secondary);}
+  .ativ-card{background:var(--white);border-radius:12px;box-shadow:0 8px 24px rgba(11,42,74,.05);border:1px solid var(--border);overflow:hidden;border-left:3px solid var(--secondary);}
   .ativ-card.entregue{border-left-color:#d97706;}
   .ativ-card.corrigida{border-left-color:var(--green);}
-  .ativ-card.locked{border-left-color:#e5e7eb;background:#fafafa;box-shadow:0 1px 4px rgba(0,0,0,.04);padding:16px 20px;}
+  .ativ-card.locked{border-left-color:#e5e7eb;background:#fcfcfd;box-shadow:none;padding:14px 20px;}
   .ativ-head{padding:18px 20px;}
   .ativ-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;}
   .ativ-titulo{font-size:1rem;font-weight:700;color:var(--primary);}
@@ -390,8 +391,11 @@
   .ativ-enunciado{font-size:.84rem;color:var(--text);line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);white-space:pre-wrap;}
   .ativ-secao{padding:14px 20px;border-top:1px solid var(--border);background:#fbfcfd;}
   .ativ-secao-tit{font-size:.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
-  .anexo-linha{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:.84rem;}
+  .anexo-linha{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:.84rem;min-height:46px;}
   .anexo-linha:not(:last-child){border-bottom:1px solid var(--border);}
+  .anexo-ic{width:16px;height:16px;stroke:var(--gray);stroke-width:1.7;fill:none;flex-shrink:0;}
+  .entrega-ic{width:38px;height:38px;border-radius:9px;background:#eef4fb;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .entrega-ic svg{width:18px;height:18px;stroke:var(--secondary);stroke-width:1.7;fill:none;}
   .entrega-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .feedback-box{background:var(--green-bg);border-left:3px solid var(--green);padding:12px 14px;border-radius:0 6px 6px 0;font-size:.84rem;color:#14532d;margin-top:10px;white-space:pre-wrap;}
   .nota-badge{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:44px;border-radius:50%;background:var(--green);color:#fff;font-size:1.05rem;font-weight:800;flex-shrink:0;}
@@ -1131,18 +1135,24 @@ function renderAtividades(){
       const ult = i===atividadesCache.length-1;
 
       // Nó da linha do tempo
+      const SVGN={
+        ok:'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',
+        env:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+        atual:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/></svg>',
+        lock:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+      };
       const [nodeCls,nodeIcon] =
-        est==='concluida' ? ['no-ok','✓'] :
-        est==='entregue'  ? ['no-env','📤'] :
-        est==='liberada'  ? ['no-atual','●'] :
-                            ['no-lock','🔒'];
+        est==='concluida' ? ['no-ok',SVGN.ok] :
+        est==='entregue'  ? ['no-env',SVGN.env] :
+        est==='liberada'  ? ['no-atual',SVGN.atual] :
+                            ['no-lock',SVGN.lock];
 
       // ---- Bloqueada: card fechado ----
       if(est==='bloqueada'){
         return trilhaItem(nodeCls,nodeIcon,ult,
           '<div class="ativ-card locked">'+
             '<div class="ativ-disc">'+t.disciplina_nome+'</div>'+
-            '<div class="ativ-titulo" style="color:var(--gray);">'+t.titulo+' 🔒</div>'+
+            '<div class="ativ-titulo" style="color:var(--gray);">'+t.titulo+'</div>'+
             '<div style="font-size:.78rem;color:var(--gray);margin-top:4px;">Disponível após liberação da etapa anterior.</div>'+
           '</div>');
       }
@@ -1161,7 +1171,7 @@ function renderAtividades(){
       if(t.anexos && t.anexos.length){
         secAnexos='<div class="ativ-secao"><div class="ativ-secao-tit">Arquivos da atividade</div>'+
           t.anexos.map(function(x){
-            return '<div class="anexo-linha"><span>📎</span>'+
+            return '<div class="anexo-linha"><svg class="anexo-ic" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>'+
               '<span style="flex:1;min-width:0;">'+x.nome_arquivo+'</span>'+
               '<button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;" onclick="baixarAnexo(\''+x.path+'\')">Baixar</button>'+
             '</div>';
@@ -1190,7 +1200,7 @@ function renderAtividades(){
           '</div>'+
         '</div>'+
         '<div class="entrega-box">'+
-          '<div style="font-size:1.4rem;">📄</div>'+
+          '<div class="entrega-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>'+
           '<div style="flex:1;min-width:0;">'+
             '<div style="font-size:.86rem;font-weight:600;color:var(--primary);">'+(t.entrega_arquivo||'Seu envio')+'</div>'+
             '<div style="font-size:.74rem;color:var(--gray);">Enviado em '+dataBR(t.enviado_em)+' · aguardando correção</div>'+
@@ -1208,7 +1218,7 @@ function renderAtividades(){
         '</div>'+
         '<div class="entrega-box">'+
           '<div style="flex:1;font-size:.84rem;color:var(--gray);">Envie seu trabalho em PDF, DOC ou DOCX (até '+MAX_MB_TRAB+' MB).</div>'+
-          '<button class="btn btn-secondary" style="font-size:.8rem;" id="btn-env-'+i+'" onclick="escolherTrabalho('+i+')" disabled>Enviar trabalho</button>'+
+          '<button class="btn btn-primary" style="font-size:.8rem;" id="btn-env-'+i+'" onclick="escolherTrabalho('+i+')" disabled>Enviar trabalho</button>'+
         '</div>';
       }
       secEntrega+='<input type="file" id="trab-'+i+'" accept=".pdf,.doc,.docx" onchange="enviarTrabalho('+i+',event)"/>';
