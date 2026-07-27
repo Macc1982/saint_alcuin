@@ -513,7 +513,12 @@ function mostrarResultado(q, token){
     + '<h2 class="serif">Sua formação atende aos requisitos iniciais</h2>'
     + '<p>Você está apto a continuar no processo seletivo. O próximo passo é escolher a linha de pesquisa mais relacionada à sua formação, experiência ou tema de interesse.</p>'
     + '<div style="margin-top:22px;"><button class="btn btn-primary btn-lg" onclick="irEscolherCurso()">Escolher programa e linha</button></div>'
-    + '<p style="margin-top:20px;font-size:.8rem;">Guarde este link para acompanhar sua candidatura:<br><code style="font-size:.8rem;color:#145da0;">?c='+token+'</code></p>';
+    + '<div style="margin-top:22px;padding:16px;background:var(--light);border:1px solid var(--border);border-radius:10px;">'
+    + '<div style="font-size:.8rem;color:var(--gray);margin-bottom:8px;">Guarde este link para acompanhar sua candidatura a qualquer momento:</div>'
+    + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
+    + '<input id="link-acomp" type="text" readonly value="'+location.origin+'/selecao.html?c='+token+'" style="flex:1;min-width:200px;font-size:.8rem;padding:9px 11px;border:1px solid var(--border);border-radius:8px;color:var(--primary);background:#fff;"/>'
+    + '<button class="btn btn-outline" onclick="copiarLinkAcomp()" style="font-size:.82rem;">Copiar</button>'
+    + '</div></div>';
   } else {
     el.innerHTML = ''
     + '<div class="res-ic wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>'
@@ -618,6 +623,17 @@ async function entrarListaEspera(id,nome){
 
 function voltarParaLinha(){ irEscolherLinha(); }
 function irProjeto(){ linhaEscolhida=null; irPara('projeto'); }
+
+function copiarLinkAcomp(){
+  const inp=document.getElementById('link-acomp');
+  if(!inp) return;
+  inp.select();
+  navigator.clipboard.writeText(inp.value).then(function(){
+    const btn=event.target; const t=btn.textContent;
+    btn.textContent='Copiado!';
+    setTimeout(function(){ btn.textContent=t; }, 1800);
+  }).catch(function(){ try{document.execCommand('copy');}catch(e){} });
+}
 
 function arquivoEscolhido(ev){
   const f=ev.target.files[0]; if(!f)return;
