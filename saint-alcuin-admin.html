@@ -1168,6 +1168,20 @@
 <div class="toast" id="toast"></div>
 
 <!-- MODAL: LIBERAR COM PRAZO -->
+<div class="modal-bg" id="modal-candidato">
+  <div class="modal-box" style="max-width:640px;max-height:88vh;overflow-y:auto;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div>
+        <div class="modal-title" id="cand-nome">Candidato</div>
+        <div class="modal-sub" id="cand-contato"></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="fecharCandidato()">Fechar</button>
+    </div>
+
+    <div id="cand-corpo" style="margin-top:14px;"></div>
+  </div>
+</div>
+
 <div class="modal-bg" id="modal-liberar">
   <div class="modal-box" style="max-width:420px;">
     <div class="modal-title" id="lib-titulo">Liberar atividade</div>
@@ -1675,11 +1689,120 @@ function copiarLinkWhats(i){
   });
 }
 
-function abrirCandidato(i){
+let candAtual=null;
+
+async function abrirCandidato(i){
   const c=candidatosCache[i];
+  candAtual=c;
+  document.getElementById('cand-nome').textContent=c.nome;
+  document.getElementById('cand-contato').textContent=(c.email||'')+' · '+(c.telefone||'')+(c.cidade?' · '+c.cidade+'/'+(c.estado||''):'');
+
+  const linha=linhasFunilCache.find(l=>l.id===c.linha_id);
   const link=FUNIL_URL+'?c='+c.token;
-  alert('Ficha completa do candidato e avaliação do pré-projeto: em construção (próxima etapa da Fatia 2).\\n\\nCandidato: '+c.nome+'\\nLink de acompanhamento:\\n'+link);
+  const d0=v=>v||'—';
+
+  const enviouProj = !!c.proj_enviado_em;
+  const projBloco = enviouProj
+    ? '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'+
+        '<button class="btn btn-primary btn-sm" onclick="baixarPreProjeto()">Baixar pré-projeto</button>'+
+        '<span style="font-size:.78rem;color:var(--gray);">'+(c.proj_titulo?c.proj_titulo:'arquivo enviado')+' · '+new Date(c.proj_enviado_em).toLocaleDateString('pt-BR')+'</span>'+
+      '</div>'
+    : '<div style="font-size:.82rem;color:var(--gray);">Pré-projeto ainda não enviado.</div>';
+
+  const t=(c.aval_aderencia||0)+(c.aval_problema||0)+(c.aval_relevancia||0)+(c.aval_viabilidade||0)+(c.aval_compat||0);
+
+  document.getElementById('cand-corpo').innerHTML =
+    // dados
+    '<div class="card" style="margin-bottom:12px;padding:14px 16px;">'+
+      '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary);margin-bottom:8px;">Dados da candidatura</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;font-size:.84rem;">'+
+        '<div><b>Programa:</b> '+d0(c.programa)+'</div>'+
+        '<div><b>Linha:</b> '+(linha?linha.nome:'—')+'</div>'+
+        '<div><b>Formação:</b> '+d0(c.formacao)+'</div>'+
+        '<div><b>Profissão:</b> '+d0(c.profissao)+'</div>'+
+        '<div><b>Documento:</b> '+d0(c.documento)+'</div>'+
+        '<div><b>Origem:</b> '+d0(c.origem)+'</div>'+
+      '</div>'+
+    '</div>'+
+    // pre-projeto
+    '<div class="card" style="margin-bottom:12px;padding:14px 16px;">'+
+      '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary);margin-bottom:8px;">Pré-projeto</div>'+
+      projBloco+
+    '</div>'+
+    // avaliacao
+    '<div class="card" style="margin-bottom:12px;padding:14px 16px;">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">'+
+        '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary);">Avaliação acadêmica</div>'+
+        '<div style="font-size:1.1rem;font-weight:700;color:var(--primary);" id="aval-total-view">'+t+'/100</div>'+
+      '</div>'+
+      notaLinha('Aderência à linha','aderencia',c.aval_aderencia,25)+
+      notaLinha('Clareza do problema','problema',c.aval_problema,20)+
+      notaLinha('Relevância acadêmica/social','relevancia',c.aval_relevancia,20)+
+      notaLinha('Viabilidade de execução','viabilidade',c.aval_viabilidade,20)+
+      notaLinha('Compatibilidade formação/experiência','compat',c.aval_compat,15)+
+      '<div class="form-group" style="margin-top:10px;margin-bottom:0;">'+
+        '<label style="font-size:.72rem;">Observações da comissão</label>'+
+        '<textarea id="aval-obs" rows="2" style="width:100%;font-family:inherit;font-size:.84rem;padding:8px;border:1px solid var(--border);border-radius:8px;">'+(c.aval_observacoes||'')+'</textarea>'+
+      '</div>'+
+    '</div>'+
+    // resultado + acoes
+    '<div class="card" style="padding:14px 16px;">'+
+      '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary);margin-bottom:8px;">Decisão</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+        '<button class="btn btn-primary btn-sm" onclick="decidir(\'aprovado\')">Aprovar (condição 50%)</button>'+
+        '<button class="btn btn-outline btn-sm" onclick="decidir(\'ajustes\')">Aprovar com ajustes</button>'+
+        '<button class="btn btn-outline btn-sm" onclick="decidir(\'reformulacao\')">Devolver p/ reformulação</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="decidir(\'nao_aprovado\')">Não aprovar</button>'+
+      '</div>'+
+      '<div style="margin-top:10px;font-size:.78rem;color:var(--gray);">Copie o link e avise pelo WhatsApp: <span style="color:var(--secondary);word-break:break-all;">'+link+'</span></div>'+
+    '</div>';
+
+  document.getElementById('modal-candidato').classList.add('open');
 }
+
+function notaLinha(rotulo,campo,valor,max){
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;">'+
+    '<span style="font-size:.82rem;">'+rotulo+'</span>'+
+    '<span style="display:flex;align-items:center;gap:6px;"><input type="number" min="0" max="'+max+'" id="aval-'+campo+'" value="'+(valor!=null?valor:'')+'" oninput="recalcTotal()" style="width:60px;text-align:center;padding:5px;border:1px solid var(--border);border-radius:6px;"/>'+
+    '<span style="font-size:.74rem;color:var(--gray);">/ '+max+'</span></span>'+
+  '</div>';
+}
+
+function recalcTotal(){
+  const g=id=>parseInt(document.getElementById('aval-'+id).value,10)||0;
+  document.getElementById('aval-total-view').textContent=(g('aderencia')+g('problema')+g('relevancia')+g('viabilidade')+g('compat'))+'/100';
+}
+
+async function baixarPreProjeto(){
+  if(!candAtual||!candAtual.proj_arquivo_url){toast('Sem arquivo.','error');return;}
+  const {data,error}=await sb.storage.from('pre-projetos').createSignedUrl(candAtual.proj_arquivo_url,120);
+  if(error){toast('Erro ao gerar link: '+error.message,'error');return;}
+  window.open(data.signedUrl,'_blank');
+}
+
+async function decidir(resultado){
+  if(!candAtual)return;
+  const g=id=>parseInt(document.getElementById('aval-'+id).value,10)||0;
+  const total=g('aderencia')+g('problema')+g('relevancia')+g('viabilidade')+g('compat');
+  const etapaNova = resultado==='aprovado' ? 'aprovado'
+                  : resultado==='ajustes' ? 'ajustes_solicitados'
+                  : resultado==='nao_aprovado' ? 'perdido'
+                  : 'projeto_elaboracao'; // reformulacao volta a elaborar
+  const upd={
+    aval_aderencia:g('aderencia'), aval_problema:g('problema'), aval_relevancia:g('relevancia'),
+    aval_viabilidade:g('viabilidade'), aval_compat:g('compat'), aval_total:total,
+    aval_observacoes:document.getElementById('aval-obs').value||null,
+    resultado:resultado, resultado_em:new Date().toISOString(), etapa:etapaNova
+  };
+  if(resultado==='aprovado'){ upd.condicao_concedida=true; }
+  const {error}=await sb.from('candidatos').update(upd).eq('id',candAtual.id);
+  if(error){toast('Erro: '+error.message,'error');return;}
+  toast('Decisão registrada. Avise o candidato pelo WhatsApp.','success');
+  fecharCandidato();
+  carregarCandidatos();
+}
+
+function fecharCandidato(){ document.getElementById('modal-candidato').classList.remove('open'); candAtual=null; }
 
 async function fazerLogout(){
   await sb.auth.signOut();
