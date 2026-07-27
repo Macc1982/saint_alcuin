@@ -1564,16 +1564,20 @@ const FUNIL_URL = location.origin + '/selecao.html';
 
 async function carregarVagas(){
   const el=document.getElementById('lista-vagas');
-  const {data,error}=await sb.from('vagas_por_linha').select('*').order('numero');
-  if(error){el.innerHTML='<div class="card"><div class="empty">Erro: '+error.message+'. Rode o funil_candidatos.sql.</div></div>';return;}
-  if(!data||!data.length){el.innerHTML='<div class="card"><div class="empty">Nenhuma linha cadastrada.</div></div>';return;}
+  const {data,error}=await sb.from('vagas_por_linha').select('*');
+  if(error){el.innerHTML='<div class="card"><div class="empty">Erro: '+error.message+'. Rode o funil_completo.sql.</div></div>';return;}
+  if(!data||!data.length){el.innerHTML='<div class="card"><div class="empty">Nenhuma linha cadastrada. As linhas de pesquisa são cadastradas por curso na aba Linhas de pesquisa.</div></div>';return;}
 
-  el.innerHTML = data.map(function(l){
-    const cheia = l.disponiveis<=0 && l.vagas_abertas>0;
-    return '<div class="card" style="margin-bottom:14px;">'+
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">'+
+  // agrupa por curso
+  const porCurso={};
+  data.forEach(function(l){ (porCurso[l.curso_nome]=porCurso[l.curso_nome]||[]).push(l); });
+
+  el.innerHTML = Object.keys(porCurso).map(function(curso){
+    const linhas=porCurso[curso];
+    const cards=linhas.map(function(l){
+      const cheia = l.disponiveis<=0 && l.vagas_abertas>0;
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--border);">'+
         '<div style="flex:1;min-width:220px;">'+
-          '<div style="font-size:.7rem;color:var(--gray);font-weight:600;">LINHA '+l.numero+'</div>'+
           '<div style="font-size:1rem;font-weight:700;color:var(--primary);">'+l.nome+'</div>'+
           '<div style="font-size:.78rem;color:var(--gray);margin-top:4px;">'+
             'Teto '+l.vagas_total+' · Ocupadas '+l.ocupadas+' (pré-projetos enviados) · '+
@@ -1582,23 +1586,27 @@ async function carregarVagas(){
           '</div>'+
         '</div>'+
         '<div style="display:flex;align-items:flex-end;gap:10px;">'+
-          '<div class="form-group" style="margin-bottom:0;max-width:120px;">'+
+          '<div class="form-group" style="margin-bottom:0;max-width:110px;">'+
             '<label style="font-size:.7rem;">Vagas abertas</label>'+
-            '<input type="number" min="0" max="40" id="vag-'+l.numero+'" value="'+l.vagas_abertas+'" style="text-align:center;"/>'+
+            '<input type="number" min="0" max="40" id="vag-'+l.linha_id+'" value="'+l.vagas_abertas+'" style="text-align:center;"/>'+
           '</div>'+
           '<label style="display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--gray);white-space:nowrap;margin-bottom:8px;">'+
-            '<input type="checkbox" id="mos-'+l.numero+'" '+(l.mostrar_vagas?'checked':'')+'/> exibir nº</label>'+
-          '<button class="btn btn-primary btn-sm" onclick="salvarVagas('+l.numero+')" style="margin-bottom:4px;">Salvar</button>'+
+            '<input type="checkbox" id="mos-'+l.linha_id+'" '+(l.mostrar_vagas?'checked':'')+'/> exibir nº</label>'+
+          '<button class="btn btn-primary btn-sm" onclick="salvarVagas(\''+l.linha_id+'\')" style="margin-bottom:4px;">Salvar</button>'+
         '</div>'+
-      '</div>'+
+      '</div>';
+    }).join('');
+    return '<div class="card" style="margin-bottom:16px;">'+
+      '<div style="font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--secondary);margin-bottom:2px;">'+curso+'</div>'+
+      cards+
     '</div>';
   }).join('');
 }
 
-async function salvarVagas(numero){
-  const abertas = parseInt(document.getElementById('vag-'+numero).value,10)||0;
-  const mostrar = document.getElementById('mos-'+numero).checked;
-  const {error}=await sb.from('funil_linhas').update({vagas_abertas:abertas,mostrar_vagas:mostrar}).eq('numero',numero);
+async function salvarVagas(linhaId){
+  const abertas = parseInt(document.getElementById('vag-'+linhaId).value,10)||0;
+  const mostrar = document.getElementById('mos-'+linhaId).checked;
+  const {error}=await sb.from('linhas_pesquisa').update({vagas_abertas:abertas,mostrar_vagas:mostrar}).eq('id',linhaId);
   if(error){toast('Erro ao salvar: '+error.message,'error');return;}
   toast('Vagas atualizadas.','success');
   carregarVagas();
@@ -1609,7 +1617,7 @@ let candidatosCache=[], linhasFunilCache=[];
 async function carregarCandidatos(){
   const tbody=document.getElementById('lista-candidatos');
   if(!linhasFunilCache.length){
-    const {data:ls}=await sb.from('funil_linhas').select('numero,nome');
+    const {data:ls}=await sb.from('linhas_pesquisa').select('id,nome');
     linhasFunilCache=ls||[];
   }
   let q=sb.from('candidatos').select('*').order('criado_em',{ascending:false});
@@ -1638,7 +1646,7 @@ async function carregarCandidatos(){
   const etapaCor={aprovado:'badge-green',matriculado:'badge-green',em_analise:'badge-yellow',projeto_recebido:'badge-yellow',perdido:'badge-gray',lista_espera:'badge-gray',nao_aprovado:'badge-gray'};
 
   tbody.innerHTML=candidatosCache.map(function(c,i){
-    const linha=linhasFunilCache.find(l=>l.numero===c.linha_id);
+    const linha=linhasFunilCache.find(l=>l.id===c.linha_id);
     const cor=etapaCor[c.etapa]||'badge-blue';
     return '<tr>'+
       '<td><strong>'+c.nome+'</strong><div style="font-size:.72rem;color:var(--gray);">'+(c.email||'')+' · '+(c.telefone||'')+(c.origem?' · <span style="color:#145da0;">'+c.origem+'</span>':'')+'</div></td>'+
