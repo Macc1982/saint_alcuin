@@ -468,13 +468,8 @@ function val(id){return (document.getElementById(id).value||'').trim();}
 
 // Qualificação automática (regras simples, revisáveis no admin)
 function qualificar(){
-  const prog = val('f-prog');
-  const form = val('f-form').toLowerCase();
-  // doutorado exige mestrado declarado na formação
-  if(prog==='doutorado'){
-    const temMestrado = /mestr|máster|master|magíster|magister/.test(form);
-    if(!temMestrado) return 'analise'; // não bloqueia, manda p/ análise manual
-  }
+  // Todos os candidatos seguem o fluxo. A verificação de titulação
+  // (ex.: mestrado concluído para doutorado) é feita pela comissão na análise.
   return 'apto';
 }
 
