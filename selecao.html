@@ -486,6 +486,7 @@ async function enviarPreInscricao(){
   btn.disabled=true; btn.textContent='Enviando...';
 
   const q = qualificar();
+  window.PROGRAMA_ESCOLHIDO = val('f-prog'); // mestrado | doutorado
   const registro = {
     nome:val('f-nome'), documento:val('f-doc'), telefone:val('f-tel'),
     email:val('f-email'), cidade:val('f-cidade'), estado:val('f-estado').toUpperCase(),
@@ -543,8 +544,17 @@ async function irEscolherCurso(){
   const el=document.getElementById('lista-cursos');
   const {data,error}=await sb.from('cursos_selecao').select('*');
   if(error){el.innerHTML='<div style="color:#c1121f;font-size:.9rem;">Erro ao carregar cursos.</div>';return;}
-  if(!data||!data.length){el.innerHTML='<div style="color:var(--gray);">Nenhum curso aberto para seleção no momento.</div>';return;}
-  el.innerHTML=data.map(function(c){
+
+  // filtra pelo nível que o candidato escolheu no passo 2 (mestrado/doutorado)
+  let cursos = data||[];
+  const prog = (window.PROGRAMA_ESCOLHIDO || (CAND&&CAND.programa) || '').toLowerCase();
+  if(prog){
+    const alvo = prog.indexOf('doutor')>=0 ? 'doutor' : 'mestr';
+    cursos = cursos.filter(function(c){ return (c.nivel||'').toLowerCase().indexOf(alvo)>=0; });
+  }
+
+  if(!cursos.length){el.innerHTML='<div style="color:var(--gray);">Nenhum curso aberto para seleção no momento neste nível.</div>';return;}
+  el.innerHTML=cursos.map(function(c){
     return '<div class="opc-card" onclick="escolherCurso(\''+c.id+'\',\''+(c.nome||'').replace(/\\x27/g,"")+'\',\''+(c.nivel||'')+'\')">'+
       '<div class="opc-nivel">'+(c.nivel||'')+'</div>'+
       '<div class="opc-nome">'+c.nome+'</div>'+
