@@ -312,6 +312,9 @@
       <div class="nav-item" onclick="showTab('disciplinas',this)"><svg viewBox="0 0 24 24"><path d="M2 3h20v14H2z"/><path d="M8 21h8M12 17v4"/></svg>Disciplinas</div>
       <div class="nav-item" onclick="showTab('atividades',this)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Atividades</div>
       <div class="nav-item" onclick="showTab('trilha',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2 6.3-6.4 2 2-6.3z"/></svg>Trilha do aluno</div>
+      <div class="nav-label">Seleção</div>
+      <div class="nav-item" onclick="showTab('selecao',this)" id="nav-selecao"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Candidatos</div>
+      <div class="nav-item" onclick="showTab('vagas',this)"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5"/></svg>Vagas por linha</div>
     </nav>
     <div class="main">
 
@@ -1034,6 +1037,62 @@
       </div>
 
 
+      <!-- ============ VAGAS POR LINHA ============ -->
+      <div class="tab" id="tab-vagas">
+        <div class="page-title">Vagas por linha</div>
+        <div class="page-sub">Lance manualmente quantas vagas cada linha oferece. A vaga só é ocupada quando o candidato envia o pré-projeto.</div>
+        <div id="lista-vagas"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <!-- ============ CANDIDATOS (FUNIL) ============ -->
+      <div class="tab" id="tab-selecao">
+        <div class="page-title">Candidatos</div>
+        <div class="page-sub">Processo seletivo de mestrado e doutorado</div>
+
+        <div class="stats-row cor-stats" style="margin-bottom:18px;">
+          <div class="stat-card"><div class="stat-top"><span class="stat-label">Pré-inscritos</span><svg class="stat-ic" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-value" id="cf-total">—</div></div>
+          <div class="stat-card yellow"><div class="stat-top"><span class="stat-label">Projetos em análise</span><svg class="stat-ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="stat-value" id="cf-analise">—</div></div>
+          <div class="stat-card green"><div class="stat-top"><span class="stat-label">Aprovados</span><svg class="stat-ic" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="stat-value" id="cf-aprovados">—</div></div>
+          <div class="stat-card"><div class="stat-top"><span class="stat-label">Matriculados</span><svg class="stat-ic" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5"/></svg></div><div class="stat-value" id="cf-matriculados">—</div></div>
+        </div>
+
+        <div class="filtro-barra" style="max-width:none;justify-content:flex-start;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;"><svg class="filtro-ic" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg>
+            <select id="cf-etapa" onchange="carregarCandidatos()" style="border:none;background:none;font-size:.84rem;outline:none;cursor:pointer;">
+              <option value="">Todas as etapas</option>
+              <option value="qualificacao">Qualificação</option>
+              <option value="linha_escolhida">Linha escolhida</option>
+              <option value="projeto_recebido">Pré-projeto recebido</option>
+              <option value="em_analise">Em análise</option>
+              <option value="aprovado">Aprovado</option>
+              <option value="matriculado">Matriculado</option>
+              <option value="lista_espera">Lista de espera</option>
+              <option value="perdido">Perdido</option>
+            </select>
+          </div>
+          <select id="cf-prog" onchange="carregarCandidatos()" style="border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:.82rem;outline:none;cursor:pointer;background:#fff;">
+            <option value="">Mestrado e doutorado</option>
+            <option value="mestrado">Só mestrado</option>
+            <option value="doutorado">Só doutorado</option>
+          </select>
+          <select id="cf-origem" onchange="carregarCandidatos()" style="border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:.82rem;outline:none;cursor:pointer;background:#fff;">
+            <option value="">Todas as origens</option>
+            <option value="instagram">Instagram</option>
+            <option value="google">Google Ads</option>
+            <option value="facebook">Facebook</option>
+            <option value="direto">Direto</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Candidato</th><th>Programa</th><th>Linha</th><th style="text-align:center">Nota</th><th>Etapa</th><th style="text-align:right">Ações</th></tr></thead>
+            <tbody id="lista-candidatos"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+
       <!-- NOTAS -->
       <div class="tab" id="tab-notas">
         <div class="page-title">Notas</div><div class="page-sub">Lançamento por aluno e disciplina</div>
@@ -1500,6 +1559,120 @@ async function enviarFotoAdmin(ev){
   await carregarPerfilAdmin();
 }
 
+// ============ FUNIL DE SELEÇÃO ============
+const FUNIL_URL = location.origin + '/selecao.html';
+
+async function carregarVagas(){
+  const el=document.getElementById('lista-vagas');
+  const {data,error}=await sb.from('vagas_por_linha').select('*').order('numero');
+  if(error){el.innerHTML='<div class="card"><div class="empty">Erro: '+error.message+'. Rode o funil_candidatos.sql.</div></div>';return;}
+  if(!data||!data.length){el.innerHTML='<div class="card"><div class="empty">Nenhuma linha cadastrada.</div></div>';return;}
+
+  el.innerHTML = data.map(function(l){
+    const cheia = l.disponiveis<=0 && l.vagas_abertas>0;
+    return '<div class="card" style="margin-bottom:14px;">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">'+
+        '<div style="flex:1;min-width:220px;">'+
+          '<div style="font-size:.7rem;color:var(--gray);font-weight:600;">LINHA '+l.numero+'</div>'+
+          '<div style="font-size:1rem;font-weight:700;color:var(--primary);">'+l.nome+'</div>'+
+          '<div style="font-size:.78rem;color:var(--gray);margin-top:4px;">'+
+            'Teto '+l.vagas_total+' · Ocupadas '+l.ocupadas+' (pré-projetos enviados) · '+
+            '<strong style="color:'+(l.disponiveis>0?'#166534':'#c1121f')+';">'+l.disponiveis+' disponível(is)</strong>'+
+            (cheia?' · <span style="color:#c1121f;font-weight:600;">LINHA CHEIA</span>':'')+
+          '</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:flex-end;gap:10px;">'+
+          '<div class="form-group" style="margin-bottom:0;max-width:120px;">'+
+            '<label style="font-size:.7rem;">Vagas abertas</label>'+
+            '<input type="number" min="0" max="40" id="vag-'+l.numero+'" value="'+l.vagas_abertas+'" style="text-align:center;"/>'+
+          '</div>'+
+          '<label style="display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--gray);white-space:nowrap;margin-bottom:8px;">'+
+            '<input type="checkbox" id="mos-'+l.numero+'" '+(l.mostrar_vagas?'checked':'')+'/> exibir nº</label>'+
+          '<button class="btn btn-primary btn-sm" onclick="salvarVagas('+l.numero+')" style="margin-bottom:4px;">Salvar</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function salvarVagas(numero){
+  const abertas = parseInt(document.getElementById('vag-'+numero).value,10)||0;
+  const mostrar = document.getElementById('mos-'+numero).checked;
+  const {error}=await sb.from('funil_linhas').update({vagas_abertas:abertas,mostrar_vagas:mostrar}).eq('numero',numero);
+  if(error){toast('Erro ao salvar: '+error.message,'error');return;}
+  toast('Vagas atualizadas.','success');
+  carregarVagas();
+}
+
+let candidatosCache=[], linhasFunilCache=[];
+
+async function carregarCandidatos(){
+  const tbody=document.getElementById('lista-candidatos');
+  if(!linhasFunilCache.length){
+    const {data:ls}=await sb.from('funil_linhas').select('numero,nome');
+    linhasFunilCache=ls||[];
+  }
+  let q=sb.from('candidatos').select('*').order('criado_em',{ascending:false});
+  const etapa=document.getElementById('cf-etapa').value;
+  const prog=document.getElementById('cf-prog').value;
+  const origem=document.getElementById('cf-origem').value;
+  if(etapa) q=q.eq('etapa',etapa);
+  if(prog)  q=q.eq('programa',prog);
+  if(origem) q=q.ilike('origem', origem+'%');
+
+  const {data,error}=await q;
+  if(error){tbody.innerHTML='<tr><td colspan="6" class="empty">Erro: '+error.message+'</td></tr>';return;}
+  candidatosCache=data||[];
+
+  // KPIs (sempre do total, não do filtro)
+  const {data:todos}=await sb.from('candidatos').select('etapa,resultado');
+  const t=todos||[];
+  document.getElementById('cf-total').textContent=t.length;
+  document.getElementById('cf-analise').textContent=t.filter(c=>c.etapa==='em_analise'||c.etapa==='projeto_recebido').length;
+  document.getElementById('cf-aprovados').textContent=t.filter(c=>c.resultado==='aprovado').length;
+  document.getElementById('cf-matriculados').textContent=t.filter(c=>c.etapa==='matriculado').length;
+
+  if(!candidatosCache.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Nenhum candidato nesta seleção.</td></tr>';return;}
+
+  const etapaLabel={pre_inscricao:'Pré-inscrição',qualificacao:'Qualificação',linha_escolhida:'Linha escolhida',projeto_elaboracao:'Elaborando projeto',projeto_recebido:'Projeto recebido',em_analise:'Em análise',ajustes_solicitados:'Ajustes',aprovado:'Aprovado',condicao_concedida:'Condição concedida',matricula_iniciada:'Matrícula iniciada',documentos_pendentes:'Docs pendentes',pagamento_pendente:'Pagto pendente',matriculado:'Matriculado',perdido:'Perdido',lista_espera:'Lista de espera'};
+  const etapaCor={aprovado:'badge-green',matriculado:'badge-green',em_analise:'badge-yellow',projeto_recebido:'badge-yellow',perdido:'badge-gray',lista_espera:'badge-gray',nao_aprovado:'badge-gray'};
+
+  tbody.innerHTML=candidatosCache.map(function(c,i){
+    const linha=linhasFunilCache.find(l=>l.numero===c.linha_id);
+    const cor=etapaCor[c.etapa]||'badge-blue';
+    return '<tr>'+
+      '<td><strong>'+c.nome+'</strong><div style="font-size:.72rem;color:var(--gray);">'+(c.email||'')+' · '+(c.telefone||'')+(c.origem?' · <span style="color:#145da0;">'+c.origem+'</span>':'')+'</div></td>'+
+      '<td style="text-transform:capitalize;">'+(c.programa||'—')+'</td>'+
+      '<td style="font-size:.82rem;">'+(linha?linha.nome:'<span style="color:#9aa4b1;">não escolhida</span>')+'</td>'+
+      '<td style="text-align:center;font-weight:600;">'+(c.aval_total!=null?c.aval_total:'—')+'</td>'+
+      '<td><span class="badge '+cor+'">'+(etapaLabel[c.etapa]||c.etapa)+'</span></td>'+
+      '<td style="white-space:nowrap;text-align:right;">'+
+        '<button class="btn btn-outline btn-sm" onclick="copiarLinkWhats('+i+')" title="Copiar mensagem para WhatsApp">WhatsApp</button> '+
+        '<button class="btn btn-primary btn-sm" onclick="abrirCandidato('+i+')">Abrir</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function copiarLinkWhats(i){
+  const c=candidatosCache[i];
+  const link=FUNIL_URL+'?c='+c.token;
+  const primeiro=(c.nome||'').split(' ')[0];
+  const msg='Olá, '+primeiro+'! Aqui é da Saint Alcuin of York. '+
+    'Acompanhe sua candidatura ao processo seletivo por este link: '+link;
+  navigator.clipboard.writeText(msg).then(function(){
+    toast('Mensagem copiada. Cole no WhatsApp do candidato.','success');
+  }).catch(function(){
+    prompt('Copie a mensagem:', msg);
+  });
+}
+
+function abrirCandidato(i){
+  const c=candidatosCache[i];
+  const link=FUNIL_URL+'?c='+c.token;
+  alert('Ficha completa do candidato e avaliação do pré-projeto: em construção (próxima etapa da Fatia 2).\\n\\nCandidato: '+c.nome+'\\nLink de acompanhamento:\\n'+link);
+}
+
 async function fazerLogout(){
   await sb.auth.signOut();
   document.getElementById('app').classList.remove('active');
@@ -1524,6 +1697,8 @@ function showTab(name,el){
   document.getElementById('tab-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el)el.classList.add('active');
+  if(name==='vagas')   carregarVagas();
+  if(name==='selecao') carregarCandidatos();
 }
 
 async function carregarCursos(){
