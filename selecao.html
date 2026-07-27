@@ -128,6 +128,45 @@
   .rodape{background:var(--white);border-top:1px solid var(--border);padding:28px 0;text-align:center;
           font-size:.78rem;color:var(--gray);}
 
+  .upload-box{border:2px dashed var(--border);border-radius:12px;padding:34px 20px;text-align:center;
+             cursor:pointer;transition:border-color .15s,background .15s;margin-top:6px;}
+  .upload-box:hover{border-color:var(--secondary);background:#f8fafd;}
+  .upload-box.tem-arquivo{border-color:var(--green);background:#f4faf6;border-style:solid;}
+  .upload-box svg{width:34px;height:34px;stroke:var(--secondary);stroke-width:1.6;fill:none;margin-bottom:10px;}
+  .upload-box.tem-arquivo svg{stroke:var(--green);}
+  .upload-txt{font-size:.95rem;font-weight:600;color:var(--primary);}
+  .upload-sub{font-size:.78rem;color:var(--gray);margin-top:4px;}
+
+  .opc-card{border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:12px;
+            cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;background:var(--white);}
+  .opc-card:hover{border-color:var(--secondary);box-shadow:0 6px 18px rgba(11,42,74,.08);transform:translateY(-1px);}
+  .opc-card.cheia{cursor:default;opacity:.75;}
+  .opc-card.cheia:hover{border-color:var(--border);box-shadow:none;transform:none;}
+  .opc-nome{font-size:1.02rem;font-weight:700;color:var(--primary);margin-bottom:3px;}
+  .opc-nivel{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--secondary);}
+  .opc-desc{font-size:.84rem;color:var(--gray);margin-top:6px;line-height:1.5;}
+  .opc-rodape{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:12px;}
+  .opc-vagas{font-size:.8rem;font-weight:600;}
+  .opc-vagas.tem{color:var(--green);}
+  .opc-vagas.zero{color:#c1121f;}
+  .opc-btn{font-size:.82rem;font-weight:600;color:var(--secondary);display:flex;align-items:center;gap:5px;}
+
+  .tl{position:relative;padding-left:0;margin-top:20px;}
+  .tl-item{display:flex;gap:14px;padding-bottom:4px;}
+  .tl-eixo{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .tl-no{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+         border:3px solid #fff;box-shadow:0 0 0 1px var(--border);flex-shrink:0;z-index:1;background:#fff;}
+  .tl-no svg{width:13px;height:13px;stroke-width:2.4;fill:none;}
+  .tl-no.ok{background:#eaf6ee;}.tl-no.ok svg{stroke:var(--green);}
+  .tl-no.atual{background:#eef4fb;}.tl-no.atual svg{stroke:var(--secondary);}
+  .tl-no.wait{background:#fff7ed;}.tl-no.wait svg{stroke:#d97706;}
+  .tl-no.lock{background:#f3f4f6;}.tl-no.lock svg{stroke:#9aa4b1;}
+  .tl-linha{width:2px;flex:1;background:var(--border);min-height:22px;}
+  .tl-txt{padding-bottom:20px;padding-top:3px;}
+  .tl-et{font-size:.9rem;font-weight:600;color:var(--primary);}
+  .tl-st{font-size:.78rem;color:var(--gray);margin-top:1px;}
+  .tl-item:last-child .tl-linha{display:none;}
+
   @media(max-width:720px){
     h1.hero-t{font-size:1.7rem;}
     .valores,.req-grid{grid-template-columns:1fr;}
@@ -259,8 +298,6 @@
         <div class="fg"><label>Programa desejado *</label>
           <select id="f-prog"><option value="">Selecione</option><option value="mestrado">Mestrado</option><option value="doutorado">Doutorado</option></select></div>
         <div class="fg"><label>Formação acadêmica *</label><input id="f-form" type="text" placeholder="Ex.: Licenciatura em Pedagogia"/></div>
-        <div class="fg"><label>Instituição de formação</label><input id="f-inst" type="text"/></div>
-        <div class="fg"><label>Ano de conclusão</label><input id="f-ano" type="number" min="1960" max="2030" placeholder="AAAA"/></div>
       </div>
       <div class="fg full"><label>Situação do pré-projeto</label>
         <select id="f-projsit">
@@ -269,14 +306,6 @@
           <option value="ideia">Tenho apenas uma ideia inicial</option>
           <option value="sem_tema">Ainda não defini o tema</option>
           <option value="precisa_orientacao">Preciso de orientação</option>
-        </select></div>
-      <div class="fg full"><label>Quando pretende iniciar?</label>
-        <select id="f-prazo">
-          <option value="">Selecione</option>
-          <option value="imediato">Desejo iniciar imediatamente</option>
-          <option value="30d">Em até 30 dias</option>
-          <option value="90d">Em até 90 dias</option>
-          <option value="pesquisando">Estou apenas pesquisando</option>
         </select></div>
       <div class="form-nav">
         <button class="btn btn-outline" onclick="passo(1)">Voltar</button>
@@ -289,12 +318,14 @@
       <div class="form-passo-lab">Passo 3 de 3</div>
       <h2 class="serif">Confirmação</h2>
       <p class="desc">Uma última informação antes de registrar sua candidatura.</p>
-      <div class="fg full"><label>Caso seja aprovado na análise acadêmica, você teria disponibilidade para a mensalidade da condição especial (R$ 400 no mestrado ou R$ 500 no doutorado)?</label>
+      <div style="background:#eef4fb;border:1px solid #d8e6f6;border-radius:10px;padding:16px 18px;margin-bottom:18px;font-size:.86rem;color:var(--primary);line-height:1.6;">
+        Caso seu pré-projeto seja aprovado pela instituição, o valor da mensalidade poderá ter um <strong>desconto de 50%</strong>. Caso haja necessidade de ajustes na proposta, você será avisado.
+      </div>
+      <div class="fg full"><label>Sendo aprovado, você gostaria de aproveitar a condição especial e iniciar o curso?</label>
         <select id="f-fin">
           <option value="">Selecione</option>
-          <option value="sim">Sim</option>
-          <option value="entender">Preciso entender melhor as condições</option>
-          <option value="nao">Não neste momento</option>
+          <option value="sim">Sim, tenho interesse em iniciar</option>
+          <option value="entender">Sim, mas gostaria de saber mais detalhes</option>
         </select></div>
       <div class="lgpd">
         <input type="checkbox" id="f-lgpd"/>
@@ -313,6 +344,76 @@
   <div class="form-wrap">
     <div class="form-card">
       <div class="resultado" id="res-conteudo"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TELA: ESCOLHA DE CURSO ===================== -->
+<div class="tela" id="tela-curso">
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-passo-lab">Etapa · Programa</div>
+      <h2 class="serif">Escolha o programa</h2>
+      <p class="desc">Selecione o curso ao qual deseja se candidatar.</p>
+      <div id="lista-cursos"><div style="color:var(--gray);font-size:.9rem;">Carregando cursos...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TELA: ESCOLHA DE LINHA ===================== -->
+<div class="tela" id="tela-linha">
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-passo-lab">Etapa · Linha de pesquisa</div>
+      <h2 class="serif">Escolha a linha de pesquisa</h2>
+      <p class="desc" id="linha-desc">Selecione a linha mais relacionada à sua formação, experiência ou tema de interesse.</p>
+      <div id="lista-linhas"><div style="color:var(--gray);font-size:.9rem;">Carregando linhas...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TELA: PRÉ-PROJETO (upload) ===================== -->
+<div class="tela" id="tela-projeto">
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-passo-lab">Etapa · Pré-projeto</div>
+      <h2 class="serif">Apresente sua proposta de pesquisa</h2>
+      <p class="desc">Seu pré-projeto será usado para verificar a aderência do tema à linha escolhida, sua relevância e a viabilidade inicial. O documento não precisa estar em versão definitiva.</p>
+
+      <div class="fg full">
+        <label>Título provisório da pesquisa</label>
+        <input id="pp-titulo" type="text" placeholder="Um título de trabalho para sua proposta"/>
+      </div>
+
+      <div class="upload-box" id="upload-box" onclick="document.getElementById('pp-file').click()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg>
+        <div class="upload-txt" id="upload-txt">Clique para enviar seu pré-projeto</div>
+        <div class="upload-sub">PDF, DOC ou DOCX · até 15 MB</div>
+        <input type="file" id="pp-file" accept=".pdf,.doc,.docx" style="display:none" onchange="arquivoEscolhido(event)"/>
+      </div>
+
+      <div class="lgpd" style="margin-top:18px;">
+        <input type="checkbox" id="pp-confirma"/>
+        <label for="pp-confirma" style="margin:0;font-weight:400;cursor:pointer;">Confirmo que as informações apresentadas correspondem à minha proposta de pesquisa e poderão ser analisadas pela comissão acadêmica.</label>
+      </div>
+
+      <div class="form-nav">
+        <button class="btn btn-outline" onclick="voltarParaLinha()">Voltar</button>
+        <button class="btn btn-primary" id="btn-enviar-pp" onclick="enviarPreProjeto()">Enviar para análise acadêmica</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TELA: ACOMPANHAMENTO ===================== -->
+<div class="tela" id="tela-acompanhar">
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-passo-lab" id="ac-programa">Acompanhamento</div>
+      <h2 class="serif" id="ac-nome">Sua candidatura</h2>
+      <p class="desc" id="ac-sub">Acompanhe o andamento do seu processo seletivo.</p>
+      <div id="ac-timeline"></div>
+      <div id="ac-acao" style="margin-top:24px;"></div>
     </div>
   </div>
 </div>
@@ -374,14 +475,11 @@ function val(id){return (document.getElementById(id).value||'').trim();}
 function qualificar(){
   const prog = val('f-prog');
   const form = val('f-form').toLowerCase();
-  const fin  = val('f-fin');
   // doutorado exige mestrado declarado na formação
   if(prog==='doutorado'){
     const temMestrado = /mestr|máster|master|magíster|magister/.test(form);
     if(!temMestrado) return 'analise'; // não bloqueia, manda p/ análise manual
   }
-  // sem disponibilidade financeira agora -> análise manual (nutrição), não recusa
-  if(fin==='nao') return 'analise';
   return 'apto';
 }
 
@@ -396,12 +494,11 @@ async function enviarPreInscricao(){
   const registro = {
     nome:val('f-nome'), documento:val('f-doc'), telefone:val('f-tel'),
     email:val('f-email'), cidade:val('f-cidade'), estado:val('f-estado').toUpperCase(),
-    profissao:val('f-prof'), formacao:val('f-form'), instituicao:val('f-inst'),
-    ano_conclusao: val('f-ano')?parseInt(val('f-ano')):null,
-    programa:val('f-prog'), prazo_ingresso:val('f-prazo'),
+    profissao:val('f-prof'), formacao:val('f-form'),
+    programa:val('f-prog'),
     situacao_projeto:val('f-projsit'), disponibilidade_fin:val('f-fin'),
     qualificacao:q,
-    etapa: q==='apto' ? 'qualificacao' : 'qualificacao',
+    etapa:'qualificacao',
     consentimento:true, consent_em:new Date().toISOString(),
     origem: ORIGEM_CANDIDATO
   };
@@ -424,7 +521,7 @@ function mostrarResultado(q, token){
     + '<div class="res-ic ok"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>'
     + '<h2 class="serif">Sua formação atende aos requisitos iniciais</h2>'
     + '<p>Você está apto a continuar no processo seletivo. O próximo passo é escolher a linha de pesquisa mais relacionada à sua formação, experiência ou tema de interesse.</p>'
-    + '<div style="margin-top:22px;"><button class="btn btn-primary btn-lg" onclick="alert(\'Próxima etapa: Escolha da linha de pesquisa (em construção).\')">Escolher linha de pesquisa</button></div>'
+    + '<div style="margin-top:22px;"><button class="btn btn-primary btn-lg" onclick="irEscolherCurso()">Escolher programa e linha</button></div>'
     + '<p style="margin-top:20px;font-size:.8rem;">Guarde este link para acompanhar sua candidatura:<br><code style="font-size:.8rem;color:#145da0;">?c='+token+'</code></p>';
   } else {
     el.innerHTML = ''
@@ -435,6 +532,199 @@ function mostrarResultado(q, token){
   }
   irPara('resultado');
 }
+
+// ===================== FLUXO: CURSO -> LINHA -> PRÉ-PROJETO =====================
+let CAND_TOKEN=null, CAND=null, cursoEscolhido=null, linhaEscolhida=null, arquivoPP=null;
+const MAX_MB_PP=15;
+
+function tokenAtual(){
+  if(CAND_TOKEN) return CAND_TOKEN;
+  try{ return localStorage.getItem('say_cand_token'); }catch(e){ return null; }
+}
+
+async function irEscolherCurso(){
+  CAND_TOKEN = CAND_TOKEN || tokenAtual();
+  irPara('curso');
+  const el=document.getElementById('lista-cursos');
+  const {data,error}=await sb.from('cursos_selecao').select('*');
+  if(error){el.innerHTML='<div style="color:#c1121f;font-size:.9rem;">Erro ao carregar cursos.</div>';return;}
+  if(!data||!data.length){el.innerHTML='<div style="color:var(--gray);">Nenhum curso aberto para seleção no momento.</div>';return;}
+  el.innerHTML=data.map(function(c){
+    return '<div class="opc-card" onclick="escolherCurso(\''+c.id+'\',\''+(c.nome||'').replace(/\\x27/g,"")+'\',\''+(c.nivel||'')+'\')">'+
+      '<div class="opc-nivel">'+(c.nivel||'')+'</div>'+
+      '<div class="opc-nome">'+c.nome+'</div>'+
+      (c.descricao?'<div class="opc-desc">'+c.descricao+'</div>':'')+
+      '<div class="opc-rodape"><span></span><span class="opc-btn">Selecionar →</span></div>'+
+    '</div>';
+  }).join('');
+}
+
+async function escolherCurso(id,nome,nivel){
+  cursoEscolhido={id:id,nome:nome,nivel:nivel};
+  const prog = (nivel||'').toLowerCase().indexOf('doutor')>=0 ? 'doutorado' : 'mestrado';
+  // grava curso na candidatura
+  const tk=tokenAtual();
+  if(tk) await sb.from('candidatos').update({curso_id:id, programa:prog, etapa:'linha_escolhida'}).eq('token',tk);
+  irEscolherLinha();
+}
+
+async function irEscolherLinha(){
+  irPara('linha');
+  document.getElementById('linha-desc').textContent='Linhas de pesquisa do '+(cursoEscolhido?cursoEscolhido.nome:'programa')+'. Escolha a mais relacionada ao seu tema.';
+  const el=document.getElementById('lista-linhas');
+  const {data,error}=await sb.from('vagas_por_linha').select('*').eq('curso_id',cursoEscolhido.id);
+  if(error){el.innerHTML='<div style="color:#c1121f;font-size:.9rem;">Erro ao carregar linhas.</div>';return;}
+  if(!data||!data.length){
+    // curso sem linhas cadastradas -> segue direto ao pré-projeto
+    el.innerHTML='<div style="color:var(--gray);font-size:.9rem;margin-bottom:16px;">Este programa não exige escolha de linha. Você pode seguir direto para o envio do pré-projeto.</div>'+
+      '<button class="btn btn-primary" onclick="irProjeto()">Continuar para o pré-projeto</button>';
+    return;
+  }
+  el.innerHTML=data.map(function(l){
+    const cheia = l.disponiveis<=0;
+    const vagasTxt = l.mostrar_vagas
+      ? (cheia?'<span class="opc-vagas zero">Vagas encerradas</span>'
+             :'<span class="opc-vagas tem">'+l.disponiveis+' vaga(s) disponível(is)</span>')
+      : '<span></span>';
+    const acao = cheia
+      ? '<span class="opc-btn" style="color:#c1121f;">Entrar na lista de espera →</span>'
+      : '<span class="opc-btn">Escolher esta linha →</span>';
+    const onclick = cheia
+      ? 'entrarListaEspera(\''+l.linha_id+'\',\''+(l.nome||'').replace(/\\x27/g,"")+'\')'
+      : 'escolherLinha(\''+l.linha_id+'\',\''+(l.nome||'').replace(/\\x27/g,"")+'\')';
+    return '<div class="opc-card'+(cheia?' cheia':'')+'" onclick="'+onclick+'">'+
+      '<div class="opc-nome">'+l.nome+'</div>'+
+      (l.descricao?'<div class="opc-desc">'+l.descricao+'</div>':'')+
+      '<div class="opc-rodape">'+vagasTxt+acao+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function escolherLinha(id,nome){
+  linhaEscolhida={id:id,nome:nome};
+  const tk=tokenAtual();
+  if(tk) await sb.from('candidatos').update({linha_id:id, etapa:'projeto_elaboracao'}).eq('token',tk);
+  irPara('projeto');
+}
+
+async function entrarListaEspera(id,nome){
+  const tk=tokenAtual();
+  if(tk) await sb.from('candidatos').update({linha_id:id, etapa:'lista_espera'}).eq('token',tk);
+  const el=document.getElementById('lista-linhas');
+  el.innerHTML='<div class="resultado"><div class="res-ic wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>'+
+    '<h2 class="serif">Você entrou na lista de espera</h2>'+
+    '<p>A linha <strong>'+nome+'</strong> está com as vagas preenchidas no momento. Registramos seu interesse e a equipe acadêmica entrará em contato caso uma vaga seja aberta.</p></div>';
+}
+
+function voltarParaLinha(){ irEscolherLinha(); }
+function irProjeto(){ linhaEscolhida=null; irPara('projeto'); }
+
+function arquivoEscolhido(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  if(f.size > MAX_MB_PP*1024*1024){ alert('Arquivo muito grande (máx. '+MAX_MB_PP+' MB).'); ev.target.value=''; return; }
+  arquivoPP=f;
+  document.getElementById('upload-box').classList.add('tem-arquivo');
+  document.getElementById('upload-txt').textContent=f.name;
+}
+
+async function enviarPreProjeto(){
+  if(!arquivoPP){ alert('Envie o arquivo do seu pré-projeto (PDF, DOC ou DOCX).'); return; }
+  if(!document.getElementById('pp-confirma').checked){ alert('Confirme a declaração antes de enviar.'); return; }
+  const tk=tokenAtual();
+  if(!tk){ alert('Sessão não encontrada. Abra o link da sua candidatura para continuar.'); return; }
+
+  const btn=document.getElementById('btn-enviar-pp');
+  btn.disabled=true; btn.textContent='Enviando...';
+
+  const ext=(arquivoPP.name.split('.').pop()||'pdf').toLowerCase();
+  const path='candidato-'+tk+'-'+Date.now()+'.'+ext;
+  const up=await sb.storage.from('pre-projetos').upload(path, arquivoPP, {upsert:false});
+  if(up.error){ btn.disabled=false; btn.textContent='Enviar para análise acadêmica'; alert('Falha no envio do arquivo. Tente novamente.'); console.error(up.error); return; }
+
+  const {error}=await sb.from('candidatos').update({
+    proj_titulo: (document.getElementById('pp-titulo').value||'').trim() || null,
+    proj_arquivo_url: path,
+    proj_enviado_em: new Date().toISOString(),
+    etapa:'projeto_recebido'
+  }).eq('token',tk);
+  if(error){ btn.disabled=false; btn.textContent='Enviar para análise acadêmica'; alert('Arquivo enviado, mas houve erro ao registrar. Fale com a equipe.'); return; }
+
+  abrirAcompanhamento(tk);
+}
+
+// ===================== ACOMPANHAMENTO POR TOKEN =====================
+const ETAPAS_TL=[
+  {chave:'pre_inscricao',   nome:'Pré-inscrição'},
+  {chave:'linha_escolhida', nome:'Linha de pesquisa'},
+  {chave:'projeto_recebido',nome:'Pré-projeto'},
+  {chave:'em_analise',      nome:'Análise acadêmica'},
+  {chave:'aprovado',        nome:'Resultado'},
+  {chave:'matriculado',     nome:'Matrícula'}
+];
+const ORDEM_ETAPA={pre_inscricao:0,qualificacao:0,linha_escolhida:1,projeto_elaboracao:1,lista_espera:1,
+  projeto_recebido:2,em_analise:3,ajustes_solicitados:3,aprovado:4,condicao_concedida:4,nao_aprovado:4,
+  matricula_iniciada:5,documentos_pendentes:5,pagamento_pendente:5,matriculado:5};
+
+async function abrirAcompanhamento(tk){
+  const {data,error}=await sb.from('candidatos').select('*').eq('token',tk).single();
+  if(error||!data){ alert('Candidatura não encontrada.'); irPara('anuncio'); return; }
+  CAND=data; CAND_TOKEN=tk;
+
+  document.getElementById('ac-programa').textContent='Processo Seletivo · '+((data.programa||'').charAt(0).toUpperCase()+(data.programa||'').slice(1));
+  document.getElementById('ac-nome').textContent=(data.nome||'').split(' ')[0]+', acompanhe sua candidatura';
+  document.getElementById('ac-sub').textContent='Veja em que etapa você está e qual é o próximo passo.';
+
+  const pos = ORDEM_ETAPA[data.etapa] !== undefined ? ORDEM_ETAPA[data.etapa] : 0;
+  const SVG={ok:'<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>',
+    atual:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/></svg>',
+    wait:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    lock:'<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'};
+  const stTxt={0:'Concluída',1:'Concluída',2:'Concluída',3:'Concluída',4:'Concluída',5:'Concluída'};
+
+  const tl=ETAPAS_TL.map(function(et,i){
+    let cls,ic,st;
+    if(i<pos){ cls='ok'; ic=SVG.ok; st='Concluída'; }
+    else if(i===pos){
+      if(data.etapa==='projeto_recebido'||data.etapa==='em_analise'){ cls='wait'; ic=SVG.wait; st='Em andamento'; }
+      else { cls='atual'; ic=SVG.atual; st='Em andamento'; }
+    }
+    else { cls='lock'; ic=SVG.lock; st='Aguardando'; }
+    // rótulo de espera especial
+    if(et.chave==='linha_escolhida' && data.etapa==='lista_espera'){ cls='wait'; ic=SVG.wait; st='Lista de espera'; }
+    return '<div class="tl-item"><div class="tl-eixo"><div class="tl-no '+cls+'">'+ic+'</div><div class="tl-linha"></div></div>'+
+      '<div class="tl-txt"><div class="tl-et">'+et.nome+'</div><div class="tl-st">'+st+'</div></div></div>';
+  }).join('');
+  document.getElementById('ac-timeline').innerHTML='<div class="tl">'+tl+'</div>';
+
+  // ação conforme etapa
+  const acao=document.getElementById('ac-acao');
+  if(data.etapa==='linha_escolhida' || data.etapa==='qualificacao'){
+    acao.innerHTML='<button class="btn btn-primary btn-lg" onclick="retomarFluxo()">Continuar minha candidatura</button>';
+  } else if(data.etapa==='projeto_elaboracao'){
+    acao.innerHTML='<button class="btn btn-primary btn-lg" onclick="irProjeto()">Enviar meu pré-projeto</button>';
+  } else if(data.resultado==='aprovado'){
+    acao.innerHTML='<div style="background:#f4faf6;border:1px solid #cce9d5;border-radius:10px;padding:16px 18px;color:#166534;font-size:.9rem;">Pré-projeto aprovado. A equipe entrará em contato para a matrícula com a condição especial.</div>';
+  } else {
+    acao.innerHTML='<div style="color:var(--gray);font-size:.85rem;">Assim que houver novidade, você será avisado pelos dados informados.</div>';
+  }
+  irPara('acompanhar');
+}
+
+async function retomarFluxo(){
+  // reconstrói curso/linha a partir da candidatura e volta ao ponto certo
+  if(CAND && CAND.curso_id){
+    const {data:cur}=await sb.from('cursos').select('id,nome,nivel').eq('id',CAND.curso_id).single();
+    if(cur){ cursoEscolhido={id:cur.id,nome:cur.nome,nivel:cur.nivel}; irEscolherLinha(); return; }
+  }
+  irEscolherCurso();
+}
+
+// Se a página abrir com ?c=token, mostra o acompanhamento direto
+(function(){
+  const p=new URLSearchParams(location.search);
+  const c=p.get('c');
+  if(c){ CAND_TOKEN=c; try{localStorage.setItem('say_cand_token',c);}catch(e){} abrirAcompanhamento(c); }
+})();
 </script>
 </body>
 </html>
