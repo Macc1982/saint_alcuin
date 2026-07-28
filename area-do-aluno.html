@@ -850,7 +850,7 @@ async function carregarMateriais(){
   const [{data:vw}, {data:raw}] = await Promise.all([
     sb.from('vw_materiais').select('*').eq('curso_id',estudante.curso_id)
       .order('grupo').order('ordem').order('created_at'),
-    sb.from('materiais').select('id,categoria,aviso,autor_original,instituicao_origem,licenca,url_original')
+    sb.from('materiais').select('id,categoria,aviso,autor_original,instituicao_origem,licenca,url_original,capa_url,autor,ano')
       .eq('curso_id',estudante.curso_id)
   ]);
 
@@ -958,25 +958,39 @@ function renderGrupos(itens,tipo){
       '</section>';
     }
 
-    return '<div class="grupo-card">'+
-      '<div class="grupo-head">'+
-        '<div class="grupo-nome">'+nome+'</div>'+
-        '<div class="grupo-sub">'+lista.length+' documento'+(lista.length===1?'':'s')+'</div>'+
+    return '<div class="mat-estante-bloco">'+
+      '<div class="estante-area"><b>'+nome+'</b><small>'+lista.length+' material'+(lista.length===1?'':'is')+'</small></div>'+
+      '<div class="estante-grade">'+
+        lista.map(function(m){
+          return '<a href="'+m.url+'" target="_blank" rel="noopener" class="livro" title="'+m.titulo.replace(/"/g,'&quot;')+'">'+
+            capaMaterialHTML(m)+
+            '<div class="livro-info">'+
+              '<div class="livro-titulo">'+m.titulo+'</div>'+
+              (m.autor?'<div class="livro-autor">'+m.autor+'</div>':'')+
+            '</div>'+
+          '</a>';
+        }).join('')+
       '</div>'+
-      lista.map(function(m){
-        return '<div class="doc-linha">'+
-          '<div class="doc-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h2"/></svg></div>'+
-          '<div class="doc-info">'+
-            '<div class="doc-titulo" title="'+m.titulo.replace(/"/g,'&quot;')+'">'+m.titulo+'</div>'+
-            (m.descricao?'<div class="doc-desc">'+m.descricao+'</div>':'')+
-            creditoHTML(m)+
-          '</div>'+
-          '<a href="'+m.url+'" target="_blank" rel="noopener" class="doc-abrir">'+
-            '<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>Abrir PDF</a>'+
-        '</div>';
-      }).join('')+
     '</div>';
   }).join('');
+}
+
+function capaMaterialHTML(m){
+  if(m.capa_url){
+    return '<div class="capa"><img src="'+m.capa_url+'" alt="'+(m.titulo||'').replace(/"/g,'')+'"/></div>';
+  }
+  const ano=m.ano||'';
+  const n=(m.titulo||'').length;
+  const cls=n>44?' t-xs':n>28?' t-sm':'';
+  return '<div class="capa capa-gerada">'+
+    '<div class="capa-topo"></div>'+
+    '<div class="capa-corpo">'+
+      '<div class="capa-titulo'+cls+'">'+(m.titulo||'')+'</div>'+
+      '<div class="capa-rule"></div>'+
+      '<div class="capa-autor">'+(m.autor||'')+'</div>'+
+    '</div>'+
+    '<div class="capa-pe"><span class="capa-marca">SAY</span><span>'+ano+'</span></div>'+
+  '</div>';
 }
 
 async function carregarDisciplinas(){
