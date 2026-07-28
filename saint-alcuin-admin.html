@@ -1118,8 +1118,8 @@
         </div>
         <div class="table-wrap">
           <table class="data-table tabela-notas-full">
-            <thead><tr><th>Aluno</th><th>Disciplina</th><th style="text-align:center">N1</th><th style="text-align:center">N2</th><th style="text-align:center">Trab.</th><th style="text-align:center">Média</th><th style="text-align:right">Situação</th></tr></thead>
-            <tbody id="tabela-notas"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
+            <thead><tr><th>Aluno</th><th>Disciplina</th><th style="text-align:center">N1</th><th style="text-align:center">N2</th><th style="text-align:center">Trab.</th><th style="text-align:center">Média</th><th style="text-align:center">Situação</th><th style="text-align:right">Ações</th></tr></thead>
+            <tbody id="tabela-notas"><tr><td colspan="8" class="loading">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -3610,12 +3610,38 @@ async function carregarNotas(){
   if(filtro)q=q.eq('aluno_id',filtro);
   const{data}=await q;
   const tbody=document.getElementById('tabela-notas');
-  if(!data?.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Nenhuma nota lançada.</td></tr>';return;}
+  if(!data?.length){tbody.innerHTML='<tr><td colspan="8" class="empty">Nenhuma nota lançada.</td></tr>';return;}
   tbody.innerHTML=data.map(n=>{
     const m=n.media||0;
     const[cls,sit]=m>=7?['badge-green','Aprovado']:m>=5?['badge-blue','Recuperação']:['badge-red','Reprovado'];
-    return`<tr><td>${n.estudantes?.nome||'—'}</td><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+    return`<tr><td>${n.estudantes?.nome||'—'}</td><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td><td style="white-space:nowrap;text-align:right;"><button class="btn btn-outline btn-sm" onclick="editarNota('${n.id}')">Editar</button> <button class="btn btn-danger btn-sm" onclick="excluirNota('${n.id}','${(n.estudantes?.nome||'').replace(/'/g,"")}','${(n.disciplinas?.nome||'').replace(/'/g,"")}')">Excluir</button></td></tr>`;
   }).join('');
+}
+
+let notasCache=[];
+
+async function editarNota(id){
+  // busca a nota e preenche o formulário de lançamento para reedição
+  const {data,error}=await sb.from('notas').select('*').eq('id',id).single();
+  if(error||!data){toast('Nota não encontrada.','error');return;}
+  document.getElementById('n-aluno').value=data.aluno_id;
+  document.getElementById('n-disc').value=data.disciplina_id;
+  document.getElementById('n-1').value=data.nota1??'';
+  document.getElementById('n-2').value=data.nota2??'';
+  document.getElementById('n-t').value=data.trabalho??'';
+  const mp=document.getElementById('media-preview');
+  if(mp&&data.media!=null) mp.textContent='Média: '+data.media;
+  // rola até o formulário
+  document.getElementById('n-aluno').scrollIntoView({behavior:'smooth',block:'center'});
+  toast('Edite os valores e clique em Salvar nota.','success');
+}
+
+async function excluirNota(id,aluno,disc){
+  if(!confirm('Excluir a nota de '+(aluno||'este aluno')+' na disciplina '+(disc||'')+'?\n\nEsta ação remove o registro de nota. A disciplina continua na trilha do aluno.')) return;
+  const {error}=await sb.from('notas').delete().eq('id',id);
+  if(error){toast('Erro ao excluir: '+error.message,'error');return;}
+  toast('Nota excluída.','success');
+  await carregarNotas();
 }
 
 /* ==========================================================================
