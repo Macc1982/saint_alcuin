@@ -640,7 +640,7 @@
         <div class="page-sub">Acervo digital da instituição — obras em domínio público e material licenciado</div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title" id="bib-form-title">Nova obra</div></div>
+          <div class="card-header"><div class="card-title" id="bib-form-title">Novo material</div></div>
           <input type="hidden" id="bib-id"/>
 
           <div class="fin-hint">
@@ -689,6 +689,13 @@
                 <option value="Metodologia da Pesquisa"></option>
                 <option value="Educação Inclusiva"></option>
               </datalist>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group"><label>Disciplina (material do aluno) *</label>
+              <select id="bib-disciplina"><option value="">Selecione a disciplina...</option></select>
+              <div style="font-size:.72rem;color:var(--gray);margin-top:4px;">O material aparece na estante do aluno, nesta disciplina.</div>
             </div>
           </div>
 
@@ -778,7 +785,7 @@
           </div>
 
           <div style="display:flex;gap:10px;margin-top:16px;">
-            <button class="btn btn-primary" id="btnBib" onclick="salvarObra()">Adicionar à biblioteca</button>
+            <button class="btn btn-primary" id="btnBib" onclick="salvarObra()">Adicionar material</button>
             <button class="btn btn-outline" id="btnCancelarBib" onclick="limparFormBib()" style="display:none;">Cancelar edição</button>
           </div>
         </div>
@@ -2481,7 +2488,7 @@ function limparFormBib(){
   document.getElementById('bib-previa').innerHTML='<div class="capa-previa-vazia">A capa aparece aqui</div>';
   document.getElementById('btnExtrair').disabled=true;
   bibFile=null; capaBlob=null; onOrigemBib();
-  document.getElementById('bib-form-title').textContent='Nova obra';
+  document.getElementById('bib-form-title').textContent='Novo material';
   document.getElementById('btnBib').textContent='Adicionar à biblioteca';
   document.getElementById('btnCancelarBib').style.display='none';
 }
@@ -2548,21 +2555,66 @@ async function salvarObra(){
   if(arquivo_url){ payload.arquivo_url=arquivo_url; payload.arquivo_path=arquivo_path; }
   if(origem==='nenhum' && id){ payload.arquivo_url=null; payload.arquivo_path=null; }
 
+  // Destino: MATERIAL de uma disciplina (a cara do site)
+  const disciplina_id = document.getElementById('bib-disciplina').value;
+  if(!disciplina_id){ toast('Selecione a disciplina do material.','error'); btn.disabled=false; btn.textContent=id?'Salvar alterações':'Adicionar material'; return; }
+  if(!arquivo_url){ toast('Envie o PDF do material.','error'); btn.disabled=false; btn.textContent=id?'Salvar alterações':'Adicionar material'; return; }
+
+  // curso da disciplina escolhida
+  const opt = document.querySelector('#bib-disciplina option[value="'+disciplina_id+'"]');
+  const curso_id_mat = opt ? opt.getAttribute('data-curso') : null;
+
+  const matPayload={
+    titulo, autor,
+    curso_id: curso_id_mat,
+    disciplina_id: disciplina_id,
+    tipo: 'pdf',
+    categoria: 'material',
+    url: arquivo_url,
+    capa_url: capa_url,
+    ano: parseInt(document.getElementById('bib-ano').value,10)||null,
+    descricao: document.getElementById('bib-resumo').value.trim()||null,
+    licenca: document.getElementById('bib-licenca').value||null,
+    autor_original: autor,
+    instituicao_origem: document.getElementById('bib-editora').value.trim()||null,
+    url_original: document.getElementById('bib-url-fonte').value.trim()||null
+  };
+
   btn.textContent='Salvando...';
   const {error} = id
-    ? await sb.from('biblioteca').update(payload).eq('id',id)
-    : await sb.from('biblioteca').insert(payload);
+    ? await sb.from('materiais').update(matPayload).eq('id',id)
+    : await sb.from('materiais').insert(matPayload);
 
   btn.disabled=false;
-  btn.textContent = id?'Salvar alterações':'Adicionar à biblioteca';
+  btn.textContent = id?'Salvar alterações':'Adicionar material';
   if(error){toast('Erro: '+error.message,'error');return;}
 
-  toast(id?'Obra atualizada.':'Obra adicionada à biblioteca.','success');
+  toast(id?'Material atualizado.':'Material adicionado.','success');
   limparFormBib();
   await carregarBiblioteca();
 }
 
 async function carregarBiblioteca(){
+  // popula o select de disciplina (agrupado por curso)
+  const selDisc=document.getElementById('bib-disciplina');
+  if(selDisc && discCache.length && selDisc.options.length<=1){
+    const porCurso={};
+    discCache.forEach(d=>{
+      const c=cursosCache.find(x=>x.id===d.curso_id);
+      const cn=c?c.nome:'Sem curso';
+      (porCurso[cn]=porCurso[cn]||[]).push(d);
+    });
+    let html='<option value="">Selecione a disciplina...</option>';
+    Object.keys(porCurso).sort().forEach(cn=>{
+      html+='<optgroup label="'+cn+'">';
+      porCurso[cn].sort((a,b)=>(a.nome||'').localeCompare(b.nome||'')).forEach(d=>{
+        html+='<option value="'+d.id+'" data-curso="'+d.curso_id+'">'+d.nome+'</option>';
+      });
+      html+='</optgroup>';
+    });
+    selDisc.innerHTML=html;
+  }
+
   const {data,error}=await sb.from('biblioteca').select('*')
     .order('destaque',{ascending:false}).order('autor').order('titulo');
   bibCache=data||[];
