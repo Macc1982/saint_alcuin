@@ -2186,6 +2186,7 @@ async function salvarPagamento(){
   btn.disabled=false; btn.textContent='Confirmar pagamento';
   if(error){toast('Erro: '+error.message,'error');return;}
   toast('Pagamento lançado!','success');
+  notificar(finAlunoAtual,'pagamento','Pagamento registrado', valor?('Parcela de R$ '+valor):null);
   fecharModal('modal-pagamento');
   await carregarFinanceiroAluno();
 }
@@ -2590,6 +2591,7 @@ async function salvarObra(){
   if(error){toast('Erro: '+error.message,'error');return;}
 
   toast(id?'Material atualizado.':'Material adicionado.','success');
+  if(!id && curso_id_mat){ notificarCurso(curso_id_mat,'material','Novo material disponível', titulo); }
   limparFormBib();
   await carregarBiblioteca();
 }
@@ -2924,6 +2926,7 @@ async function enviarDocumentos(){
   docFiles=[];
 
   if(ok)     toast(ok+' documento(s) enviado(s).','success');
+  if(ok)     notificar(alunoId,'documento','Novo documento anexado', ok+' documento(s) na sua área.');
   if(falhas) toast(falhas+' arquivo(s) falharam.','error');
   await carregarDocumentos();
 }
@@ -3608,6 +3611,7 @@ async function salvarCorrecao(){
   if(error){toast('Erro: '+error.message,'error');return;}
 
   toast(aplicar?'Correção salva e nota aplicada na média!':'Correção salva.','success');
+  if(entregaAtual && entregaAtual.aluno_id){ notificar(entregaAtual.aluno_id,'correcao','Trabalho corrigido', 'Nota '+nota+(feedback?' · com feedback':'')); }
   fecharModal('modal-corrigir');
   await Promise.all([carregarCorrecoes(),carregarAtividades(),carregarNotas()]);
 }
@@ -3650,10 +3654,31 @@ async function lancarNota(){
   const media=nota1&&nota2&&trabalho?+((nota1+nota2+trabalho)/3).toFixed(1):null;
   const{error}=await sb.from('notas').upsert({aluno_id,disciplina_id,nota1,nota2,trabalho,media},{onConflict:'aluno_id,disciplina_id'});
   if(error){toast('Erro: '+error.message,'error');return;}
+  const disc=discCache.find(d=>d.id===disciplina_id);
+  notificar(aluno_id,'nota','Nota lançada', (disc?disc.nome:'Disciplina')+(media!=null?' · média '+media:''));
   toast('Nota salva!','success');
   ['n-1','n-2','n-t'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('media-preview').textContent='';
   await carregarNotas();
+}
+
+// Helper: cria uma notificação in-app para o aluno
+async function notificar(aluno_id, tipo, titulo, descricao){
+  if(!aluno_id) return;
+  try{
+    await sb.from('notificacoes').insert({aluno_id, tipo, titulo, descricao:descricao||null});
+  }catch(e){ /* notificação é best-effort, não bloqueia a ação */ }
+}
+
+// Helper: notifica todos os alunos de um curso
+async function notificarCurso(curso_id, tipo, titulo, descricao){
+  if(!curso_id) return;
+  try{
+    const {data}=await sb.from('estudantes').select('id').eq('curso_id',curso_id);
+    if(!data||!data.length) return;
+    const linhas=data.map(a=>({aluno_id:a.id, tipo, titulo, descricao:descricao||null}));
+    await sb.from('notificacoes').insert(linhas);
+  }catch(e){ /* best-effort */ }
 }
 
 async function carregarNotas(){
@@ -4178,6 +4203,7 @@ async function confirmarLiberar(){
   btn.disabled=false;
   if(error){toast('Erro: '+error.message,'error');return;}
   toast(modo==='prazo'?'Prazo atualizado.':'Atividade liberada.','success');
+  if(modo!=='prazo'){ notificar(alunoId,'atividade','Nova atividade liberada','Você tem uma nova atividade na sua trilha.'); }
   fecharModal('modal-liberar');
   await carregarTrilhaAluno();
 }
