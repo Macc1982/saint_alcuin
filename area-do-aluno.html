@@ -15,6 +15,31 @@
   .site-header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:#E00000;}
   .btn-sair{display:flex;align-items:center;gap:7px;background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);font-size:.76rem;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;font-family:inherit;}
   .btn-sair:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4);color:#fff;}
+  .notif-wrap{position:relative;margin-right:12px;}
+  .notif-btn{position:relative;background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);width:38px;height:38px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s;}
+  .notif-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4);color:#fff;}
+  .notif-badge{position:absolute;top:-5px;right:-5px;background:#E00000;color:#fff;font-size:.62rem;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--primary);}
+  .notif-painel{display:none;position:absolute;top:46px;right:0;width:340px;max-width:88vw;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgba(11,42,74,.18);z-index:100;overflow:hidden;}
+  .notif-painel.aberto{display:block;}
+  .notif-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border);font-size:.86rem;font-weight:700;color:var(--primary);}
+  .notif-limpar{background:none;border:none;color:var(--secondary);font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .notif-limpar:hover{text-decoration:underline;}
+  #notif-lista{max-height:400px;overflow-y:auto;}
+  .notif-item{display:flex;gap:11px;padding:12px 16px;border-bottom:1px solid #f0f3f7;cursor:default;}
+  .notif-item.nao-lida{background:#f5f9ff;}
+  .notif-ic{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .notif-ic svg{width:16px;height:16px;stroke-width:1.9;fill:none;}
+  .notif-ic.nota{background:#eaf6ee;}.notif-ic.nota svg{stroke:#166534;}
+  .notif-ic.material{background:#eef4fb;}.notif-ic.material svg{stroke:#145da0;}
+  .notif-ic.pagamento{background:#fff7ed;}.notif-ic.pagamento svg{stroke:#d97706;}
+  .notif-ic.documento{background:#f3f0fb;}.notif-ic.documento svg{stroke:#6d28d9;}
+  .notif-ic.atividade{background:#eef4fb;}.notif-ic.atividade svg{stroke:#145da0;}
+  .notif-ic.correcao{background:#eaf6ee;}.notif-ic.correcao svg{stroke:#166534;}
+  .notif-txt{flex:1;min-width:0;}
+  .notif-titulo{font-size:.83rem;font-weight:600;color:var(--primary);}
+  .notif-desc{font-size:.76rem;color:var(--gray);margin-top:1px;line-height:1.4;}
+  .notif-quando{font-size:.68rem;color:#9aa4b1;margin-top:3px;}
+  .notif-vazio{padding:28px 16px;text-align:center;color:var(--gray);font-size:.82rem;}
   .header-brand-name{font-size:1rem;font-weight:700;}
   .header-brand-sub{font-size:.58rem;opacity:.72;letter-spacing:.1em;text-transform:uppercase;}
   .btn{font-family:"Segoe UI",sans-serif;font-size:.82rem;font-weight:600;padding:9px 22px;border-radius:6px;cursor:pointer;border:none;transition:all .18s;}
@@ -458,6 +483,17 @@
       </div>
       <input type="file" id="avatarInput" accept="image/*" onchange="enviarAvatar(event)"/>
 
+      <div class="notif-wrap">
+        <button class="notif-btn" onclick="toggleNotif()" title="Notificações" aria-label="Notificações">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
+        </button>
+        <div class="notif-painel" id="notif-painel">
+          <div class="notif-head"><span>Notificações</span><button onclick="marcarTodasLidas()" class="notif-limpar">Marcar todas como lidas</button></div>
+          <div id="notif-lista"><div class="notif-vazio">Nenhuma notificação.</div></div>
+        </div>
+      </div>
+
       <button class="btn-sair" onclick="fazerLogout()" title="Sair do portal">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
         Sair
@@ -757,9 +793,88 @@ function iniciarDashboard(){
   Promise.all([
     carregarMateriais(), carregarDisciplinas(), carregarNotas(),
     carregarFinanceiro(), carregarAtividades(), carregarProgresso(),
-    carregarAcervoAluno(), carregarDocsAluno(), carregarLinhasAluno(), carregarEstante()
+    carregarAcervoAluno(), carregarDocsAluno(), carregarLinhasAluno(), carregarEstante(),
+    carregarNotificacoes()
   ]);
 }
+
+/* ===== Notificações ===== */
+let notifCache=[];
+async function carregarNotificacoes(){
+  if(!estudante) return;
+  const {data}=await sb.from('notificacoes').select('*')
+    .eq('aluno_id',estudante.id).order('criada_em',{ascending:false}).limit(30);
+  notifCache=data||[];
+  renderNotificacoes();
+}
+
+function renderNotificacoes(){
+  const naoLidas=notifCache.filter(n=>!n.lida).length;
+  const badge=document.getElementById('notif-badge');
+  if(badge){
+    if(naoLidas>0){ badge.style.display='flex'; badge.textContent=naoLidas>9?'9+':naoLidas; }
+    else badge.style.display='none';
+  }
+  const lista=document.getElementById('notif-lista');
+  if(!lista) return;
+  if(!notifCache.length){ lista.innerHTML='<div class="notif-vazio">Nenhuma notificação ainda.</div>'; return; }
+  const ic={
+    nota:'<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+    material:'<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+    pagamento:'<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',
+    documento:'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+    atividade:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    correcao:'<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>'
+  };
+  lista.innerHTML=notifCache.map(function(n){
+    return '<div class="notif-item'+(n.lida?'':' nao-lida')+'">'+
+      '<div class="notif-ic '+n.tipo+'">'+(ic[n.tipo]||ic.material)+'</div>'+
+      '<div class="notif-txt">'+
+        '<div class="notif-titulo">'+n.titulo+'</div>'+
+        (n.descricao?'<div class="notif-desc">'+n.descricao+'</div>':'')+
+        '<div class="notif-quando">'+tempoRelativo(n.criada_em)+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function tempoRelativo(iso){
+  const d=new Date(iso), ag=new Date(), s=Math.floor((ag-d)/1000);
+  if(s<60) return 'agora';
+  if(s<3600) return 'há '+Math.floor(s/60)+' min';
+  if(s<86400) return 'há '+Math.floor(s/3600)+'h';
+  if(s<604800) return 'há '+Math.floor(s/86400)+'d';
+  return d.toLocaleDateString('pt-BR');
+}
+
+async function toggleNotif(){
+  const p=document.getElementById('notif-painel');
+  const abrindo=!p.classList.contains('aberto');
+  p.classList.toggle('aberto');
+  if(abrindo){
+    // marca as não lidas como lidas ao abrir
+    const naoLidas=notifCache.filter(n=>!n.lida).map(n=>n.id);
+    if(naoLidas.length){
+      await sb.from('notificacoes').update({lida:true}).in('id',naoLidas);
+      notifCache.forEach(n=>n.lida=true);
+      renderNotificacoes();
+    }
+  }
+}
+
+async function marcarTodasLidas(){
+  const ids=notifCache.filter(n=>!n.lida).map(n=>n.id);
+  if(ids.length){ await sb.from('notificacoes').update({lida:true}).in('id',ids); }
+  notifCache.forEach(n=>n.lida=true);
+  renderNotificacoes();
+}
+
+// fecha o painel ao clicar fora
+document.addEventListener('click',function(e){
+  const w=document.querySelector('.notif-wrap');
+  const p=document.getElementById('notif-painel');
+  if(w && p && !w.contains(e.target)) p.classList.remove('aberto');
+});
 
 /* ==========================================================================
    AVATAR — foto de perfil (o aluno sobe a própria)
