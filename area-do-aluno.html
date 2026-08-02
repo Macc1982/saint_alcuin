@@ -507,6 +507,7 @@
       <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início</div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
+      <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo</div>
       <div class="nav-label">Acadêmico</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)"><svg viewBox="0 0 24 24"><path d="M2 3h20v14H2z"/><path d="M8 21h8M12 17v4"/></svg>Disciplinas</div>
       <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Atividades</div>
@@ -567,6 +568,20 @@
         <div class="page-title">Videoaulas</div>
         <div class="page-sub">Aulas gravadas do seu curso</div>
         <div id="lista-videos"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <!-- AULAS AO VIVO -->
+      <div class="tab-content" id="tab-aovivo">
+        <style>@keyframes pulseLive{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}</style>
+        <div class="page-title">Aulas ao Vivo</div>
+        <div class="page-sub">Transmissões da comunidade acadêmica</div>
+        <div id="aovivo-criar" style="display:none;margin-bottom:16px;">
+          <button class="btn btn-primary" onclick="abrirCriarLive()">+ Criar aula ao vivo</button>
+        </div>
+        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin:4px 0 10px;">Ao vivo agora</div>
+        <div id="lista-lives-ativas"><div class="loading">Carregando...</div></div>
+        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin:18px 0 10px;">Últimas aulas</div>
+        <div id="lista-lives-historico"></div>
       </div>
 
       <!-- DISCIPLINAS -->
@@ -794,7 +809,7 @@ function iniciarDashboard(){
     carregarMateriais(), carregarDisciplinas(), carregarNotas(),
     carregarFinanceiro(), carregarAtividades(), carregarProgresso(),
     carregarAcervoAluno(), carregarDocsAluno(), carregarLinhasAluno(), carregarEstante(),
-    carregarNotificacoes()
+    carregarNotificacoes(), carregarLivesAluno()
   ]);
 }
 
@@ -1785,6 +1800,56 @@ function emitirDeclaracao(tipo){
   const t={matricula:'Declaração de Matrícula',frequencia:'Declaração de Frequência',historico:'Histórico Escolar'};
   alert('Emitindo '+t[tipo]+' para '+estudante.nome+'.\n\nEsta função gerará um PDF em breve.');
 }
+
+/* ===== AULAS AO VIVO (Fatia 1) ===== */
+async function carregarLivesAluno(){
+  try{
+    const {data:eu}=await sb.from('estudantes').select('pode_criar_live').eq('id',estudante.id).single();
+    const cr=document.getElementById('aovivo-criar');
+    if(cr) cr.style.display=(eu&&eu.pode_criar_live)?'block':'none';
+  }catch(e){}
+
+  const elA=document.getElementById('lista-lives-ativas');
+  const elH=document.getElementById('lista-lives-historico');
+
+  const {data:ativas,error:e1}=await sb.from('lives')
+    .select('id,titulo,iniciada_em,pdf_url,pdf_nome,criador:estudantes(nome,avatar_url)')
+    .eq('status','ativa').order('iniciada_em',{ascending:false});
+  if(e1){elA.innerHTML='<div class="card"><div class="empty">Erro ao carregar as aulas ao vivo.</div></div>';}
+  else if(!ativas||!ativas.length){elA.innerHTML='<div class="card"><div class="empty">Nenhuma aula ao vivo agora. Quando alguém iniciar uma transmissão, ela aparece aqui.</div></div>';}
+  else{
+    elA.innerHTML=ativas.map(l=>`
+      <div class="card" style="display:flex;align-items:center;gap:14px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#E00000;flex-shrink:0;animation:pulseLive 1.5s infinite;"></span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;">${l.titulo}</div>
+          <div style="font-size:.78rem;color:var(--gray);">com ${(l.criador&&l.criador.nome||'—').split(' ')[0]} · ao vivo desde ${horaBR(l.iniciada_em)}</div>
+        </div>
+        <button class="btn btn-primary" onclick="entrarLive('${l.id}')">Entrar</button>
+      </div>`).join('');
+  }
+
+  const {data:hist,error:e2}=await sb.from('lives')
+    .select('id,titulo,iniciada_em,encerrada_em,pdf_url,pdf_nome,criador:estudantes(nome)')
+    .eq('status','encerrada').order('encerrada_em',{ascending:false}).limit(12);
+  if(e2||!hist||!hist.length){elH.innerHTML='<div class="card"><div class="empty">Nenhuma aula encerrada ainda.</div></div>';}
+  else{
+    elH.innerHTML=hist.map(l=>`
+      <div class="card" style="display:flex;align-items:center;gap:14px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;">${l.titulo}</div>
+          <div style="font-size:.78rem;color:var(--gray);">com ${(l.criador&&l.criador.nome||'—').split(' ')[0]} · ${dataBR(String(l.iniciada_em).slice(0,10))}</div>
+        </div>
+        ${l.pdf_url?`<button class="btn btn-outline" onclick="window.open('${l.pdf_url}','_blank')">Material (PDF)</button>`:''}
+      </div>`).join('');
+  }
+}
+function horaBR(iso){
+  if(!iso) return '—';
+  return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function entrarLive(id){ toast('A sala de transmissão chega na próxima etapa.'); }
+function abrirCriarLive(){ toast('Criação de aula ao vivo chega na próxima etapa.'); }
 
 // Restaura sessão se existir
 const saved=sessionStorage.getItem('estudante');
