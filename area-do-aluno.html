@@ -471,6 +471,15 @@
 .lv-wait{text-align:center;}
 .lv-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--secondary);border-radius:50%;margin:0 auto 12px;animation:lvspin 1s linear infinite;}
 @keyframes lvspin{to{transform:rotate(360deg)}}
+.lv-reacoes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1001;}
+.lv-float{position:absolute;bottom:150px;display:flex;flex-direction:column;align-items:center;gap:2px;animation:lvfloat 3s ease-out forwards;pointer-events:none;}
+.lv-float .e{font-size:2rem;line-height:1;}
+.lv-float .n{font-size:.65rem;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+@keyframes lvfloat{0%{transform:translateY(0) scale(.7);opacity:0}12%{opacity:1;transform:translateY(-20px) scale(1)}100%{transform:translateY(-46vh) scale(1);opacity:0}}
+.lv-emojis{position:absolute;bottom:86px;left:50%;transform:translateX(-50%);display:flex;gap:4px;background:rgba(11,42,74,.6);backdrop-filter:blur(8px);border-radius:24px;padding:6px 10px;z-index:1002;}
+.lv-emojis button{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px 4px;transition:transform .12s;line-height:1;}
+.lv-emojis button:hover{transform:scale(1.3);}
+@media(max-width:640px){.lv-emojis{bottom:96px;padding:5px 8px;}.lv-emojis button{font-size:1.15rem;}}
 </style>
 </head>
 <body>
@@ -494,7 +503,7 @@
 <!-- DASHBOARD -->
 <div id="screen-dashboard" class="screen">
   <header class="site-header">
-    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v2.2" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
+    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v3.1" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="text-align:right;">
         <div style="font-size:.84rem;font-weight:600;" id="dash-name">—</div>
@@ -529,10 +538,10 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v2.2" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v3.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
-      <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo</div>
+      <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo<span id="selo-aovivo-nav" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:8px;animation:pulseLive 1.5s infinite;">AO VIVO</span></div>
       <div class="nav-label">Acadêmico</div>
       <div class="nav-item" onclick="showTab('disciplinas',this)"><svg viewBox="0 0 24 24"><path d="M2 3h20v14H2z"/><path d="M8 21h8M12 17v4"/></svg>Disciplinas</div>
       <div class="nav-item" onclick="showTab('atividades',this)" id="nav-ativ"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Atividades</div>
@@ -575,7 +584,7 @@
 
         <div class="card-grid">
           <div class="quick-card" onclick="showTab('materiais',null)"><svg class="quick-ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div class="quick-label">Biblioteca</div><div class="quick-title">Materiais PDF</div><span class="quick-link">Acessar →</span></div>
-          <div class="quick-card" onclick="showTab('aovivo',null)"><svg class="quick-ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg><div class="quick-label">Ao vivo</div><div class="quick-title">Aulas ao Vivo</div><span class="quick-link">Entrar →</span></div>
+          <div class="quick-card" onclick="showTab('aovivo',null)"><svg class="quick-ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg><div class="quick-label">Ao vivo</div><div class="quick-title">Aulas ao Vivo<span id="selo-aovivo-card" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:6px;vertical-align:middle;animation:pulseLive 1.5s infinite;">AO VIVO</span></div><span class="quick-link">Entrar →</span></div>
           <div class="quick-card" onclick="showTab('atividades',null)"><svg class="quick-ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="quick-label">Trabalhos</div><div class="quick-title">Atividades</div><span class="quick-link">Ver →</span></div>
           <div class="quick-card" onclick="showTab('aulas',null)"><svg class="quick-ic" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><div class="quick-label">Videoaulas</div><div class="quick-title">Aulas gravadas</div><span class="quick-link">Assistir →</span></div>
           <div class="quick-card" onclick="showTab('financeiro',null)"><svg class="quick-ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><div class="quick-label">Financeiro</div><div class="quick-title">Meus pagamentos</div><span class="quick-link">Ver →</span></div>
@@ -1861,6 +1870,9 @@ async function carregarLivesAluno(){
       </div>`).join('');
   }
 
+  atualizarSeloAoVivo((ativas&&ativas.length)||0);
+  iniciarSeloTimer();
+
   const {data:hist,error:e2}=await sb.from('lives')
     .select('id,titulo,iniciada_em,encerrada_em,pdf_url,pdf_nome,criador:estudantes(nome)')
     .eq('status','encerrada').order('encerrada_em',{ascending:false}).limit(12);
@@ -1883,7 +1895,7 @@ function horaBR(iso){
 /* ---- Fatia 2: sala ao vivo (ZEGO Live Streaming) ---- */
 const ZEGO_APP_ID=210362642;
 const ZEGO_SERVER_SECRET='65381506fc5d0b45e0a1625d6bbac1b7';
-let lvZp=null,lvLive=null,lvSouHost=false,lvHeartbeat=null,lvPollPedidos=null,lvPollEspera=null,lvPresencaId=null,lvAvatares={};
+let lvZp=null,lvLive=null,lvSouHost=false,lvHeartbeat=null,lvPollPedidos=null,lvPollEspera=null,lvPresencaId=null,lvAvatares={},lvCanal=null,lvSeloTimer=null;
 
 function lvSan(id){return String(id).replace(/[^a-zA-Z0-9_]/g,'_');}
 
@@ -1974,6 +1986,11 @@ async function abrirSala(live,souHost){
   document.getElementById('lv-btn-sair').style.display=souHost?'none':'inline-block';
   document.getElementById('lv-overlay').classList.add('on');
   document.getElementById('lv-root').innerHTML='';
+  try{
+    lvCanal=sb.channel('live-'+live.id,{config:{broadcast:{self:true}}})
+      .on('broadcast',{event:'reacao'},(msg)=>{mostrarReacao(msg.payload||{});})
+      .subscribe();
+  }catch(e){lvCanal=null;}
 
   const userID=lvSan(estudante.id);
   const userName=(estudante.nome||'Aluno').split(' ')[0];
@@ -2021,6 +2038,7 @@ async function fecharSala(){
   if(lvPollPedidos){clearInterval(lvPollPedidos);lvPollPedidos=null;}
   if(lvPresencaId){try{await sb.from('presencas').update({saida:new Date().toISOString()}).eq('id',lvPresencaId);}catch(e){}lvPresencaId=null;}
   if(lvZp){try{lvZp.destroy();}catch(e){}lvZp=null;}
+  if(lvCanal){try{sb.removeChannel(lvCanal);}catch(e){}lvCanal=null;}
   document.getElementById('lv-overlay').classList.remove('on');
   document.getElementById('lv-root').innerHTML='';
   document.getElementById('lv-pedidos').classList.remove('on');
@@ -2028,6 +2046,38 @@ async function fecharSala(){
   carregarLivesAluno();
 }
 function sairDaSala(){fecharSala();}
+
+/* ---- Fatia 3: reações por emoji + selo AO VIVO ---- */
+function enviarReacao(emo){
+  if(!lvCanal)return;
+  try{lvCanal.send({type:'broadcast',event:'reacao',payload:{e:emo,n:(estudante&&estudante.nome||'').split(' ')[0]}});}catch(e){}
+}
+function mostrarReacao(pl){
+  const area=document.getElementById('lv-reacoes');
+  if(!area||!pl.e)return;
+  const el=document.createElement('div');
+  el.className='lv-float';
+  el.style.left=(8+Math.random()*80)+'%';
+  const em=document.createElement('div');em.className='e';em.textContent=pl.e;
+  const nm=document.createElement('div');nm.className='n';nm.textContent=pl.n||'';
+  el.appendChild(em);el.appendChild(nm);
+  area.appendChild(el);
+  setTimeout(()=>{el.remove();},3100);
+}
+function atualizarSeloAoVivo(n){
+  const mostrar=n>0?'inline-block':'none';
+  const a=document.getElementById('selo-aovivo-nav');if(a)a.style.display=mostrar;
+  const b=document.getElementById('selo-aovivo-card');if(b)b.style.display=mostrar;
+}
+function iniciarSeloTimer(){
+  if(lvSeloTimer)return;
+  lvSeloTimer=setInterval(async()=>{
+    try{
+      const {count}=await sb.from('lives').select('id',{count:'exact',head:true}).eq('status','ativa');
+      atualizarSeloAoVivo(count||0);
+    }catch(e){}
+  },60000);
+}
 
 async function encerrarLiveHost(){
   if(!lvLive)return;
@@ -2075,6 +2125,16 @@ if(saved){estudante=JSON.parse(saved);iniciarDashboard();}
     <button class="lv-btn" id="lv-btn-sair" onclick="sairDaSala()">Sair</button>
   </div>
   <div id="lv-root"></div>
+  <div class="lv-reacoes" id="lv-reacoes"></div>
+  <div class="lv-emojis" id="lv-emojis">
+    <button onclick="enviarReacao('❤️')">❤️</button>
+    <button onclick="enviarReacao('✅')">✅</button>
+    <button onclick="enviarReacao('🚀')">🚀</button>
+    <button onclick="enviarReacao('🖌️')">🖌️</button>
+    <button onclick="enviarReacao('📘')">📘</button>
+    <button onclick="enviarReacao('📚')">📚</button>
+    <button onclick="enviarReacao('🎁')">🎁</button>
+  </div>
   <div class="lv-pedidos" id="lv-pedidos">
     <div style="font-weight:700;font-size:.8rem;color:var(--primary);margin-bottom:6px;">Pedidos de entrada</div>
     <div id="lv-ped-lista"><div class="empty" style="padding:8px 0;">Nenhum pedido.</div></div>
