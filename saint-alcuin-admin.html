@@ -296,7 +296,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f97316;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
@@ -315,6 +315,9 @@
       <div class="nav-label">Seleção</div>
       <div class="nav-item" onclick="showTab('selecao',this)" id="nav-selecao"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Candidatos</div>
       <div class="nav-item" onclick="showTab('vagas',this)"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2 3 6 3s6-2 6-3v-5"/></svg>Vagas por linha</div>
+      <div class="nav-label">Aulas ao Vivo</div>
+      <div class="nav-item" onclick="showTab('criadores',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Criadores</div>
+      <div class="nav-item" onclick="showTab('presencas',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Presença</div>
     </nav>
     <div class="main">
 
@@ -1049,6 +1052,39 @@
         <div class="page-title">Vagas por linha</div>
         <div class="page-sub">Lance manualmente quantas vagas cada linha oferece. A vaga só é ocupada quando o candidato envia o pré-projeto.</div>
         <div id="lista-vagas"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <!-- ============ AULAS AO VIVO: CRIADORES ============ -->
+      <div class="tab" id="tab-criadores">
+        <div class="page-title">Criadores de aulas ao vivo</div>
+        <div class="page-sub">Autorize quais alunos podem abrir transmissões no portal. Sem autorização, o aluno participa mas não cria.</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+          <input id="cr-busca" placeholder="Buscar por nome ou matrícula..." oninput="filtrarCriadores()" style="flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;"/>
+          <div style="font-size:.8rem;color:var(--gray);">Autorizados: <b id="cr-total" style="color:var(--primary);">—</b></div>
+        </div>
+        <div class="table-wrap"><table class="data-table">
+          <thead><tr><th>Aluno</th><th>Matrícula</th><th>Curso</th><th>Pode criar</th><th></th></tr></thead>
+          <tbody id="cr-lista"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- ============ AULAS AO VIVO: PRESENÇA ============ -->
+      <div class="tab" id="tab-presencas">
+        <div class="page-title">Presença em aulas ao vivo</div>
+        <div class="page-sub">Chamada eletrônica registrada automaticamente: entrada, saída e tempo de cada aluno.</div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+          <select id="pr-live" onchange="renderPresencas()" style="flex:1;min-width:260px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;background:#fff;"></select>
+          <button class="btn btn-outline btn-sm" id="pr-btn-sessao" onclick="setVisaoPresenca('sessao')">Por sessão</button>
+          <button class="btn btn-outline btn-sm" id="pr-btn-acum" onclick="setVisaoPresenca('acumulada')">Acumulada</button>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+          <div style="font-size:.8rem;color:var(--gray);">Participantes: <b id="pr-kpi-alunos" style="color:var(--primary);">—</b></div>
+          <div style="font-size:.8rem;color:var(--gray);">Minutos somados: <b id="pr-kpi-min" style="color:var(--primary);">—</b></div>
+        </div>
+        <div class="table-wrap"><table class="data-table">
+          <thead id="pr-head"></thead>
+          <tbody id="pr-lista"><tr><td colspan="6" class="loading">Escolha uma aula.</td></tr></tbody>
+        </table></div>
       </div>
 
       <!-- ============ CANDIDATOS (FUNIL) ============ -->
@@ -1837,6 +1873,8 @@ function showTab(name,el){
   if(el)el.classList.add('active');
   if(name==='vagas')   carregarVagas();
   if(name==='selecao') carregarCandidatos();
+  if(name==='criadores') carregarCriadores();
+  if(name==='presencas') carregarPresencas();
 }
 
 async function carregarCursos(){
@@ -4582,6 +4620,94 @@ async function excluirCurso(id,qtdAlunos){
   if(error){toast('Erro: '+error.message,'error');return;}
   toast('Curso excluído.','success');
   await Promise.all([carregarCursos(),carregarCursosTabela(),carregarDashboard()]);
+}
+
+/* ===== AULAS AO VIVO — Fatia 4 (admin) ===== */
+let crCache=[];
+function prDataHora(iso){
+  if(!iso)return '—';
+  const d=new Date(iso);
+  return d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+
+async function carregarCriadores(){
+  const{data}=await sb.from('estudantes')
+    .select('id,nome,matricula,pode_criar_live,cursos(nome)')
+    .eq('status','ativo').order('nome');
+  crCache=data||[];
+  renderCriadores(crCache);
+}
+function filtrarCriadores(){
+  const q=(document.getElementById('cr-busca').value||'').toLowerCase();
+  renderCriadores(crCache.filter(e=>(e.nome||'').toLowerCase().includes(q)||(e.matricula||'').toLowerCase().includes(q)));
+}
+function renderCriadores(lista){
+  document.getElementById('cr-total').textContent=crCache.filter(e=>e.pode_criar_live).length;
+  const el=document.getElementById('cr-lista');
+  if(!lista.length){el.innerHTML='<tr><td colspan="5" class="loading">Nenhum aluno encontrado.</td></tr>';return;}
+  el.innerHTML=lista.map(e=>`
+    <tr>
+      <td style="font-weight:600;color:var(--primary);">${e.nome}</td>
+      <td>${e.matricula||'—'}</td>
+      <td>${(e.cursos&&e.cursos.nome)||'—'}</td>
+      <td>${e.pode_criar_live?'<span style="background:#dcfce7;color:#166534;border-radius:20px;padding:3px 10px;font-size:.7rem;font-weight:700;">AUTORIZADO</span>':'<span style="color:var(--gray);font-size:.75rem;">—</span>'}</td>
+      <td style="text-align:right;">${e.pode_criar_live
+        ?`<button class="btn btn-danger btn-sm" onclick="toggleCriador('${e.id}',false)">Revogar</button>`
+        :`<button class="btn btn-outline btn-sm" onclick="toggleCriador('${e.id}',true)">Autorizar</button>`}</td>
+    </tr>`).join('');
+}
+async function toggleCriador(id,valor){
+  const{error}=await sb.from('estudantes').update({pode_criar_live:valor}).eq('id',id);
+  if(error){toast('Não foi possível salvar.','erro');return;}
+  toast(valor?'Aluno autorizado a criar aulas ao vivo.':'Autorização revogada.');
+  const e=crCache.find(x=>x.id===id);if(e)e.pode_criar_live=valor;
+  filtrarCriadores();
+}
+
+let prVisao='sessao';
+async function carregarPresencas(){
+  const{data:lvs}=await sb.from('lives')
+    .select('id,titulo,status,iniciada_em')
+    .order('iniciada_em',{ascending:false}).limit(60);
+  const sel=document.getElementById('pr-live');
+  if(!lvs||!lvs.length){sel.innerHTML='<option value="">Nenhuma aula realizada ainda</option>';}
+  else{
+    sel.innerHTML=lvs.map(l=>`<option value="${l.id}">${l.status==='ativa'?'🔴 ':''}${l.titulo} — ${prDataHora(l.iniciada_em)}</option>`).join('');
+  }
+  setVisaoPresenca(prVisao);
+}
+function setVisaoPresenca(v){
+  prVisao=v;
+  document.getElementById('pr-btn-sessao').className='btn btn-sm '+(v==='sessao'?'btn-primary':'btn-outline');
+  document.getElementById('pr-btn-acum').className='btn btn-sm '+(v==='acumulada'?'btn-primary':'btn-outline');
+  renderPresencas();
+}
+async function renderPresencas(){
+  const liveId=document.getElementById('pr-live').value;
+  const head=document.getElementById('pr-head');
+  const el=document.getElementById('pr-lista');
+  const kA=document.getElementById('pr-kpi-alunos');
+  const kM=document.getElementById('pr-kpi-min');
+  if(!liveId){head.innerHTML='';el.innerHTML='<tr><td colspan="6" class="loading">Nenhuma aula para exibir.</td></tr>';kA.textContent='—';kM.textContent='—';return;}
+  if(prVisao==='sessao'){
+    head.innerHTML='<tr><th>Aluno</th><th>Matrícula</th><th>Entrada</th><th>Saída</th><th>Minutos</th></tr>';
+    const{data}=await sb.from('presenca_sessoes').select('*').eq('live_id',liveId).order('entrada');
+    if(!data||!data.length){el.innerHTML='<tr><td colspan="5" class="loading">Nenhuma presença registrada nesta aula.</td></tr>';kA.textContent='0';kM.textContent='0';return;}
+    kA.textContent=new Set(data.map(r=>r.estudante_id)).size;
+    kM.textContent=Math.round(data.reduce((t,r)=>t+Number(r.minutos||0),0));
+    el.innerHTML=data.map(r=>`
+      <tr><td style="font-weight:600;color:var(--primary);">${r.nome}</td><td>${r.matricula||'—'}</td>
+      <td>${prDataHora(r.entrada)}</td><td>${prDataHora(r.saida_efetiva)}</td><td>${r.minutos}</td></tr>`).join('');
+  }else{
+    head.innerHTML='<tr><th>Aluno</th><th>Matrícula</th><th>Sessões</th><th>Minutos totais</th><th>Primeira entrada</th><th>Última saída</th></tr>';
+    const{data}=await sb.from('presenca_acumulada').select('*').eq('live_id',liveId).order('minutos_totais',{ascending:false});
+    if(!data||!data.length){el.innerHTML='<tr><td colspan="6" class="loading">Nenhuma presença registrada nesta aula.</td></tr>';kA.textContent='0';kM.textContent='0';return;}
+    kA.textContent=data.length;
+    kM.textContent=Math.round(data.reduce((t,r)=>t+Number(r.minutos_totais||0),0));
+    el.innerHTML=data.map(r=>`
+      <tr><td style="font-weight:600;color:var(--primary);">${r.nome}</td><td>${r.matricula||'—'}</td>
+      <td>${r.sessoes}</td><td>${r.minutos_totais}</td><td>${prDataHora(r.primeira_entrada)}</td><td>${prDataHora(r.ultima_saida)}</td></tr>`).join('');
+  }
 }
 
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
