@@ -447,6 +447,31 @@
     .stats-row,.stats-row-4{grid-template-columns:1fr;}
   }
 </style>
+<style>
+/* AULAS AO VIVO — sala e modais (Fatia 2) */
+.lv-overlay{position:fixed;inset:0;background:#0b1220;z-index:1000;display:none;flex-direction:column;}
+.lv-overlay.on{display:flex;}
+.lv-top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--primary);color:#fff;}
+.lv-title{font-weight:600;font-size:.95rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lv-btn{border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;border-radius:8px;padding:7px 14px;font-size:.8rem;cursor:pointer;font-family:inherit;}
+.lv-btn.encerrar{background:#E00000;border-color:#E00000;}
+#lv-root{flex:1;min-height:0;}
+.lv-pedidos{position:absolute;top:60px;right:16px;width:280px;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:14px;z-index:1001;display:none;}
+.lv-pedidos.on{display:block;}
+.lv-ped-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.82rem;}
+.lv-ped-item:last-child{border-bottom:none;}
+.lv-ped-ok{background:var(--secondary);color:#fff;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:.72rem;font-family:inherit;}
+.lv-ped-no{background:#fff;color:#E00000;border:1px solid #E00000;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:.72rem;font-family:inherit;}
+.lv-modal-bg{position:fixed;inset:0;background:rgba(11,42,74,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;}
+.lv-modal-bg.on{display:flex;}
+.lv-modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.lv-modal h3{margin:0 0 14px;color:var(--primary);font-size:1.05rem;}
+.lv-input{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-size:.9rem;font-family:inherit;margin-bottom:12px;box-sizing:border-box;}
+.lv-file{font-size:.8rem;margin-bottom:14px;color:var(--text);}
+.lv-wait{text-align:center;}
+.lv-spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--secondary);border-radius:50%;margin:0 auto 12px;animation:lvspin 1s linear infinite;}
+@keyframes lvspin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
 
@@ -1812,6 +1837,12 @@ async function carregarLivesAluno(){
   const elA=document.getElementById('lista-lives-ativas');
   const elH=document.getElementById('lista-lives-historico');
 
+  // encerra lives órfãs (criador sem heartbeat há 3+ minutos)
+  try{
+    await sb.from('lives').update({status:'encerrada',encerrada_em:new Date().toISOString()})
+      .eq('status','ativa').lt('ultima_atividade',new Date(Date.now()-3*60*1000).toISOString());
+  }catch(e){}
+
   const {data:ativas,error:e1}=await sb.from('lives')
     .select('id,titulo,iniciada_em,pdf_url,pdf_nome,criador:estudantes(nome,avatar_url)')
     .eq('status','ativa').order('iniciada_em',{ascending:false});
@@ -1848,12 +1879,224 @@ function horaBR(iso){
   if(!iso) return '—';
   return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
-function entrarLive(id){ toast('A sala de transmissão chega na próxima etapa.'); }
-function abrirCriarLive(){ toast('Criação de aula ao vivo chega na próxima etapa.'); }
+/* ---- Fatia 2: sala ao vivo (ZEGO Live Streaming) ---- */
+const ZEGO_APP_ID=210362642;
+const ZEGO_SERVER_SECRET='65381506fc5d0b45e0a1625d6bbac1b7';
+let lvZp=null,lvLive=null,lvSouHost=false,lvHeartbeat=null,lvPollPedidos=null,lvPollEspera=null,lvPresencaId=null,lvAvatares={};
+
+function lvSan(id){return String(id).replace(/[^a-zA-Z0-9_]/g,'_');}
+
+function carregarScriptZego(){
+  return new Promise((res,rej)=>{
+    if(window.ZegoUIKitPrebuilt){res();return;}
+    const sc=document.createElement('script');
+    sc.src='https://unpkg.com/@zegocloud/zego-uikit-prebuilt/zego-uikit-prebuilt.js';
+    sc.onload=()=>res();sc.onerror=()=>rej(new Error('zego'));
+    document.head.appendChild(sc);
+  });
+}
+
+function abrirCriarLive(){
+  document.getElementById('lv-titulo').value='';
+  document.getElementById('lv-pdf').value='';
+  document.getElementById('lv-modal-criar').classList.add('on');
+}
+function fecharModal(id){document.getElementById(id).classList.remove('on');}
+
+async function iniciarLive(){
+  const titulo=document.getElementById('lv-titulo').value.trim();
+  if(!titulo){toast('Dê um título para a aula.','erro');return;}
+  const btn=document.getElementById('lv-btn-iniciar');
+  btn.disabled=true;btn.textContent='Preparando...';
+  try{
+    const {data:live,error}=await sb.from('lives').insert({titulo,criador_id:estudante.id}).select().single();
+    if(error||!live) throw error||new Error('insert');
+    const room_id='live_'+lvSan(live.id);
+    await sb.from('lives').update({room_id}).eq('id',live.id);
+    live.room_id=room_id;
+    const f=document.getElementById('lv-pdf').files[0];
+    if(f){
+      const path=live.id+'.pdf';
+      const {error:upErr}=await sb.storage.from('lives').upload(path,f,{contentType:'application/pdf',upsert:true});
+      if(upErr){toast('A aula vai começar, mas o PDF não subiu.','erro');}
+      else{
+        const {data:pub}=sb.storage.from('lives').getPublicUrl(path);
+        await sb.from('lives').update({pdf_url:pub.publicUrl,pdf_nome:f.name}).eq('id',live.id);
+      }
+    }
+    fecharModal('lv-modal-criar');
+    await abrirSala(live,true);
+  }catch(e){toast('Não foi possível iniciar a aula.','erro');}
+  btn.disabled=false;btn.textContent='Iniciar transmissão';
+}
+
+async function entrarLive(id){
+  const {data:live}=await sb.from('lives').select('*').eq('id',id).single();
+  if(!live||live.status!=='ativa'){toast('Esta aula não está mais no ar.','erro');carregarLivesAluno();return;}
+  if(live.criador_id===estudante.id){await abrirSala(live,true);return;}
+  const {data:sol}=await sb.from('live_solicitacoes').select('*').eq('live_id',id).eq('estudante_id',estudante.id).maybeSingle();
+  if(sol&&sol.status==='aceito'){await abrirSala(live,false);return;}
+  if(sol&&sol.status==='negado'){toast('Sua entrada nesta aula não foi autorizada.','erro');return;}
+  if(!sol){
+    const {error}=await sb.from('live_solicitacoes').insert({live_id:id,estudante_id:estudante.id});
+    if(error){toast('Não foi possível pedir entrada.','erro');return;}
+  }
+  esperarAprovacao(live);
+}
+
+function esperarAprovacao(live){
+  document.getElementById('lv-modal-espera').classList.add('on');
+  lvPollEspera=setInterval(async()=>{
+    const {data:sol}=await sb.from('live_solicitacoes').select('status').eq('live_id',live.id).eq('estudante_id',estudante.id).maybeSingle();
+    if(sol&&sol.status==='aceito'){cancelarEspera();await abrirSala(live,false);return;}
+    if(sol&&sol.status==='negado'){cancelarEspera();toast('Sua entrada não foi autorizada.','erro');return;}
+    const {data:l}=await sb.from('lives').select('status').eq('id',live.id).single();
+    if(!l||l.status!=='ativa'){cancelarEspera();toast('A aula foi encerrada.');carregarLivesAluno();}
+  },4000);
+}
+function cancelarEspera(){
+  if(lvPollEspera){clearInterval(lvPollEspera);lvPollEspera=null;}
+  document.getElementById('lv-modal-espera').classList.remove('on');
+}
+
+async function abrirSala(live,souHost){
+  try{await carregarScriptZego();}catch(e){toast('Não foi possível carregar o módulo de vídeo.','erro');return;}
+  lvLive=live;lvSouHost=souHost;
+  try{
+    const {data:avs}=await sb.from('estudantes').select('id,avatar_url');
+    lvAvatares={};(avs||[]).forEach(a=>{if(a.avatar_url)lvAvatares[lvSan(a.id)]=a.avatar_url;});
+  }catch(e){lvAvatares={};}
+
+  document.getElementById('lv-title').textContent=live.titulo;
+  document.getElementById('lv-btn-encerrar').style.display=souHost?'inline-block':'none';
+  document.getElementById('lv-btn-pedidos').style.display=souHost?'inline-block':'none';
+  document.getElementById('lv-btn-sair').style.display=souHost?'none':'inline-block';
+  document.getElementById('lv-overlay').classList.add('on');
+  document.getElementById('lv-root').innerHTML='';
+
+  const userID=lvSan(estudante.id);
+  const userName=(estudante.nome||'Aluno').split(' ')[0];
+  const kitToken=ZegoUIKitPrebuilt.generateKitTokenForTest(ZEGO_APP_ID,ZEGO_SERVER_SECRET,live.room_id,userID,userName);
+  lvZp=ZegoUIKitPrebuilt.create(kitToken);
+  lvZp.joinRoom({
+    container:document.getElementById('lv-root'),
+    scenario:{mode:ZegoUIKitPrebuilt.LiveStreaming,config:{role:souHost?ZegoUIKitPrebuilt.Host:ZegoUIKitPrebuilt.Audience}},
+    showPreJoinView:souHost,
+    preJoinViewConfig:{title:live.titulo},
+    turnOnCameraWhenJoining:souHost,
+    turnOnMicrophoneWhenJoining:souHost,
+    showTextChat:true,
+    showUserList:true,
+    showScreenSharingButton:souHost,
+    showRemoveUserButton:souHost,
+    showTurnOffRemoteMicrophoneButton:souHost,
+    showInviteToCohostButton:souHost,
+    showRemoveCohostButton:souHost,
+    showRequestToCohostButton:!souHost,
+    showLeaveRoomConfirmDialog:false,
+    showLeavingView:false,
+    lowerLeftNotification:{showUserJoinAndLeave:true,showTextChat:true},
+    onUserAvatarSetter:(users)=>{users.forEach(u=>{const url=lvAvatares[u.userID];if(url)u.setUserAvatar(url);});},
+    onJoinRoom:async()=>{
+      try{
+        const {data:pz}=await sb.from('presencas').insert({live_id:live.id,estudante_id:estudante.id}).select('id').single();
+        lvPresencaId=pz&&pz.id;
+      }catch(e){}
+      lvHeartbeat=setInterval(async()=>{
+        const agora=new Date().toISOString();
+        if(lvPresencaId){try{await sb.from('presencas').update({ultima_atividade:agora}).eq('id',lvPresencaId);}catch(e){}}
+        if(lvSouHost&&lvLive){try{await sb.from('lives').update({ultima_atividade:agora}).eq('id',lvLive.id);}catch(e){}}
+      },60000);
+      if(souHost){pollPedidosStart();}
+    },
+    onLeaveRoom:()=>{fecharSala();},
+    onLiveEnd:()=>{if(!lvSouHost){toast('A aula foi encerrada pelo criador.');fecharSala();}},
+    onYouRemovedFromRoom:()=>{toast('Você foi removido da aula.','erro');fecharSala();}
+  });
+}
+
+async function fecharSala(){
+  if(lvHeartbeat){clearInterval(lvHeartbeat);lvHeartbeat=null;}
+  if(lvPollPedidos){clearInterval(lvPollPedidos);lvPollPedidos=null;}
+  if(lvPresencaId){try{await sb.from('presencas').update({saida:new Date().toISOString()}).eq('id',lvPresencaId);}catch(e){}lvPresencaId=null;}
+  if(lvZp){try{lvZp.destroy();}catch(e){}lvZp=null;}
+  document.getElementById('lv-overlay').classList.remove('on');
+  document.getElementById('lv-root').innerHTML='';
+  document.getElementById('lv-pedidos').classList.remove('on');
+  lvLive=null;
+  carregarLivesAluno();
+}
+function sairDaSala(){fecharSala();}
+
+async function encerrarLiveHost(){
+  if(!lvLive)return;
+  if(!confirm('Encerrar esta aula ao vivo para todos?'))return;
+  try{await sb.from('lives').update({status:'encerrada',encerrada_em:new Date().toISOString()}).eq('id',lvLive.id);}catch(e){}
+  fecharSala();
+}
+
+function togglePedidos(){document.getElementById('lv-pedidos').classList.toggle('on');}
+function pollPedidosStart(){atualizarPedidos();lvPollPedidos=setInterval(atualizarPedidos,5000);}
+async function atualizarPedidos(){
+  if(!lvLive)return;
+  const {data:peds}=await sb.from('live_solicitacoes')
+    .select('id,status,estudantes(nome)')
+    .eq('live_id',lvLive.id).eq('status','pendente').order('pedido_em');
+  const n=(peds||[]).length;
+  document.getElementById('lv-ped-count').textContent=n?('('+n+')'):'';
+  const el=document.getElementById('lv-ped-lista');
+  if(!n){el.innerHTML='<div class="empty" style="padding:8px 0;">Nenhum pedido.</div>';return;}
+  el.innerHTML=peds.map(pd=>`
+    <div class="lv-ped-item">
+      <div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(pd.estudantes&&pd.estudantes.nome)||'Aluno'}</div>
+      <button class="lv-ped-ok" onclick="responderPedido('${pd.id}','aceito')">Aceitar</button>
+      <button class="lv-ped-no" onclick="responderPedido('${pd.id}','negado')">Negar</button>
+    </div>`).join('');
+  document.getElementById('lv-pedidos').classList.add('on');
+}
+async function responderPedido(id,status){
+  await sb.from('live_solicitacoes').update({status,respondido_em:new Date().toISOString()}).eq('id',id);
+  atualizarPedidos();
+}
 
 // Restaura sessão se existir
 const saved=sessionStorage.getItem('estudante');
 if(saved){estudante=JSON.parse(saved);iniciarDashboard();}
 </script>
+
+<!-- AULAS AO VIVO — sala e modais (Fatia 2) -->
+<div class="lv-overlay" id="lv-overlay">
+  <div class="lv-top">
+    <span style="width:9px;height:9px;border-radius:50%;background:#E00000;flex-shrink:0;animation:pulseLive 1.5s infinite;"></span>
+    <div class="lv-title" id="lv-title"></div>
+    <button class="lv-btn" id="lv-btn-pedidos" style="display:none;" onclick="togglePedidos()">Pedidos <span id="lv-ped-count"></span></button>
+    <button class="lv-btn encerrar" id="lv-btn-encerrar" style="display:none;" onclick="encerrarLiveHost()">Encerrar aula</button>
+    <button class="lv-btn" id="lv-btn-sair" onclick="sairDaSala()">Sair</button>
+  </div>
+  <div id="lv-root"></div>
+  <div class="lv-pedidos" id="lv-pedidos">
+    <div style="font-weight:700;font-size:.8rem;color:var(--primary);margin-bottom:6px;">Pedidos de entrada</div>
+    <div id="lv-ped-lista"><div class="empty" style="padding:8px 0;">Nenhum pedido.</div></div>
+  </div>
+</div>
+<div class="lv-modal-bg" id="lv-modal-criar">
+  <div class="lv-modal">
+    <h3>Criar aula ao vivo</h3>
+    <input class="lv-input" id="lv-titulo" maxlength="120" placeholder="Título da aula"/>
+    <div class="lv-file"><label>Material em PDF (opcional):<br/><input type="file" id="lv-pdf" accept="application/pdf"/></label></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="fecharModal('lv-modal-criar')">Cancelar</button>
+      <button class="btn btn-primary" id="lv-btn-iniciar" onclick="iniciarLive()">Iniciar transmissão</button>
+    </div>
+  </div>
+</div>
+<div class="lv-modal-bg" id="lv-modal-espera">
+  <div class="lv-modal lv-wait">
+    <div class="lv-spin"></div>
+    <div style="font-weight:600;color:var(--primary);margin-bottom:4px;">Aguardando aprovação</div>
+    <div style="font-size:.8rem;color:var(--gray);margin-bottom:14px;">O criador da aula precisa autorizar sua entrada.</div>
+    <button class="btn btn-outline" onclick="cancelarEspera()">Cancelar</button>
+  </div>
+</div>
 </body>
 </html>
