@@ -159,6 +159,12 @@
   .kpi-green .kpi-value{color:#15803d;}
   .kpi-red .kpi-value{color:#c1121f;}
   .kpi-foot{font-size:.7rem;color:var(--gray);margin-top:7px;min-height:1em;}
+  .olho-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 9px;cursor:pointer;margin-left:12px;vertical-align:middle;line-height:0;}
+  .olho-btn svg{width:17px;height:17px;stroke:var(--gray);stroke-width:2;fill:none;}
+  .olho-btn:hover svg{stroke:var(--primary);}
+  body.vals-off #k-recebido,body.vals-off #k-avencer,body.vals-off #k-vencido,body.vals-off #k-inad,
+  body.vals-off #k-recebido-sub,body.vals-off #k-avencer-sub,body.vals-off #k-vencido-sub,body.vals-off #k-inad-sub,
+  body.vals-off #dash-fin{filter:blur(10px);user-select:none;pointer-events:none;transition:filter .18s;}
   .mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
   .mini{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 20px rgba(11,42,74,.05);}
   .mini-ic{width:20px;height:20px;stroke:var(--secondary);stroke-width:1.7;fill:none;flex-shrink:0;}
@@ -296,7 +302,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f97316;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.2" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ec4899;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
@@ -323,7 +329,7 @@
 
       <!-- DASHBOARD -->
       <div class="tab active" id="tab-dashboard">
-        <div class="page-title">Dashboard</div><div class="page-sub">Visão geral da instituição</div>
+        <div class="page-title">Dashboard<button class="olho-btn" id="btn-olho" onclick="toggleValores()" title="Ocultar/mostrar valores"><svg id="olho-svg" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div><div class="page-sub">Visão geral da instituição</div>
 
         <div class="kpi-grid">
           <div class="kpi kpi-green">
@@ -4709,6 +4715,23 @@ async function renderPresencas(){
       <td>${r.sessoes}</td><td>${r.minutos_totais}</td><td>${prDataHora(r.primeira_entrada)}</td><td>${prDataHora(r.ultima_saida)}</td></tr>`).join('');
   }
 }
+
+/* ===== Olhinho: ocultar valores do Dashboard ===== */
+const OLHO_ABERTO='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+const OLHO_FECHADO='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M1 1l22 22"/><path d="M14.12 14.12A3 3 0 1 1 9.88 9.88"/>';
+function toggleValores(){
+  const off=document.body.classList.toggle('vals-off');
+  try{localStorage.setItem('sa_vals_off',off?'1':'0');}catch(e){}
+  const svg=document.getElementById('olho-svg');
+  if(svg)svg.innerHTML=off?OLHO_FECHADO:OLHO_ABERTO;
+}
+try{
+  if(localStorage.getItem('sa_vals_off')==='1'){
+    document.body.classList.add('vals-off');
+    const svg=document.getElementById('olho-svg');
+    if(svg)svg.innerHTML=OLHO_FECHADO;
+  }
+}catch(e){}
 
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
 </script>
