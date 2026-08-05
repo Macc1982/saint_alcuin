@@ -480,6 +480,14 @@
 .lv-emojis button{background:none;border:none;font-size:1.3rem;cursor:pointer;padding:2px 4px;transition:transform .12s;line-height:1;}
 .lv-emojis button:hover{transform:scale(1.3);}
 @media(max-width:640px){.lv-emojis{bottom:96px;padding:5px 8px;}.lv-emojis button{font-size:1.15rem;}}
+.not-row{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;}
+.not-card{min-width:235px;max-width:235px;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;box-shadow:0 8px 24px rgba(11,42,74,.05);transition:transform .16s,box-shadow .16s;flex-shrink:0;}
+.not-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(11,42,74,.09);}
+.not-img{height:108px;background:linear-gradient(135deg,var(--primary),var(--secondary));background-size:cover;background-position:center;}
+.not-body{padding:12px 14px;}
+.not-data{font-size:.66rem;color:var(--gray);margin-bottom:4px;}
+.not-titulo{font-size:.84rem;font-weight:600;color:var(--primary);line-height:1.35;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:3.4em;}
+.not-ler{font-size:.74rem;color:var(--secondary);font-weight:600;}
 </style>
 </head>
 <body>
@@ -503,7 +511,7 @@
 <!-- DASHBOARD -->
 <div id="screen-dashboard" class="screen">
   <header class="site-header">
-    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v3.1" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
+    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v3.2" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#eab308;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="text-align:right;">
         <div style="font-size:.84rem;font-weight:600;" id="dash-name">—</div>
@@ -538,7 +546,7 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v3.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v3.2" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#eab308;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
       <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo<span id="selo-aovivo-nav" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:8px;animation:pulseLive 1.5s infinite;">AO VIVO</span></div>
@@ -588,6 +596,11 @@
           <div class="quick-card" onclick="showTab('atividades',null)"><svg class="quick-ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="quick-label">Trabalhos</div><div class="quick-title">Atividades</div><span class="quick-link">Ver →</span></div>
           <div class="quick-card" onclick="showTab('aulas',null)"><svg class="quick-ic" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg><div class="quick-label">Videoaulas</div><div class="quick-title">Aulas gravadas</div><span class="quick-link">Assistir →</span></div>
           <div class="quick-card" onclick="showTab('financeiro',null)"><svg class="quick-ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><div class="quick-label">Financeiro</div><div class="quick-title">Meus pagamentos</div><span class="quick-link">Ver →</span></div>
+        </div>
+
+        <div id="noticias-sec" style="display:none;margin-top:26px;">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:12px;">Últimas notícias</div>
+          <div class="not-row" id="not-lista"></div>
         </div>
       </div>
 
@@ -844,7 +857,7 @@ function iniciarDashboard(){
     carregarMateriais(), carregarDisciplinas(), carregarNotas(),
     carregarFinanceiro(), carregarAtividades(), carregarProgresso(),
     carregarAcervoAluno(), carregarDocsAluno(), carregarLinhasAluno(), carregarEstante(),
-    carregarNotificacoes(), carregarLivesAluno()
+    carregarNotificacoes(), carregarLivesAluno(), carregarNoticiasHome()
   ]);
 }
 
@@ -2047,6 +2060,37 @@ async function fecharSala(){
 }
 function sairDaSala(){fecharSala();}
 
+/* ---- Notícias institucionais (home) ---- */
+let notCache=[];
+async function carregarNoticiasHome(){
+  try{
+    const {data}=await sb.from('noticias').select('*').eq('publicada',true).order('publicado_em',{ascending:false}).limit(8);
+    notCache=data||[];
+    const sec=document.getElementById('noticias-sec');
+    const el=document.getElementById('not-lista');
+    if(!notCache.length){sec.style.display='none';return;}
+    sec.style.display='block';
+    el.innerHTML=notCache.map((n,i)=>`
+      <div class="not-card" onclick="abrirNoticia(${i})">
+        <div class="not-img" ${n.imagem_url?`style="background-image:url('${n.imagem_url}')"`:''}></div>
+        <div class="not-body">
+          <div class="not-data">${dataBR(String(n.publicado_em).slice(0,10))}</div>
+          <div class="not-titulo">${n.titulo}</div>
+          <span class="not-ler">Continue lendo →</span>
+        </div>
+      </div>`).join('');
+  }catch(e){}
+}
+function abrirNoticia(i){
+  const n=notCache[i];if(!n)return;
+  const img=document.getElementById('not-m-img');
+  if(n.imagem_url){img.src=n.imagem_url;img.style.display='block';}else{img.style.display='none';}
+  document.getElementById('not-m-data').textContent=dataBR(String(n.publicado_em).slice(0,10));
+  document.getElementById('not-m-titulo').textContent=n.titulo;
+  document.getElementById('not-m-conteudo').textContent=n.conteudo||'';
+  document.getElementById('modal-noticia').classList.add('on');
+}
+
 /* ---- Fatia 3: reações por emoji + selo AO VIVO ---- */
 function enviarReacao(emo){
   if(!lvCanal)return;
@@ -2157,6 +2201,15 @@ if(saved){estudante=JSON.parse(saved);iniciarDashboard();}
     <div style="font-weight:600;color:var(--primary);margin-bottom:4px;">Aguardando aprovação</div>
     <div style="font-size:.8rem;color:var(--gray);margin-bottom:14px;">O criador da aula precisa autorizar sua entrada.</div>
     <button class="btn btn-outline" onclick="cancelarEspera()">Cancelar</button>
+  </div>
+</div>
+<div class="lv-modal-bg" id="modal-noticia">
+  <div class="lv-modal" style="max-width:620px;max-height:86vh;overflow-y:auto;">
+    <img id="not-m-img" style="display:none;width:100%;border-radius:10px;margin-bottom:14px;" alt=""/>
+    <div id="not-m-data" style="font-size:.72rem;color:var(--gray);margin-bottom:4px;"></div>
+    <h3 id="not-m-titulo"></h3>
+    <div id="not-m-conteudo" style="font-size:.9rem;line-height:1.65;color:var(--text);white-space:pre-line;margin-bottom:18px;"></div>
+    <div style="text-align:right;"><button class="btn btn-outline" onclick="fecharModal('modal-noticia')">Fechar</button></div>
   </div>
 </div>
 </body>
