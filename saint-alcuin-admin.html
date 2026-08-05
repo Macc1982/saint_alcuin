@@ -302,12 +302,13 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.2" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ec4899;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.3" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#06b6d4;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
       <div class="nav-item" onclick="showTab('documentos',this)"><svg viewBox="0 0 24 24"><path d="M4 4h5l2 3h9a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Documentos</div>
       <div class="nav-item" onclick="showTab('materiais',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
+      <div class="nav-item" onclick="showTab('noticias',this)"><svg viewBox="0 0 24 24"><path d="M2 20V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14z"/><path d="M6 8h12M6 12h12M6 16h7"/></svg>Notícias</div>
       <div class="nav-item" onclick="showTab('linhas',this)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Linhas de pesquisa</div>
       <div class="nav-item" onclick="showTab('biblioteca',this)"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Biblioteca</div>
       <div class="nav-item" onclick="showTab('acervo',this)"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Acervo do curso</div>
@@ -1058,6 +1059,28 @@
         <div class="page-title">Vagas por linha</div>
         <div class="page-sub">Lance manualmente quantas vagas cada linha oferece. A vaga só é ocupada quando o candidato envia o pré-projeto.</div>
         <div id="lista-vagas"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <!-- ============ NOTÍCIAS ============ -->
+      <div class="tab" id="tab-noticias">
+        <div class="page-title">Notícias</div>
+        <div class="page-sub">Publique comunicados que aparecem na home do portal do aluno, no estilo "Últimas notícias".</div>
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-header"><div><div class="card-title" id="not-form-titulo">Nova notícia</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <input id="na-titulo" placeholder="Título" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;"/>
+            <textarea id="na-conteudo" rows="6" placeholder="Texto completo da notícia..." style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;font-family:inherit;resize:vertical;"></textarea>
+            <label style="font-size:.78rem;color:var(--gray);">Imagem de capa (opcional): <input type="file" id="na-img" accept="image/*"/></label>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+              <button class="btn btn-outline btn-sm" id="na-cancelar" style="display:none;" onclick="cancelarEdicaoNoticia()">Cancelar edição</button>
+              <button class="btn btn-primary" id="na-salvar" onclick="salvarNoticia()">Publicar</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="data-table">
+          <thead><tr><th>Data</th><th>Título</th><th>Status</th><th></th></tr></thead>
+          <tbody id="na-lista"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody>
+        </table></div>
       </div>
 
       <!-- ============ AULAS AO VIVO: CRIADORES ============ -->
@@ -1881,6 +1904,7 @@ function showTab(name,el){
   if(name==='selecao') carregarCandidatos();
   if(name==='criadores') carregarCriadores();
   if(name==='presencas') carregarPresencas();
+  if(name==='noticias') carregarNoticiasAdm();
 }
 
 async function carregarCursos(){
@@ -4732,6 +4756,81 @@ try{
     if(svg)svg.innerHTML=OLHO_FECHADO;
   }
 }catch(e){}
+
+/* ===== Notícias (admin) ===== */
+let naCache=[],naEditId=null;
+async function carregarNoticiasAdm(){
+  const {data}=await sb.from('noticias').select('*').order('publicado_em',{ascending:false});
+  naCache=data||[];
+  const el=document.getElementById('na-lista');
+  if(!naCache.length){el.innerHTML='<tr><td colspan="4" class="loading">Nenhuma notícia publicada ainda.</td></tr>';return;}
+  el.innerHTML=naCache.map(n=>`
+    <tr>
+      <td style="white-space:nowrap;">${new Date(n.publicado_em).toLocaleDateString('pt-BR')}</td>
+      <td style="font-weight:600;color:var(--primary);">${n.titulo}</td>
+      <td>${n.publicada?'<span style="background:#dcfce7;color:#166534;border-radius:20px;padding:3px 10px;font-size:.7rem;font-weight:700;">PUBLICADA</span>':'<span style="background:#fee2e2;color:#991b1b;border-radius:20px;padding:3px 10px;font-size:.7rem;font-weight:700;">OCULTA</span>'}</td>
+      <td style="text-align:right;white-space:nowrap;">
+        <button class="btn btn-outline btn-sm" onclick="editarNoticia('${n.id}')">Editar</button>
+        <button class="btn btn-outline btn-sm" onclick="togglePubNoticia('${n.id}',${n.publicada?'false':'true'})">${n.publicada?'Ocultar':'Publicar'}</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirNoticia('${n.id}')">Excluir</button>
+      </td>
+    </tr>`).join('');
+}
+async function salvarNoticia(){
+  const titulo=document.getElementById('na-titulo').value.trim();
+  const conteudo=document.getElementById('na-conteudo').value.trim();
+  if(!titulo||!conteudo){toast('Preencha título e texto.','erro');return;}
+  const btn=document.getElementById('na-salvar');btn.disabled=true;
+  let imagem_url=null;
+  const f=document.getElementById('na-img').files[0];
+  if(f){
+    const path=Date.now()+'_'+f.name.replace(/[^a-zA-Z0-9._-]/g,'');
+    const {error:up}=await sb.storage.from('noticias').upload(path,f,{upsert:true});
+    if(up){toast('A imagem não subiu: '+(up.message||''),'erro');}
+    else{imagem_url=sb.storage.from('noticias').getPublicUrl(path).data.publicUrl;}
+  }
+  let error;
+  if(naEditId){
+    const upd={titulo,conteudo};if(imagem_url)upd.imagem_url=imagem_url;
+    ({error}=await sb.from('noticias').update(upd).eq('id',naEditId));
+  }else{
+    ({error}=await sb.from('noticias').insert({titulo,conteudo,imagem_url}));
+  }
+  btn.disabled=false;
+  if(error){toast('Não foi possível salvar.','erro');return;}
+  toast(naEditId?'Notícia atualizada.':'Notícia publicada.');
+  cancelarEdicaoNoticia();
+  carregarNoticiasAdm();
+}
+function editarNoticia(id){
+  const n=naCache.find(x=>x.id===id);if(!n)return;
+  naEditId=id;
+  document.getElementById('na-titulo').value=n.titulo;
+  document.getElementById('na-conteudo').value=n.conteudo||'';
+  document.getElementById('not-form-titulo').textContent='Editar notícia';
+  document.getElementById('na-salvar').textContent='Salvar alterações';
+  document.getElementById('na-cancelar').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelarEdicaoNoticia(){
+  naEditId=null;
+  document.getElementById('na-titulo').value='';
+  document.getElementById('na-conteudo').value='';
+  document.getElementById('na-img').value='';
+  document.getElementById('not-form-titulo').textContent='Nova notícia';
+  document.getElementById('na-salvar').textContent='Publicar';
+  document.getElementById('na-cancelar').style.display='none';
+}
+async function togglePubNoticia(id,val){
+  await sb.from('noticias').update({publicada:val}).eq('id',id);
+  carregarNoticiasAdm();
+}
+async function excluirNoticia(id){
+  if(!confirm('Excluir esta notícia definitivamente?'))return;
+  await sb.from('noticias').delete().eq('id',id);
+  toast('Notícia excluída.');
+  carregarNoticiasAdm();
+}
 
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
 </script>
