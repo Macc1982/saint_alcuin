@@ -302,7 +302,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.4" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.5" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
@@ -1545,6 +1545,11 @@
         <label>Link do original</label>
         <input type="url" id="em-orig-url" placeholder="https://youtube.com/watch?v=..."/>
       </div>
+          <div class="form-group" id="em-bloco-capa">
+            <label>Capa da disciplina <span style="font-weight:400;color:var(--gray)">(opcional — vira a capa do card em Videoaulas; formato 3:4)</span></label>
+            <div id="em-capa-atual" style="font-size:.72rem;color:var(--gray);margin-bottom:6px;"></div>
+            <input type="file" id="em-capa" accept="image/*"/>
+          </div>
     </div>
 
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
@@ -3291,6 +3296,10 @@ async function abrirEditarMaterial(id){
 
   document.getElementById('em-bloco-aviso').style.display   = ehVideo?'block':'none';
   document.getElementById('em-bloco-credito').style.display = 'block';
+  window.emCursoAtual = m.curso_id;
+  document.getElementById('em-bloco-capa').style.display = ehVideo?'block':'none';
+  document.getElementById('em-capa-atual').textContent = m.capa_url?'Capa atual definida \u2714 (enviar nova substitui)':'Sem capa \u2014 o card usa a capa gerada';
+  document.getElementById('em-capa').value='';
 
   abrirModal('modal-material');
 }
@@ -3303,7 +3312,20 @@ async function salvarMaterial(){
   const btn=document.getElementById('btnSalvarMat');
   btn.disabled=true;btn.textContent='Salvando...';
 
-  const {error}=await sb.from('materiais').update({
+  const upd={};
+  const emCapaFile=(document.getElementById('em-capa').files||[])[0];
+  if(emCapaFile){
+    btn.textContent='Enviando capa...';
+    const cext=(emCapaFile.name.split('.').pop()||'jpg').toLowerCase();
+    const cpath=(window.emCursoAtual||'geral')+'/capas/'+Date.now()+'.'+cext;
+    const {error:cErr}=await sb.storage.from('materiais')
+      .upload(cpath,emCapaFile,{upsert:false,contentType:emCapaFile.type||'image/jpeg'});
+    if(cErr){toast('A capa n\u00e3o subiu: '+cErr.message,'error');}
+    else{upd.capa_url=sb.storage.from('materiais').getPublicUrl(cpath).data.publicUrl;}
+    btn.textContent='Salvando...';
+  }
+
+  const {error}=await sb.from('materiais').update(Object.assign(upd,{
     titulo,
     descricao:          document.getElementById('em-desc').value.trim()||null,
     aviso:              document.getElementById('em-aviso').value.trim()||null,
@@ -3311,7 +3333,7 @@ async function salvarMaterial(){
     instituicao_origem: document.getElementById('em-inst').value.trim()||null,
     licenca:            document.getElementById('em-licenca').value||null,
     url_original:       document.getElementById('em-orig-url').value.trim()||null
-  }).eq('id',id);
+  })).eq('id',id);
 
   btn.disabled=false;btn.textContent='Salvar alterações';
   if(error){toast('Erro: '+error.message,'error');return;}
