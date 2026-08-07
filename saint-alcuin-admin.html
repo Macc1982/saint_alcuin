@@ -164,7 +164,7 @@
   .olho-btn:hover svg{stroke:var(--primary);}
   body.vals-off #k-recebido,body.vals-off #k-avencer,body.vals-off #k-vencido,body.vals-off #k-inad,
   body.vals-off #k-recebido-sub,body.vals-off #k-avencer-sub,body.vals-off #k-vencido-sub,body.vals-off #k-inad-sub,
-  body.vals-off #dash-fin{filter:blur(10px);user-select:none;pointer-events:none;transition:filter .18s;}
+  body.vals-off #dash-fin,body.vals-off #cr-mrr,body.vals-off #cr-proj,body.vals-off #cr-blur-1,body.vals-off #cr-blur-2{filter:blur(10px);user-select:none;pointer-events:none;transition:filter .18s;}
   .mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
   .mini{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:13px;box-shadow:0 6px 20px rgba(11,42,74,.05);}
   .mini-ic{width:20px;height:20px;stroke:var(--secondary);stroke-width:1.7;fill:none;flex-shrink:0;}
@@ -302,7 +302,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.5" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.7" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f97316;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
@@ -383,6 +383,32 @@
             <span class="card-hint" id="dash-venc-hint"></span>
           </div>
           <div id="dash-vencidas"><div class="loading">Carregando...</div></div>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+          <div class="card-header"><div>
+            <div class="card-title">Crescimento no tempo</div>
+            <div class="card-subtitle">Receita mes a mes, MRR por curso e evolucao da base</div>
+          </div></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 16px;">
+            <div class="mini" style="flex:1;min-width:150px;"><div><div class="mini-value" id="cr-mrr">--</div><div class="mini-label">Receita recorrente (mes)</div></div></div>
+            <div class="mini" style="flex:1;min-width:150px;"><div><div class="mini-value" id="cr-cresc">--</div><div class="mini-label">Crescimento vs. mes anterior</div></div></div>
+            <div class="mini" style="flex:1;min-width:150px;"><div><div class="mini-value" id="cr-proj">--</div><div class="mini-label">Projecao 12 meses</div></div></div>
+            <div class="mini" style="flex:1;min-width:150px;"><div><div class="mini-value" id="cr-base">--</div><div class="mini-label">Base de alunos ativos</div></div></div>
+          </div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:.72rem;color:var(--gray);">
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:3px;background:#185da0;"></span>Recebido</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:3px;background:#9fbfe0;"></span>Contratado</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:16px;height:3px;background:#E00000;display:inline-block;"></span>Inadimplencia %</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:16px;height:3px;background:#7a5af5;display:inline-block;"></span>Alunos ativos</span>
+          </div>
+          <div id="cr-blur-1" style="position:relative;width:100%;height:280px;"><canvas id="chart-crescimento"></canvas></div>
+
+          <div class="card-header" style="margin-top:22px;"><div>
+            <div class="card-title" style="font-size:.95rem;">Receita recorrente por curso</div>
+          </div></div>
+          <div id="cr-legenda-mrr" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:.72rem;color:var(--gray);"></div>
+          <div id="cr-blur-2" style="position:relative;width:100%;height:260px;"><canvas id="chart-mrr"></canvas></div>
         </div>
       </div>
 
@@ -1899,7 +1925,7 @@ async function iniciarApp(){
   await carregarCursos();
   await carregarDisciplinas();   // discCache precisa estar pronto p/ os selects
   await Promise.all([
-    carregarDashboard(), carregarAlunos(), carregarMateriais(),
+    carregarDashboard(), carregarCrescimento(), carregarAlunos(), carregarMateriais(),
     carregarNotas(), carregarMatriculas(), carregarCursosTabela(),
     carregarAtividades(), carregarCorrecoes(), carregarAcervo(), carregarLinhas(), carregarBiblioteca()
   ]);
@@ -4872,7 +4898,73 @@ async function excluirNoticia(id){
   carregarNoticiasAdm();
 }
 
+/* ===== Painel de crescimento (le v_crescimento_mensal + v_mrr_curso_mes) ===== */
+let chartCresc=null, chartMrr=null;
+const CR_CORES=["#185da0","#E00000","#0f8a5f","#c98500","#7a5af5","#d55181","#1baf7a","#888780"];
+function crBRLk(v){return 'R$ '+Math.round(Number(v)/1000).toLocaleString('pt-BR')+'k';}
+async function carregarCrescimento(){
+  let cm=[];
+  try{ const r=await sb.from('v_crescimento_mensal').select('*'); cm=r.data||[]; }catch(e){}
+  if(cm.length){
+    const labels=cm.map(x=>x.rotulo);
+    const receb=cm.map(x=>Number(x.recebido||0)/1000);
+    const contr=cm.map(x=>Number(x.contratado||0)/1000);
+    const inad =cm.map(x=>Number(x.inadimplencia_pct||0));
+    let alunosMap={};
+    try{ const ra=await sb.from('v_alunos_mensal').select('*'); (ra.data||[]).forEach(a=>{alunosMap[a.rotulo]=Number(a.base_ativa||0);}); }catch(e){}
+    const baseAtiva=labels.map(l=>alunosMap[l]!==undefined?alunosMap[l]:null);
+    const ult=cm[cm.length-1], pen=cm[cm.length-2];
+    { const bs=baseAtiva.filter(v=>v!==null); document.getElementById('cr-base').textContent = bs.length?bs[bs.length-1]:'--'; }
+    document.getElementById('cr-mrr').textContent=brl(Number(ult.recebido||0));
+    if(pen && Number(pen.recebido)>0){
+      const g=(Number(ult.recebido)-Number(pen.recebido))/Number(pen.recebido)*100;
+      const el=document.getElementById('cr-cresc');
+      el.textContent=(g>=0?'\u25b2 ':'\u25bc ')+Math.abs(g).toFixed(0)+'%';
+      el.style.color=g>=0?'#0f8a5f':'#E00000';
+    } else { document.getElementById('cr-cresc').textContent='--'; }
+    document.getElementById('cr-proj').textContent=brl(Number(ult.recebido||0)*12);
+    if(chartCresc)chartCresc.destroy();
+    chartCresc=new Chart(document.getElementById('chart-crescimento'),{
+      data:{labels,datasets:[
+        {type:'bar',label:'Recebido',data:receb,backgroundColor:'#185da0',borderRadius:4,order:2,yAxisID:'y'},
+        {type:'bar',label:'Contratado',data:contr,backgroundColor:'#9fbfe0',borderRadius:4,order:3,yAxisID:'y'},
+        {type:'line',label:'Inadimplencia %',data:inad,borderColor:'#E00000',backgroundColor:'#E00000',tension:.3,borderWidth:2,pointRadius:3,order:1,yAxisID:'y1'},
+        {type:'line',label:'Alunos ativos',data:baseAtiva,borderColor:'#7a5af5',backgroundColor:'#7a5af5',tension:.3,borderWidth:2,pointRadius:3,order:0,yAxisID:'y2'}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='Alunos ativos'?c.dataset.label+': '+c.parsed.y:(c.dataset.type==='line'?c.dataset.label+': '+c.parsed.y+'%':c.dataset.label+': '+crBRLk(c.parsed.y*1000))}}},
+        scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{color:'#888780',callback:v=>'R$'+v+'k'}},
+                y1:{position:'right',beginAtZero:true,grid:{display:false},ticks:{color:'#E00000',callback:v=>v+'%'}},
+                y2:{display:false,beginAtZero:true},
+                x:{grid:{display:false},ticks:{color:'#888780'}}}}
+    });
+  }
+  let mm=[];
+  try{ const r=await sb.from('v_mrr_curso_mes').select('*'); mm=r.data||[]; }catch(e){}
+  if(mm.length){
+    const meses=[...new Set(mm.map(x=>x.rotulo))];
+    const cursos=[...new Set(mm.map(x=>x.curso_id))];
+    const nomeCurso=id=>{const c=cursosCache.find(x=>x.id===id);return c?c.nome:'Sem curso';};
+    const ds=cursos.map((cid,i)=>({
+      label:nomeCurso(cid),
+      data:meses.map(mes=>{const row=mm.find(x=>x.rotulo===mes && x.curso_id===cid);return row?Number(row.receita||0)/1000:0;}),
+      backgroundColor:CR_CORES[i%CR_CORES.length],borderRadius:4,stack:'m'
+    }));
+    document.getElementById('cr-legenda-mrr').innerHTML=ds.map((d,i)=>
+      '<span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:3px;background:'+CR_CORES[i%CR_CORES.length]+';"></span>'+d.label+'</span>').join('');
+    if(chartMrr)chartMrr.destroy();
+    chartMrr=new Chart(document.getElementById('chart-mrr'),{
+      type:'bar',data:{labels:meses,datasets:ds},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+crBRLk(c.parsed.y*1000)}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#888780'}},
+                y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{color:'#888780',callback:v=>'R$'+v+'k'}}}}
+    });
+  }
+}
+
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </body>
 </html>
