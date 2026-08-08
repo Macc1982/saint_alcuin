@@ -159,6 +159,37 @@
   .kpi-green .kpi-value{color:#15803d;}
   .kpi-red .kpi-value{color:#c1121f;}
   .kpi-foot{font-size:.7rem;color:var(--gray);margin-top:7px;min-height:1em;}
+  /* ===== Executivo (Apple/Stripe) ===== */
+  .ex-wrap{max-width:1200px;}
+  .ex-chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .ex-chip{border:1px solid var(--border);background:#fff;color:var(--gray);border-radius:20px;padding:6px 14px;font-size:.76rem;cursor:pointer;font-family:inherit;transition:all .15s;}
+  .ex-chip:hover{border-color:#b9c4d0;color:var(--primary);}
+  .ex-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;}
+  .ex-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:0 1px 2px rgba(11,42,74,.03);}
+  .ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:12px;}
+  .ex-kpi-label{font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .ex-kpi-val{font-size:1.5rem;font-weight:650;color:var(--primary);letter-spacing:-.02em;line-height:1.1;}
+  .ex-kpi-delta{font-size:.72rem;font-weight:600;margin-top:6px;}
+  .ex-up{color:#0f8a5f;} .ex-down{color:#c92a2a;} .ex-flat{color:var(--gray);}
+  .ex-spark{margin-top:10px;height:26px;width:100%;}
+  .ex-h{font-size:.95rem;font-weight:650;color:var(--primary);letter-spacing:-.01em;}
+  .ex-sub{font-size:.74rem;color:var(--gray);margin-top:2px;}
+  .ex-sec{margin-top:16px;}
+  .ex-hbar{height:8px;border-radius:5px;background:#eef1f5;overflow:hidden;display:flex;}
+  .ex-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f0f3f6;}
+  .ex-row:last-child{border-bottom:none;}
+  .ex-row .n{flex:0 0 240px;font-size:.8rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ex-row .v{flex:0 0 110px;text-align:right;font-size:.8rem;font-weight:600;color:var(--primary);}
+  .ex-row .p{flex:0 0 52px;text-align:right;font-size:.72rem;color:var(--gray);}
+  .ex-row .b{flex:1;}
+  .ex-funil-et{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #f0f3f6;}
+  .ex-funil-et:last-child{border-bottom:none;}
+  .ex-funil-nome{flex:0 0 210px;font-size:.8rem;color:var(--text);}
+  .ex-funil-num{flex:0 0 64px;font-size:.95rem;font-weight:650;color:var(--primary);text-align:right;}
+  .ex-funil-tx{flex:0 0 110px;font-size:.72rem;color:var(--gray);text-align:right;}
+  .ex-gargalo{background:#fff5f5;border-radius:8px;}
+  body.vals-off .ex-money{filter:blur(9px);user-select:none;}
+
   .olho-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 9px;cursor:pointer;margin-left:12px;vertical-align:middle;line-height:0;}
   .olho-btn svg{width:17px;height:17px;stroke:var(--gray);stroke-width:2;fill:none;}
   .olho-btn:hover svg{stroke:var(--primary);}
@@ -302,7 +333,8 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.8" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ec4899;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.9" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#eab308;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
@@ -1090,6 +1122,113 @@
         <div class="page-title">Vagas por linha</div>
         <div class="page-sub">Lance manualmente quantas vagas cada linha oferece. A vaga só é ocupada quando o candidato envia o pré-projeto.</div>
         <div id="lista-vagas"><div class="loading">Carregando...</div></div>
+      </div>
+
+      <!-- ============ EXECUTIVO ============ -->
+      <div class="tab" id="tab-executivo">
+        <div class="ex-wrap">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+          <div>
+            <div class="page-title" style="margin-bottom:2px;">Executivo</div>
+            <div class="page-sub" style="margin:0;">Crescimento, receita e aquisição em tempo real</div>
+          </div>
+          <div class="ex-chips" id="ex-filtros">
+            <button class="ex-chip" data-p="hoje" onclick="exPeriodo('hoje')">Hoje</button>
+            <button class="ex-chip" data-p="7" onclick="exPeriodo('7')">7 dias</button>
+            <button class="ex-chip on" data-p="30" onclick="exPeriodo('30')">30 dias</button>
+            <button class="ex-chip" data-p="90" onclick="exPeriodo('90')">90 dias</button>
+            <button class="ex-chip" data-p="180" onclick="exPeriodo('180')">6 meses</button>
+            <button class="ex-chip" data-p="365" onclick="exPeriodo('365')">12 meses</button>
+            <button class="ex-chip" data-p="ano" onclick="exPeriodo('ano')">Ano atual</button>
+          </div>
+        </div>
+
+        <div class="ex-grid" id="ex-pulse"></div>
+
+        <div class="ex-card ex-sec">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div><div class="ex-h">Crescimento Institucional</div><div class="ex-sub" id="ex-main-sub"></div></div>
+            <div class="ex-chips" id="ex-metricas">
+              <button class="ex-chip on" data-m="mat" onclick="exMetrica('mat')">Matrículas</button>
+              <button class="ex-chip" data-m="rec" onclick="exMetrica('rec')">Recebido</button>
+              <button class="ex-chip" data-m="con" onclick="exMetrica('con')">Contratado</button>
+            </div>
+          </div>
+          <div style="position:relative;width:100%;height:300px;margin-top:14px;"><canvas id="ex-chart-main"></canvas></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;" class="ex-sec">
+          <div class="ex-card">
+            <div class="ex-h">Carteira contratada → caixa</div>
+            <div class="ex-sub">Quanto do contratado já virou dinheiro</div>
+            <div style="display:flex;gap:22px;flex-wrap:wrap;margin:16px 0 12px;" class="ex-money">
+              <div><div class="ex-kpi-label">Contratado</div><div class="ex-kpi-val" id="ex-cart-total" style="font-size:1.2rem;">—</div></div>
+              <div><div class="ex-kpi-label">Recebido</div><div class="ex-kpi-val" id="ex-cart-rec" style="font-size:1.2rem;color:#0f8a5f;">—</div></div>
+              <div><div class="ex-kpi-label">Saldo futuro</div><div class="ex-kpi-val" id="ex-cart-fut" style="font-size:1.2rem;">—</div></div>
+              <div><div class="ex-kpi-label">Realizado</div><div class="ex-kpi-val" id="ex-cart-pct" style="font-size:1.2rem;">—</div></div>
+            </div>
+            <div class="ex-hbar" id="ex-cart-bar"></div>
+          </div>
+          <div class="ex-card">
+            <div class="ex-h">Velocidade e projeção</div>
+            <div class="ex-sub">Ritmo atual e para onde ele leva</div>
+            <div style="display:flex;gap:22px;flex-wrap:wrap;margin-top:16px;">
+              <div><div class="ex-kpi-label">Aceleração</div><div class="ex-kpi-val" id="ex-acel" style="font-size:1.2rem;">—</div><div class="ex-sub" id="ex-acel-sub"></div></div>
+              <div><div class="ex-kpi-label">Média/dia</div><div class="ex-kpi-val" id="ex-vel-dia" style="font-size:1.2rem;">—</div></div>
+              <div><div class="ex-kpi-label">Média/semana</div><div class="ex-kpi-val" id="ex-vel-sem" style="font-size:1.2rem;">—</div></div>
+            </div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f3f6;">
+              <div class="ex-kpi-label">Projeção (ritmo atual — não realizado)</div>
+              <div class="ex-sub" id="ex-proj" style="font-size:.8rem;color:var(--text);margin-top:6px;line-height:1.7;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;" class="ex-sec">
+          <div class="ex-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+              <div class="ex-h">Por curso</div>
+              <div class="ex-chips" id="ex-curso-met">
+                <button class="ex-chip on" data-c="mat" onclick="exCursoMet('mat')">Matrículas</button>
+                <button class="ex-chip" data-c="con" onclick="exCursoMet('con')">Contratado</button>
+                <button class="ex-chip" data-c="rec" onclick="exCursoMet('rec')">Recebido</button>
+                <button class="ex-chip" data-c="tic" onclick="exCursoMet('tic')">Ticket</button>
+              </div>
+            </div>
+            <div id="ex-cursos" style="margin-top:10px;"></div>
+          </div>
+          <div class="ex-card">
+            <div class="ex-h">Receita por curso</div>
+            <div class="ex-sub"><span style="color:#0f8a5f;">●</span> Recebido &nbsp;<span style="color:#145da0;">●</span> A vencer &nbsp;<span style="color:#c92a2a;">●</span> Vencido</div>
+            <div id="ex-rec-curso" style="margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;" class="ex-sec">
+          <div class="ex-card">
+            <div class="ex-h">Funil de conversão</div>
+            <div class="ex-sub">Candidatos do período, da inscrição ao primeiro pagamento</div>
+            <div id="ex-funil" style="margin-top:8px;"></div>
+          </div>
+          <div class="ex-card">
+            <div class="ex-h">Inadimplência</div>
+            <div class="ex-sub">Carteira vencida e envelhecimento</div>
+            <div style="display:flex;gap:22px;flex-wrap:wrap;margin:16px 0 12px;">
+              <div><div class="ex-kpi-label">Taxa</div><div class="ex-kpi-val" id="ex-inad-pct" style="font-size:1.2rem;">—</div></div>
+              <div class="ex-money"><div class="ex-kpi-label">Vencido</div><div class="ex-kpi-val" id="ex-inad-val" style="font-size:1.2rem;color:#c92a2a;">—</div></div>
+              <div><div class="ex-kpi-label">Alunos</div><div class="ex-kpi-val" id="ex-inad-n" style="font-size:1.2rem;">—</div></div>
+              <div class="ex-money"><div class="ex-kpi-label">Médio/aluno</div><div class="ex-kpi-val" id="ex-inad-med" style="font-size:1.2rem;">—</div></div>
+            </div>
+            <div id="ex-aging"></div>
+          </div>
+        </div>
+
+        <div class="ex-card ex-sec">
+          <div class="ex-h">Insights</div>
+          <div class="ex-sub">Calculados a partir dos dados do período</div>
+          <div id="ex-insights" style="margin-top:10px;font-size:.84rem;line-height:2;color:var(--text);"></div>
+        </div>
+        </div>
       </div>
 
       <!-- ============ NOTÍCIAS ============ -->
@@ -1941,6 +2080,7 @@ function showTab(name,el){
   if(name==='criadores') carregarCriadores();
   if(name==='presencas') carregarPresencas();
   if(name==='noticias') carregarNoticiasAdm();
+  if(name==='executivo') carregarExecutivo();
 }
 
 async function carregarCursos(){
@@ -4962,6 +5102,291 @@ async function carregarCrescimento(){
                 y:{stacked:true,beginAtZero:true,grid:{color:'#eef1f5'},ticks:{color:'#888780',callback:v=>'R$'+v+'k'}}}}
     });
   }
+}
+
+/* ===== EXECUTIVO — cockpit de crescimento (cálculo no cliente) ===== */
+let exDados=null, exP='30', exMet='mat', exCMet='mat', exChartMain=null;
+const exDia=d=>d?String(d).slice(0,10):null;
+function exBRL(v){return 'R$ '+Math.round(Number(v||0)).toLocaleString('pt-BR');}
+function exPct(v){return (v>=0?'+':'')+v.toFixed(1).replace('.',',')+'%';}
+
+async function carregarExecutivo(){
+  if(!exDados){
+    const [m,f,c]=await Promise.all([
+      sb.from('matriculas').select('id,curso_id,data_inicio,status'),
+      sb.from('financeiro_parcelas').select('matricula_id,tipo,status,valor,valor_pago,vencimento,data_pagamento'),
+      sb.from('candidatos').select('etapa,resultado,criado_em')
+    ]);
+    exDados={
+      mats:(m.data||[]).filter(x=>x.data_inicio && !['cancelada','cancelado'].includes(String(x.status||'').toLowerCase())),
+      pars:(f.data||[]).filter(x=>String(x.status||'')!=='cancelado'),
+      cands:c.data||[]
+    };
+    exDados.contratoPorMat={};
+    exDados.pars.forEach(p=>{ if(p.matricula_id) exDados.contratoPorMat[p.matricula_id]=(exDados.contratoPorMat[p.matricula_id]||0)+Number(p.valor||0); });
+    exDados.pagouPorMat={};
+    exDados.pars.forEach(p=>{ if(p.status==='pago'&&p.matricula_id) exDados.pagouPorMat[p.matricula_id]=true; });
+  }
+  renderExecutivo();
+}
+function exPeriodo(p){exP=p;document.querySelectorAll('#ex-filtros .ex-chip').forEach(b=>b.classList.toggle('on',b.dataset.p===p));renderExecutivo();}
+function exMetrica(m){exMet=m;document.querySelectorAll('#ex-metricas .ex-chip').forEach(b=>b.classList.toggle('on',b.dataset.m===m));renderChartMain();}
+function exCursoMet(c){exCMet=c;document.querySelectorAll('#ex-curso-met .ex-chip').forEach(b=>b.classList.toggle('on',b.dataset.c===c));renderCursos();}
+
+function exJanela(){
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  let ini,fim=new Date(hoje); fim.setDate(fim.getDate()+1);
+  if(exP==='hoje'){ini=new Date(hoje);}
+  else if(exP==='ano'){ini=new Date(hoje.getFullYear(),0,1);}
+  else{ini=new Date(hoje);ini.setDate(ini.getDate()-Number(exP)+1);}
+  const dur=Math.round((fim-ini)/86400000);
+  const iniPrev=new Date(ini);iniPrev.setDate(iniPrev.getDate()-dur);
+  return {ini,fim,iniPrev,fimPrev:ini,dur};
+}
+const noJ=(d,a,b)=>{if(!d)return false;const x=new Date(d+'T00:00:00');return x>=a&&x<b;};
+
+function exAgrega(a,b){
+  const D=exDados;
+  const mats=D.mats.filter(m=>noJ(m.data_inicio,a,b));
+  const contratado=mats.reduce((t,m)=>t+(D.contratoPorMat[m.id]||0),0);
+  const recebido=D.pars.filter(p=>p.status==='pago'&&noJ(p.data_pagamento,a,b)).reduce((t,p)=>t+Number(p.valor_pago||p.valor||0),0);
+  const cands=D.cands.filter(c=>noJ(exDia(c.criado_em),a,b));
+  const matriculados=cands.filter(c=>c.etapa==='matriculado').length;
+  return {mats,nMat:mats.length,contratado,recebido,cands,nCand:cands.length,matriculados,
+          ticket:mats.length?contratado/mats.length:0,
+          conv:cands.length?matriculados/cands.length*100:0};
+}
+function exVencidoAtual(){
+  const D=exDados,hj=new Date();hj.setHours(0,0,0,0);
+  const venc=D.pars.filter(p=>p.status==='aberto'&&p.vencimento&&new Date(p.vencimento+'T00:00:00')<hj);
+  return {lista:venc,total:venc.reduce((t,p)=>t+Number(p.valor||0),0),
+          alunos:new Set(venc.map(p=>p.matricula_id)).size};
+}
+function exDelta(el,atual,prev,inverte,pp){
+  const e=document.getElementById(el);if(!e)return;
+  if(prev===0&&atual===0){e.textContent='—';e.className='ex-kpi-delta ex-flat';return;}
+  let d,txt;
+  if(pp){d=atual-prev;txt=(d>=0?'▲ ':'▼ ')+Math.abs(d).toFixed(1).replace('.',',')+' p.p.';}
+  else if(prev===0){e.textContent='— novo';e.className='ex-kpi-delta ex-flat';return;}
+  else{d=(atual-prev)/prev*100;txt=(d>=0?'▲ ':'▼ ')+Math.abs(d).toFixed(1).replace('.',',')+'%';}
+  const bom=inverte?d<=0:d>=0;
+  e.textContent=txt+' vs período anterior';
+  e.className='ex-kpi-delta '+(d===0?'ex-flat':(bom?'ex-up':'ex-down'));
+}
+function exSpark(vals){
+  if(!vals.length)return '';
+  const w=100,h=26,mx=Math.max(...vals,1);
+  const pts=vals.map((v,i)=>((i/(vals.length-1||1))*w).toFixed(1)+','+(h-3-(v/mx)*(h-6)).toFixed(1)).join(' ');
+  return '<svg class="ex-spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><polyline points="'+pts+'" fill="none" stroke="#145da0" stroke-width="1.6" stroke-linecap="round"/></svg>';
+}
+function exBuckets(a,b,fn){
+  const dur=Math.round((b-a)/86400000);
+  const porMes=dur>92;
+  const out=[],lab=[];
+  if(porMes){
+    let c=new Date(a.getFullYear(),a.getMonth(),1);
+    while(c<b){const n=new Date(c.getFullYear(),c.getMonth()+1,1);out.push(fn(c,n));lab.push(c.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'/'+String(c.getFullYear()).slice(2));c=n;}
+  }else{
+    let c=new Date(a);
+    while(c<b){const n=new Date(c);n.setDate(n.getDate()+1);out.push(fn(c,n));lab.push(String(c.getDate()).padStart(2,'0')+'/'+String(c.getMonth()+1).padStart(2,'0'));c=n;}
+  }
+  return {vals:out,labs:lab};
+}
+
+function renderExecutivo(){
+  const J=exJanela();
+  const A=exAgrega(J.ini,J.fim), P=exAgrega(J.iniPrev,J.fimPrev);
+  const V=exVencidoAtual();
+  const inadAtual=(A.recebido+V.total)>0?V.total/(A.recebido+V.total)*100:0;
+  const inadPrev=(P.recebido+V.total)>0?V.total/(P.recebido+V.total)*100:0;
+
+  // sparklines (série do período em 8+ pontos)
+  const bMat=exBuckets(J.ini,J.fim,(a,b)=>exDados.mats.filter(m=>noJ(m.data_inicio,a,b)).length);
+  const bRec=exBuckets(J.ini,J.fim,(a,b)=>exDados.pars.filter(p=>p.status==='pago'&&noJ(p.data_pagamento,a,b)).reduce((t,p)=>t+Number(p.valor_pago||p.valor||0),0));
+  const bCon=exBuckets(J.ini,J.fim,(a,b)=>exDados.mats.filter(m=>noJ(m.data_inicio,a,b)).reduce((t,m)=>t+(exDados.contratoPorMat[m.id]||0),0));
+
+  const pulse=[
+    {l:'Matrículas',v:A.nMat,dl:'ex-d0',sp:bMat.vals,money:false},
+    {l:'Recebido',v:exBRL(A.recebido),dl:'ex-d1',sp:bRec.vals,money:true},
+    {l:'Contratado',v:exBRL(A.contratado),dl:'ex-d2',sp:bCon.vals,money:true},
+    {l:'Ticket médio',v:exBRL(A.ticket),dl:'ex-d3',sp:[],money:true},
+    {l:'Inadimplência',v:inadAtual.toFixed(1).replace('.',',')+'%',dl:'ex-d4',sp:[],money:false},
+    {l:'Conversão',v:A.conv.toFixed(1).replace('.',',')+'%',dl:'ex-d5',sp:[],money:false}
+  ];
+  document.getElementById('ex-pulse').innerHTML=pulse.map(k=>
+    '<div class="ex-card"><div class="ex-kpi-label">'+k.l+'</div><div class="ex-kpi-val'+(k.money?' ex-money':'')+'">'+k.v+'</div><div id="'+k.dl+'" class="ex-kpi-delta ex-flat">—</div>'+exSpark(k.sp)+'</div>').join('');
+  exDelta('ex-d0',A.nMat,P.nMat,false);
+  exDelta('ex-d1',A.recebido,P.recebido,false);
+  exDelta('ex-d2',A.contratado,P.contratado,false);
+  exDelta('ex-d3',A.ticket,P.ticket,false);
+  exDelta('ex-d4',inadAtual,inadPrev,true,true);
+  exDelta('ex-d5',A.conv,P.conv,false,true);
+
+  // carteira (sempre total, independe do período)
+  const totC=exDados.pars.reduce((t,p)=>t+Number(p.valor||0),0);
+  const totR=exDados.pars.filter(p=>p.status==='pago').reduce((t,p)=>t+Number(p.valor_pago||p.valor||0),0);
+  const pctR=totC?totR/totC*100:0;
+  document.getElementById('ex-cart-total').textContent=exBRL(totC);
+  document.getElementById('ex-cart-rec').textContent=exBRL(totR);
+  document.getElementById('ex-cart-fut').textContent=exBRL(totC-totR-V.total);
+  document.getElementById('ex-cart-pct').textContent=pctR.toFixed(1).replace('.',',')+'%';
+  document.getElementById('ex-cart-bar').innerHTML=
+    '<div style="width:'+pctR+'%;background:#0f8a5f;"></div><div style="width:'+(V.total/totC*100||0)+'%;background:#c92a2a;"></div><div style="flex:1;background:#145da022;"></div>';
+
+  // velocidade + projeção
+  const acel=P.nMat>0?(A.nMat-P.nMat)/P.nMat*100:(A.nMat>0?100:0);
+  const eA=document.getElementById('ex-acel');
+  eA.textContent=exPct(acel); eA.style.color=acel>=0?'#0f8a5f':'#c92a2a';
+  document.getElementById('ex-acel-sub').textContent=A.nMat+' agora · '+P.nMat+' antes';
+  document.getElementById('ex-vel-dia').textContent=(A.nMat/J.dur).toFixed(1).replace('.',',');
+  document.getElementById('ex-vel-sem').textContent=(A.nMat/J.dur*7).toFixed(1).replace('.',',');
+  const rd=A.nMat/J.dur, rc=A.contratado/J.dur, rr=A.recebido/J.dur;
+  document.getElementById('ex-proj').innerHTML=
+    '30 dias: <b>'+Math.round(rd*30)+' matrículas</b> · <span class="ex-money">'+exBRL(rc*30)+' contratados · '+exBRL(rr*30)+' recebidos</span><br>'+
+    '90 dias: <b>'+Math.round(rd*90)+' matrículas</b> · <span class="ex-money">'+exBRL(rc*90)+' contratados · '+exBRL(rr*90)+' recebidos</span>';
+
+  renderChartMain(bMat,bRec,bCon);
+  renderCursos(A);
+  renderRecCurso();
+  renderFunil(A);
+  renderInad(V,inadAtual);
+  renderInsights(A,P,V,acel,pctR);
+}
+
+let exB=null;
+function renderChartMain(bMat,bRec,bCon){
+  if(bMat)exB={bMat,bRec,bCon};
+  if(!exB)return;
+  const {bMat:m,bRec:r,bCon:c}=exB;
+  const serie=exMet==='mat'?m:(exMet==='rec'?r:c);
+  const nome=exMet==='mat'?'Matrículas':(exMet==='rec'?'Recebido':'Contratado');
+  let ac=0; const acum=c.vals.map(v=>(ac+=v));
+  document.getElementById('ex-main-sub').textContent=nome+' por período · linha: contratado acumulado';
+  if(exChartMain)exChartMain.destroy();
+  exChartMain=new Chart(document.getElementById('ex-chart-main'),{
+    data:{labels:serie.labs,datasets:[
+      {type:'bar',label:nome,data:serie.vals,backgroundColor:'#145da0',borderRadius:5,maxBarThickness:26,yAxisID:'y'},
+      {type:'line',label:'Contratado acumulado',data:acum,borderColor:'#0b2a4a',backgroundColor:'#0b2a4a',tension:.35,borderWidth:1.8,pointRadius:0,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{padding:12,backgroundColor:'#0b2a4a',cornerRadius:10,
+        callbacks:{label:t=>t.dataset.type==='line'?'Contratado acumulado: '+exBRL(t.parsed.y):(exMet==='mat'?t.parsed.y+' matrículas':nome+': '+exBRL(t.parsed.y))}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#f0f3f6'},ticks:{color:'#9aa3ad',precision:0}},
+              y1:{position:'right',beginAtZero:true,grid:{display:false},ticks:{color:'#9aa3ad',callback:v=>'R$'+Math.round(v/1000)+'k'}},
+              x:{grid:{display:false},ticks:{color:'#9aa3ad',maxTicksLimit:12}}}}
+  });
+}
+
+function renderCursos(A){
+  if(A)renderCursos.A=A; A=renderCursos.A; if(!A)return;
+  const D=exDados,agg={};
+  A.mats.forEach(m=>{const k=m.curso_id||'x';agg[k]=agg[k]||{n:0,con:0,rec:0};agg[k].n++;agg[k].con+=D.contratoPorMat[m.id]||0;});
+  const J=exJanela();
+  D.pars.filter(p=>p.status==='pago'&&noJ(p.data_pagamento,J.ini,J.fim)).forEach(p=>{
+    const mt=D.mats.find(m=>m.id===p.matricula_id); const k=(mt&&mt.curso_id)||'x';
+    agg[k]=agg[k]||{n:0,con:0,rec:0}; agg[k].rec+=Number(p.valor_pago||p.valor||0);
+  });
+  const linhas=Object.entries(agg).map(([k,v])=>({
+    nome:(cursosCache.find(c=>c.id===k)||{}).nome||'—',
+    val:exCMet==='mat'?v.n:(exCMet==='con'?v.con:(exCMet==='rec'?v.rec:(v.n?v.con/v.n:0)))
+  })).sort((a,b)=>b.val-a.val);
+  const tot=linhas.reduce((t,l)=>t+l.val,0)||1, mx=Math.max(...linhas.map(l=>l.val),1);
+  const money=exCMet!=='mat';
+  document.getElementById('ex-cursos').innerHTML=linhas.length?linhas.map(l=>
+    '<div class="ex-row"><div class="n">'+l.nome+'</div>'+
+    '<div class="b"><div class="ex-hbar"><div style="width:'+(l.val/mx*100)+'%;background:#145da0;border-radius:5px;"></div></div></div>'+
+    '<div class="v'+(money?' ex-money':'')+'">'+(money?exBRL(l.val):l.val)+'</div>'+
+    '<div class="p">'+(exCMet==='tic'?'':(l.val/tot*100).toFixed(0)+'%')+'</div></div>').join('')
+    :'<div class="empty">Sem matrículas no período.</div>';
+}
+
+function renderRecCurso(){
+  const D=exDados,hj=new Date();hj.setHours(0,0,0,0);
+  const agg={};
+  D.pars.forEach(p=>{
+    const mt=D.mats.find(m=>m.id===p.matricula_id); const k=(mt&&mt.curso_id)||'x';
+    agg[k]=agg[k]||{rec:0,av:0,vc:0};
+    if(p.status==='pago')agg[k].rec+=Number(p.valor_pago||p.valor||0);
+    else if(p.status==='aberto'){
+      if(p.vencimento&&new Date(p.vencimento+'T00:00:00')<hj)agg[k].vc+=Number(p.valor||0);
+      else agg[k].av+=Number(p.valor||0);
+    }
+  });
+  const linhas=Object.entries(agg).map(([k,v])=>({nome:(cursosCache.find(c=>c.id===k)||{}).nome||'—',...v,tot:v.rec+v.av+v.vc}))
+    .filter(l=>l.tot>0).sort((a,b)=>b.tot-a.tot);
+  document.getElementById('ex-rec-curso').innerHTML=linhas.map(l=>
+    '<div class="ex-row"><div class="n">'+l.nome+'</div>'+
+    '<div class="b"><div class="ex-hbar">'+
+      '<div style="width:'+(l.rec/l.tot*100)+'%;background:#0f8a5f;"></div>'+
+      '<div style="width:'+(l.av/l.tot*100)+'%;background:#145da0;"></div>'+
+      '<div style="width:'+(l.vc/l.tot*100)+'%;background:#c92a2a;"></div>'+
+    '</div></div>'+
+    '<div class="v ex-money">'+exBRL(l.tot)+'</div></div>').join('');
+}
+
+function renderFunil(A){
+  const ordem=['pre_inscricao','qualificacao','linha_escolhida','projeto_elaboracao','projeto_recebido','em_analise','ajustes_solicitados','aprovado','condicao_concedida','matricula_iniciada','documentos_pendentes','pagamento_pendente','matriculado'];
+  const rk=e=>ordem.indexOf(e);
+  const cs=A.cands;
+  const chegou=et=>cs.filter(c=>rk(c.etapa)>=rk(et)||(et!=='matriculado'&&c.etapa==='matriculado')).length;
+  const n0=cs.length;
+  const n1=chegou('projeto_recebido');
+  const n2=cs.filter(c=>c.resultado==='aprovado'||rk(c.etapa)>=rk('aprovado')).length;
+  const n3=A.matriculados;
+  const J=exJanela();
+  const n4=A.mats.filter(m=>exDados.pagouPorMat[m.id]).length;
+  const etapas=[['Candidatos',n0],['Pré-projetos recebidos',n1],['Aprovados',n2],['Matrículas',n3],['Primeiro pagamento',n4]];
+  let piorIdx=-1,piorTx=101;
+  const taxas=etapas.map((e,i)=>{
+    if(i===0)return null;
+    const tx=etapas[i-1][1]>0?e[1]/etapas[i-1][1]*100:0;
+    if(etapas[i-1][1]>0&&tx<piorTx){piorTx=tx;piorIdx=i;}
+    return tx;
+  });
+  document.getElementById('ex-funil').innerHTML=n0===0?'<div class="empty">Nenhum candidato no período.</div>':
+    etapas.map((e,i)=>
+    '<div class="ex-funil-et'+(i===piorIdx?' ex-gargalo':'')+'" style="'+(i===piorIdx?'padding-left:8px;padding-right:8px;':'')+'">'+
+      '<div class="ex-funil-nome">'+e[0]+(i===piorIdx?' <span style="color:#c92a2a;font-size:.66rem;font-weight:700;">GARGALO</span>':'')+'</div>'+
+      '<div class="b"><div class="ex-hbar"><div style="width:'+(n0?e[1]/n0*100:0)+'%;background:'+(i===piorIdx?'#c92a2a':'#145da0')+';border-radius:5px;"></div></div></div>'+
+      '<div class="ex-funil-num">'+e[1]+'</div>'+
+      '<div class="ex-funil-tx">'+(i===0?'100%':taxas[i].toFixed(1).replace('.',',')+'% da etapa')+'</div>'+
+    '</div>').join('');
+}
+
+function renderInad(V,pct){
+  document.getElementById('ex-inad-pct').textContent=pct.toFixed(1).replace('.',',')+'%';
+  document.getElementById('ex-inad-val').textContent=exBRL(V.total);
+  document.getElementById('ex-inad-n').textContent=V.alunos;
+  document.getElementById('ex-inad-med').textContent=V.alunos?exBRL(V.total/V.alunos):'R$ 0';
+  const hj=new Date();hj.setHours(0,0,0,0);
+  const faixas=[['1–7 dias',1,7],['8–15 dias',8,15],['16–30 dias',16,30],['31–60 dias',31,60],['+60 dias',61,99999]];
+  const vals=faixas.map(f=>V.lista.filter(p=>{const d=Math.floor((hj-new Date(p.vencimento+'T00:00:00'))/86400000);return d>=f[1]&&d<=f[2];}).reduce((t,p)=>t+Number(p.valor||0),0));
+  const mx=Math.max(...vals,1);
+  document.getElementById('ex-aging').innerHTML=V.total===0?'<div class="ex-sub" style="color:#0f8a5f;">Nenhuma parcela vencida. Carteira saudável.</div>':
+    faixas.map((f,i)=>
+    '<div class="ex-row"><div class="n" style="flex-basis:90px;">'+f[0]+'</div>'+
+    '<div class="b"><div class="ex-hbar"><div style="width:'+(vals[i]/mx*100)+'%;background:#c92a2a;border-radius:5px;"></div></div></div>'+
+    '<div class="v ex-money">'+exBRL(vals[i])+'</div></div>').join('');
+}
+
+function renderInsights(A,P,V,acel,pctR){
+  const D=exDados,ins=[];
+  if(A.nMat>0){
+    const porCurso={};A.mats.forEach(m=>{porCurso[m.curso_id]=(porCurso[m.curso_id]||0)+1;});
+    const [topId,topN]=Object.entries(porCurso).sort((a,b)=>b[1]-a[1])[0];
+    const nome=(cursosCache.find(c=>c.id===topId)||{}).nome||'—';
+    ins.push('<b>'+nome+'</b> representa <b>'+(topN/A.nMat*100).toFixed(1).replace('.',',')+'%</b> das matrículas do período.');
+  }
+  if(P.nMat>0)ins.push('A velocidade de matrículas '+(acel>=0?'aumentou <b class="ex-up">':'caiu <b class="ex-down">')+Math.abs(acel).toFixed(0)+'%</b> em relação ao período anterior.');
+  ins.push('A carteira contratada já foi <b>'+pctR.toFixed(1).replace('.',',')+'%</b> convertida em caixa.');
+  ins.push('A inadimplência atual '+(V.total<=0?'é <b class="ex-up">zero</b>.':'está em <b>'+exBRL(V.total)+'</b> ('+V.alunos+' aluno'+(V.alunos===1?'':'s')+').'));
+  if(A.nCand>0)ins.push('Conversão candidato → matrícula no período: <b>'+A.conv.toFixed(1).replace('.',',')+'%</b> ('+A.matriculados+' de '+A.nCand+').');
+  // ticket doutorado vs mestrado
+  const tk=nv=>{const ms=A.mats.filter(m=>{const c=cursosCache.find(x=>x.id===m.curso_id);return c&&String(c.nivel||'').toLowerCase().includes(nv);});
+    const v=ms.reduce((t,m)=>t+(D.contratoPorMat[m.id]||0),0);return ms.length?v/ms.length:0;};
+  const tD=tk('doutorado'),tM=tk('mestrado');
+  if(tD>0&&tM>0)ins.push('O Doutorado tem ticket médio <b>'+Math.abs((tD-tM)/tM*100).toFixed(0)+'% '+(tD>=tM?'superior':'inferior')+'</b> ao Mestrado.');
+  document.getElementById('ex-insights').innerHTML=ins.map(i=>'• '+i).join('<br>');
 }
 
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)iniciarApp();});
