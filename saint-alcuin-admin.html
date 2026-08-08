@@ -333,7 +333,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.9" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#eab308;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.0" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#111827;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -2237,9 +2237,14 @@ async function carregarAlunos(){
       <td>${a.nome}</td><td>${a.email}</td>
       <td>${a.cursos?.nome||'—'}</td>
       <td>${a.matricula||'—'}</td>
-      <td><span class="badge badge-${a.status==='ativo'?'green':'gray'}">${a.status}</span></td>
-      <td style="display:flex;gap:6px;">
+      <td><span class="badge badge-${a.status==='ativo'?'green':a.status==='desistente'?'red':'gray'}">${a.status}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">
         <button class="btn btn-outline btn-sm" onclick="abrirEdicao(${i})">Editar</button>
+        ${a.status==='ativo'
+          ? `<button class="btn btn-danger btn-sm" onclick="registrarDesistencia('${a.id}')">Desistência</button>`
+          : a.status==='desistente'
+            ? `<button class="btn btn-outline btn-sm" style="color:#0f8a5f;border-color:#9fd6be;" onclick="reativarAluno('${a.id}')">Reativar</button>`
+            : ``}
         <button class="btn btn-danger btn-sm" onclick="excluirAluno('${a.id}')">Remover</button>
       </td>
     </tr>`).join('');
@@ -2282,6 +2287,53 @@ async function cadastrarAluno(){
   ['a-nome','a-email','a-senha','a-matricula'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('a-curso').value='';
   btn.disabled=false;btn.textContent='Cadastrar Aluno';
+  await Promise.all([carregarAlunos(),carregarDashboard()]);
+}
+
+async function registrarDesistencia(id){
+  const a=alunosCache.find(x=>x.id===id);
+  if(!a)return;
+  if(!confirm('Registrar desist\u00eancia de '+a.nome+'?\n\n\u2022 O acesso ao portal \u00e9 bloqueado imediatamente\n\u2022 A matr\u00edcula \u00e9 encerrada\n\u2022 As parcelas EM ABERTO s\u00e3o canceladas (saem do contratado)\n\u2022 As parcelas j\u00e1 pagas permanecem no hist\u00f3rico\n\nPode ser revertido depois pelo bot\u00e3o Reativar.'))return;
+  const {error:e1}=await sb.from('estudantes').update({status:'desistente'}).eq('id',id);
+  if(e1){toast('Erro ao bloquear: '+e1.message,'error');return;}
+  const hoje=new Date().toISOString().slice(0,10);
+  const {data:mats}=await sb.from('matriculas').select('id,status').eq('estudante_id',id);
+  for(const m of (mats||[])){
+    if(['cancelada','cancelado'].includes(String(m.status||'').toLowerCase()))continue;
+    await sb.from('matriculas').update({status:'cancelada',data_conclusao:hoje}).eq('id',m.id);
+    const {data:ps}=await sb.from('financeiro_parcelas').select('id,observacao').eq('matricula_id',m.id).eq('status','aberto');
+    for(const p of (ps||[])){
+      await sb.from('financeiro_parcelas').update({status:'cancelado',observacao:(((p.observacao||'')+' [cancelada por desist\u00eancia em '+hoje+']').trim())}).eq('id',p.id);
+    }
+  }
+  toast('Desist\u00eancia registrada: acesso bloqueado e contratado atualizado.','success');
+  if(typeof exDados!=='undefined')exDados=null;
+  await Promise.all([carregarAlunos(),carregarDashboard()]);
+}
+
+async function reativarAluno(id){
+  const a=alunosCache.find(x=>x.id===id);
+  if(!a)return;
+  if(!confirm('Reativar '+a.nome+'?\n\n\u2022 O acesso ao portal volta imediatamente\n\u2022 Matr\u00edculas e parcelas canceladas POR DESIST\u00caNCIA s\u00e3o restauradas'))return;
+  const {error:e1}=await sb.from('estudantes').update({status:'ativo'}).eq('id',id);
+  if(e1){toast('Erro: '+e1.message,'error');return;}
+  const {data:mats}=await sb.from('matriculas').select('id,status').eq('estudante_id',id);
+  for(const m of (mats||[])){
+    const {data:ps}=await sb.from('financeiro_parcelas').select('id,observacao').eq('matricula_id',m.id).eq('status','cancelado');
+    let teveTag=false;
+    for(const p of (ps||[])){
+      if((p.observacao||'').indexOf('por desist\u00eancia')>=0){
+        teveTag=true;
+        const obs=(p.observacao||'').replace(/ ?\[cancelada por desist\u00eancia em [^\]]*\]/g,'').trim();
+        await sb.from('financeiro_parcelas').update({status:'aberto',observacao:obs||null}).eq('id',p.id);
+      }
+    }
+    if(teveTag){
+      await sb.from('matriculas').update({status:'ativa',data_conclusao:null}).eq('id',m.id);
+    }
+  }
+  toast('Aluno reativado. Financeiro restaurado.','success');
+  if(typeof exDados!=='undefined')exDados=null;
   await Promise.all([carregarAlunos(),carregarDashboard()]);
 }
 
