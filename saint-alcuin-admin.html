@@ -302,7 +302,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.7" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f97316;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v4.8" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ec4899;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
@@ -398,7 +398,7 @@
           </div>
           <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:.72rem;color:var(--gray);">
             <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:3px;background:#185da0;"></span>Recebido</span>
-            <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:3px;background:#9fbfe0;"></span>Contratado</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:3px;background:#9fbfe0;"></span>Contratado (novos)</span>
             <span style="display:flex;align-items:center;gap:5px;"><span style="width:16px;height:3px;background:#E00000;display:inline-block;"></span>Inadimplencia %</span>
             <span style="display:flex;align-items:center;gap:5px;"><span style="width:16px;height:3px;background:#7a5af5;display:inline-block;"></span>Alunos ativos</span>
           </div>
@@ -4909,6 +4909,7 @@ async function carregarCrescimento(){
     const labels=cm.map(x=>x.rotulo);
     const receb=cm.map(x=>Number(x.recebido||0)/1000);
     const contr=cm.map(x=>Number(x.contratado||0)/1000);
+    const nContr=cm.map(x=>Number(x.novos_contratos||0));
     const inad =cm.map(x=>Number(x.inadimplencia_pct||0));
     let alunosMap={};
     try{ const ra=await sb.from('v_alunos_mensal').select('*'); (ra.data||[]).forEach(a=>{alunosMap[a.rotulo]=Number(a.base_ativa||0);}); }catch(e){}
@@ -4932,7 +4933,7 @@ async function carregarCrescimento(){
         {type:'line',label:'Alunos ativos',data:baseAtiva,borderColor:'#7a5af5',backgroundColor:'#7a5af5',tension:.3,borderWidth:2,pointRadius:3,order:0,yAxisID:'y2'}
       ]},
       options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='Alunos ativos'?c.dataset.label+': '+c.parsed.y:(c.dataset.type==='line'?c.dataset.label+': '+c.parsed.y+'%':c.dataset.label+': '+crBRLk(c.parsed.y*1000))}}},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label==='Alunos ativos'?c.dataset.label+': '+c.parsed.y:(c.dataset.type==='line'?c.dataset.label+': '+c.parsed.y+'%':(c.dataset.label==='Contratado'?'Contratado: '+crBRLk(c.parsed.y*1000)+' ('+nContr[c.dataIndex]+' contrato'+(nContr[c.dataIndex]===1?'':'s')+')':c.dataset.label+': '+crBRLk(c.parsed.y*1000)))}}},
         scales:{y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{color:'#888780',callback:v=>'R$'+v+'k'}},
                 y1:{position:'right',beginAtZero:true,grid:{display:false},ticks:{color:'#E00000',callback:v=>v+'%'}},
                 y2:{display:false,beginAtZero:true},
