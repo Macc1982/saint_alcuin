@@ -3,221 +3,417 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Saint Alcuin of York Anglican College</title>
-  <meta name="description" content="Instituição de ensino superior estrangeira dedicada à formação acadêmica avançada e à pesquisa científica. Mestrado e Doutorado Internacional.">
-  <meta name="keywords" content="mestrado internacional, doutorado internacional, Saint Alcuin, pós-graduação internacional, Anglican College">
+  <title>Saint Alcuin of York Anglican College | Mestrado e Doutorado Internacional</title>
+  <meta name="description" content="Instituição de ensino superior estrangeira de pós-graduação. Mestrado e Doutorado Internacional com diplomas já reconhecidos no Brasil via Plataforma Carolina Bori (MEC).">
+  <meta name="keywords" content="mestrado internacional, doutorado internacional, Saint Alcuin, pós-graduação internacional, Carolina Bori, reconhecimento de diploma">
   <meta name="author" content="Saint Alcuin of York Anglican College">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="Saint Alcuin of York Anglican College | Mestrado e Doutorado">
-  <meta property="og:description" content="Formação acadêmica avançada e pesquisa científica de excelência.">
+  <meta property="og:description" content="Pós-graduação internacional com diplomas já reconhecidos no Brasil via Plataforma Carolina Bori (MEC).">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.universidadsaintalcuin.com/">
   <link rel="canonical" href="https://www.universidadsaintalcuin.com/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
-      --primary:   #0b2a4a;
-      --secondary: #145da0;
-      --text:      #2b2b2b;
-      --light:     #f5f7fa;
+      --ink:       #0a2540;
+      --ink-2:     #12365e;
+      --accent:    #c1121f;
+      --accent-2:  #ec0000;
+      --paper:     #f7f8fa;
+      --paper-2:   #eef1f5;
       --white:     #ffffff;
-      --gray:      #6b7280;
-      --border:    #dde3ea;
-      --green:     #166534;
-      --green-bg:  #dcfce7;
-      --red-bg:    #fee2e2;
-      --red-text:  #991b1b;
+      --text:      #26303a;
+      --muted:     #626d78;
+      --line:      #e2e6ec;
+      --line-2:    #cdd3dc;
+      --green:     #1f6b3a;
+      --green-bg:  #e5f2e9;
+      --red-bg:    #fdecec;
+      --red-text:  #9c2a2a;
+      --serif: "Fraunces", Georgia, "Times New Roman", serif;
+      --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--light); color: var(--text); font-family: "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--paper); color: var(--text);
+      font-family: var(--sans); line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+
+    /* ── TOP CREDIBILITY BAR ── */
+    .cred-bar {
+      background: var(--ink);
+      color: rgba(255,255,255,.82);
+      font-size: .72rem; letter-spacing: .02em;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .cred-bar-inner {
+      max-width: 1180px; margin: 0 auto; padding: 8px 32px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 26px; flex-wrap: wrap; text-align: center;
+    }
+    .cred-bar-item { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .cred-bar-item::before {
+      content: ""; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent-2); flex-shrink: 0;
+    }
+
+
+    /* ── LOGO ── */
+    .brand-logo {
+      display: block; height: 52px; width: auto; border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(10,37,64,.14);
+    }
+    .footer-logo { height: 60px; width: auto; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.28); }
 
     /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: #fff; position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      background: var(--white); position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--line);
     }
     .header-inner {
-      max-width: 1200px; margin: 0 auto; padding: 0 32px;
-      height: 68px; display: flex; align-items: center;
+      max-width: 1180px; margin: 0 auto; padding: 0 32px;
+      height: 74px; display: flex; align-items: center;
       justify-content: space-between; gap: 20px;
     }
-    .header-logo { display: flex; flex-direction: column; }
-    .header-logo-name { font-size: 1rem; font-weight: 700; letter-spacing: 0.01em; }
-    .header-logo-sub  { font-size: 0.58rem; opacity: 0.72; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
-    .header-nav { display: flex; align-items: center; gap: 4px; }
-    .nav-link {
-      color: rgba(255,255,255,.88); text-decoration: none;
-      font-size: 0.84rem; font-weight: 500; padding: 8px 16px;
-      border-radius: 6px; transition: all .15s;
+    .header-logo { display: flex; flex-direction: column; text-decoration: none; }
+    .header-logo-name {
+      font-family: var(--serif); font-size: 1.12rem; font-weight: 600;
+      color: var(--ink); letter-spacing: .005em; line-height: 1.1;
     }
-    .nav-link:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .header-logo-sub {
+      font-size: .58rem; color: var(--muted); letter-spacing: .16em;
+      text-transform: uppercase; margin-top: 3px;
+    }
+    .header-nav { display: flex; align-items: center; gap: 2px; }
+    .nav-link {
+      color: var(--text); text-decoration: none;
+      font-size: .84rem; font-weight: 500; padding: 8px 15px;
+      border-radius: 5px; transition: color .15s, background .15s;
+    }
+    .nav-link:hover { background: var(--paper-2); color: var(--ink); }
     .btn-area-aluno {
       display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.13); color: #fff;
-      border: 1.5px solid rgba(255,255,255,.38);
-      padding: 9px 20px; border-radius: 6px;
-      font-size: 0.84rem; font-weight: 600;
+      background: var(--ink); color: #fff;
+      border: 1px solid var(--ink);
+      padding: 9px 18px; border-radius: 5px;
+      font-size: .82rem; font-weight: 600;
       text-decoration: none; transition: all .2s; white-space: nowrap;
-      margin-left: 6px;
+      margin-left: 8px;
     }
-    .btn-area-aluno:hover {
-      background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.65);
-      transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.15);
-    }
-    .btn-aa-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+    .btn-area-aluno:hover { background: var(--ink-2); box-shadow: 0 4px 14px rgba(10,37,64,.22); }
+    .btn-aa-dot { width: 7px; height: 7px; border-radius: 50%; background: #5cd68a; flex-shrink: 0; }
 
     /* ── HERO ── */
     .hero {
-      background: linear-gradient(160deg, var(--primary) 0%, #1a4f8a 55%, var(--secondary) 100%);
-      color: #fff; padding: 72px 32px 80px; text-align: center;
+      background: var(--ink);
+      color: #fff; position: relative; overflow: hidden;
+      padding: 96px 32px 104px; text-align: center;
     }
-    .hero-eyebrow { font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.75; margin-bottom: 14px; }
-    .hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 14px; line-height: 1.2; }
-    .hero p   { font-size: 1rem; opacity: .9; max-width: 580px; margin: 0 auto 32px; line-height: 1.75; }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        radial-gradient(60% 90% at 50% -10%, rgba(236,0,0,.14), transparent 60%),
+        radial-gradient(50% 70% at 88% 120%, rgba(18,54,94,.55), transparent 60%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; max-width: 840px; margin: 0 auto; }
+    .hero-eyebrow {
+      display: inline-block; font-size: .7rem; letter-spacing: .24em;
+      text-transform: uppercase; color: var(--accent-2);
+      padding-bottom: 20px; position: relative;
+    }
+    .hero-eyebrow::after {
+      content: ""; display: block; width: 42px; height: 1px;
+      background: var(--accent-2); margin: 14px auto 0; opacity: .7;
+    }
+    .hero h1 {
+      font-family: var(--serif); font-size: 3.1rem; font-weight: 500;
+      line-height: 1.12; letter-spacing: -.01em; margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent-2); font-weight: 500; }
+    .hero p {
+      font-size: 1.06rem; color: rgba(255,255,255,.8);
+      max-width: 620px; margin: 0 auto 38px; line-height: 1.7;
+    }
     .hero-cta {
-      display: inline-block; background: #fff; color: var(--primary);
-      font-weight: 700; font-size: .9rem; padding: 13px 32px;
-      border-radius: 6px; text-decoration: none; transition: all .2s;
-      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      display: inline-block; background: var(--accent); color: #fff;
+      font-weight: 600; font-size: .92rem; letter-spacing: .01em;
+      padding: 15px 40px; border-radius: 5px; text-decoration: none;
+      transition: all .2s; box-shadow: 0 6px 22px rgba(193,18,31,.32);
     }
-    .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+    .hero-cta:hover { background: #a30f1a; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(193,18,31,.4); }
 
-    /* ── SECTIONS ── */
-    section { padding: 52px 28px; max-width: 1100px; margin: 0 auto; }
-    section h2 { color: var(--primary); margin-bottom: 18px; font-size: 1.65rem; font-weight: 700; }
-    section h3 { margin-top: 26px; margin-bottom: 8px; color: var(--secondary); font-size: 1rem; }
-    .card {
-      background: var(--white); padding: 24px; border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.07); margin-bottom: 20px;
+    /* ── SECTION SCAFFOLD ── */
+    .section { max-width: 1100px; margin: 0 auto; padding: 84px 32px; }
+    .section-eyebrow {
+      font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--accent); font-weight: 600; margin-bottom: 14px;
     }
-    ul { padding-left: 20px; margin-top: 8px; }
-    li { margin-bottom: 4px; font-size: .9rem; }
+    .section-title {
+      font-family: var(--serif); color: var(--ink);
+      font-size: 2.1rem; font-weight: 500; line-height: 1.2;
+      letter-spacing: -.01em; margin-bottom: 16px;
+    }
+    .section-lead {
+      color: var(--muted); font-size: 1.02rem; max-width: 640px; line-height: 1.7;
+    }
+    .section-head { margin-bottom: 44px; }
+
+    /* ── PROGRAMS (mestrado / doutorado) ── */
+    .levels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .level-card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: 10px; padding: 34px 32px; position: relative; overflow: hidden;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+    .level-card::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+    .level-card:hover { border-color: var(--line-2); box-shadow: 0 12px 32px rgba(10,37,64,.08); transform: translateY(-3px); }
+    .level-tag { font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+    .level-card h3 { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; color: var(--ink); margin: 8px 0 6px; }
+    .level-dur { font-size: .82rem; color: var(--muted); margin-bottom: 18px; }
+    .level-card ul { list-style: none; padding: 0; }
+    .level-card li {
+      font-size: .9rem; color: var(--text); padding: 7px 0 7px 26px;
+      position: relative; border-top: 1px solid var(--paper-2);
+    }
+    .level-card li:first-child { border-top: none; }
+    .level-card li::before {
+      content: ""; position: absolute; left: 4px; top: 14px;
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent-2);
+    }
+
+    /* ── AREAS (8) ── */
+    .areas-wrap { background: var(--paper-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .areas-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+    }
+    .area-cell {
+      background: var(--white); padding: 26px 22px;
+      transition: background .2s;
+    }
+    .area-cell:hover { background: var(--paper); }
+    .area-num { font-family: var(--serif); font-size: .8rem; color: var(--accent); font-weight: 600; }
+    .area-cell h4 { font-family: var(--serif); font-size: 1.14rem; font-weight: 600; color: var(--ink); margin: 6px 0 8px; line-height: 1.25; }
+    .area-cell p { font-size: .76rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+
+    /* ── PROVAS / RECONHECIMENTO ── */
+    .proof-wrap { background: var(--ink); color: #fff; }
+    .proof-inner { max-width: 1100px; margin: 0 auto; padding: 84px 32px; }
+    .proof-head { max-width: 680px; margin-bottom: 40px; }
+    .proof-eyebrow { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-2); font-weight: 600; margin-bottom: 14px; }
+    .proof-inner h2 { font-family: var(--serif); font-size: 2.1rem; font-weight: 500; line-height: 1.2; margin-bottom: 16px; }
+    .proof-inner .proof-lead { color: rgba(255,255,255,.76); font-size: 1.02rem; line-height: 1.7; }
+    .proof-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+    .proof-card {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 9px; padding: 22px 18px; text-decoration: none; color: #fff;
+      transition: all .2s; display: flex; flex-direction: column; gap: 12px;
+    }
+    .proof-card:hover { background: rgba(255,255,255,.09); border-color: rgba(236,0,0,.55); transform: translateY(-3px); }
+    .proof-badge {
+      display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+      font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+      color: #7ee0a1; background: rgba(126,224,161,.12);
+      padding: 4px 9px; border-radius: 20px;
+    }
+    .proof-badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #5cd68a; }
+    .proof-card-label { font-size: .82rem; color: rgba(255,255,255,.66); }
+    .proof-card-num { font-family: var(--serif); font-size: 1.28rem; font-weight: 600; }
+    .proof-card-link { font-size: .74rem; color: var(--accent-2); margin-top: auto; font-weight: 600; }
+    .proof-note { margin-top: 26px; font-size: .78rem; color: rgba(255,255,255,.5); }
+    .proof-note a { color: rgba(255,255,255,.72); }
 
     /* ── INSCRIÇÃO ── */
-    .inscricao-section {
-      background: linear-gradient(135deg, #eef4fb 0%, var(--light) 100%);
-      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-      padding: 60px 28px;
-    }
+    .inscricao-section { background: var(--paper); padding: 84px 32px; }
     .inscricao-inner {
       max-width: 1100px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: start;
+      display: grid; grid-template-columns: 1fr 1.1fr; gap: 56px; align-items: start;
     }
-    .inscricao-info h2 { color: var(--primary); font-size: 1.65rem; font-weight: 700; margin-bottom: 12px; }
-    .inscricao-info p  { color: var(--gray); font-size: .9rem; line-height: 1.75; margin-bottom: 22px; }
+    .inscricao-info .section-eyebrow { margin-bottom: 14px; }
+    .inscricao-info h2 { font-family: var(--serif); color: var(--ink); font-size: 2.1rem; font-weight: 500; line-height: 1.2; margin-bottom: 16px; }
+    .inscricao-info > p { color: var(--muted); font-size: 1rem; line-height: 1.7; margin-bottom: 28px; max-width: 440px; }
     .destaque {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 14px 16px; background: #fff; border-radius: 8px;
-      border-left: 4px solid var(--secondary);
-      box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 12px;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 18px; background: var(--white); border-radius: 9px;
+      border: 1px solid var(--line); margin-bottom: 12px;
     }
-    .destaque-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
-    .destaque strong { display: block; color: var(--primary); font-size: .86rem; margin-bottom: 1px; }
-    .destaque span   { color: var(--gray); font-size: .8rem; }
+    .destaque-mark {
+      width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0;
+      background: var(--paper-2); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-weight: 700; font-size: .9rem;
+    }
+    .destaque strong { display: block; color: var(--ink); font-size: .88rem; margin-bottom: 2px; }
+    .destaque span { color: var(--muted); font-size: .82rem; }
     .ja-inscrito {
-      margin-top: 20px; padding: 16px; background: #fff; border-radius: 8px;
-      border: 1px dashed var(--border); font-size: .84rem; color: var(--gray);
+      margin-top: 22px; padding: 18px; background: var(--white); border-radius: 9px;
+      border: 1px dashed var(--line-2); font-size: .84rem; color: var(--muted);
     }
-    .ja-inscrito a { color: var(--secondary); font-weight: 700; text-decoration: none; }
+    .ja-inscrito strong { color: var(--ink); display: block; margin-bottom: 4px; }
+    .ja-inscrito a { color: var(--accent); font-weight: 700; text-decoration: none; }
     .ja-inscrito a:hover { text-decoration: underline; }
 
     /* ── FORM CARD ── */
-    .form-card { background: var(--white); border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.1); overflow: hidden; }
-    .form-card-top { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 20px 26px; color: #fff; }
-    .form-card-top h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 2px; }
-    .form-card-top p  { font-size: .72rem; opacity: .82; }
-    .form-card-body { padding: 26px; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: .76rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
+    .form-card { background: var(--white); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 40px rgba(10,37,64,.08); overflow: hidden; }
+    .form-card-top { background: var(--ink); padding: 24px 28px; color: #fff; }
+    .form-card-top h3 { font-family: var(--serif); font-size: 1.24rem; font-weight: 600; margin-bottom: 3px; }
+    .form-card-top p { font-size: .74rem; opacity: .74; }
+    .form-card-body { padding: 28px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: .74rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; letter-spacing: .01em; }
     .form-group input,
     .form-group select,
     .form-group textarea {
-      width: 100%; background: var(--light); border: 1.5px solid var(--border);
-      border-radius: 6px; color: var(--text); font-family: "Segoe UI", sans-serif;
-      font-size: .87rem; padding: 10px 12px; outline: none;
-      transition: border-color .15s, background .15s; appearance: none; -webkit-appearance: none;
+      width: 100%; background: var(--paper); border: 1.5px solid var(--line);
+      border-radius: 7px; color: var(--text); font-family: var(--sans);
+      font-size: .88rem; padding: 11px 13px; outline: none;
+      transition: border-color .15s, background .15s, box-shadow .15s; appearance: none; -webkit-appearance: none;
     }
     .form-group select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23145da0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 12px center;
-      padding-right: 34px; background-color: var(--light); cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c1121f' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+      padding-right: 34px; background-color: var(--paper); cursor: pointer;
     }
     .form-group select option { background: #fff; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: var(--secondary); background: #fff; box-shadow: 0 0 0 3px rgba(20,93,160,.1);
+      border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(193,18,31,.12);
     }
-    .form-group input::placeholder, .form-group textarea::placeholder { color: #aab0ba; }
-    .form-group textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #a7afb8; }
+    .form-group textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
     .btn-submit {
-      width: 100%; background: var(--secondary); color: #fff;
-      font-family: "Segoe UI", sans-serif; font-size: .9rem; font-weight: 700;
-      padding: 13px; border: none; border-radius: 6px; cursor: pointer; transition: all .2s;
+      width: 100%; background: var(--accent); color: #fff;
+      font-family: var(--sans); font-size: .92rem; font-weight: 700;
+      padding: 14px; border: none; border-radius: 7px; cursor: pointer; transition: all .2s;
+      margin-top: 4px;
     }
-    .btn-submit:hover { background: #1068b5; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(20,93,160,.3); }
+    .btn-submit:hover { background: #a30f1a; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(193,18,31,.3); }
     .btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     .form-erro {
-      display: none; background: var(--red-bg); border: 1px solid #fca5a5;
-      color: var(--red-text); font-size: .8rem; padding: 10px 12px;
-      border-radius: 6px; margin-bottom: 12px;
+      display: none; background: var(--red-bg); border: 1px solid #f2b8b8;
+      color: var(--red-text); font-size: .82rem; padding: 11px 13px;
+      border-radius: 7px; margin-bottom: 13px;
     }
-    .success-box { display: none; text-align: center; padding: 30px 12px; animation: fadeIn .4s ease; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+    .success-box { display: none; text-align: center; padding: 34px 14px; animation: fadeIn .4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     .success-icon {
-      width: 52px; height: 52px; border-radius: 50%;
+      width: 54px; height: 54px; border-radius: 50%;
       background: var(--green-bg); color: var(--green);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; font-weight: 700; margin: 0 auto 14px;
+      font-size: 1.5rem; font-weight: 700; margin: 0 auto 16px;
     }
-    .success-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-    .success-sub   { font-size: .84rem; color: var(--gray); line-height: 1.7; }
+    .success-title { font-family: var(--serif); font-size: 1.28rem; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+    .success-sub { font-size: .86rem; color: var(--muted); line-height: 1.7; }
     .btn-reset {
-      margin-top: 16px; background: transparent; color: var(--secondary);
-      border: 1.5px solid var(--secondary); font-family: "Segoe UI", sans-serif;
-      font-size: .8rem; font-weight: 600; padding: 9px 22px; border-radius: 6px; cursor: pointer; transition: all .15s;
+      margin-top: 18px; background: transparent; color: var(--accent);
+      border: 1.5px solid var(--accent); font-family: var(--sans);
+      font-size: .82rem; font-weight: 600; padding: 10px 24px; border-radius: 7px; cursor: pointer; transition: all .15s;
     }
-    .btn-reset:hover { background: #eef4fb; }
+    .btn-reset:hover { background: var(--paper-2); }
 
-    /* ── CONTATO / FOOTER ── */
-    .contact { background: var(--white); padding: 26px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.07); }
-    .contact strong { display: block; margin-top: 10px; color: var(--primary); }
-    footer { background: var(--primary); color: #fff; padding: 36px 28px; font-size: .84rem; }
-    footer p { max-width: 1000px; margin: 0 auto; opacity: .85; text-align: center; line-height: 1.7; }
+    /* ── CONTATO ── */
+    .contact-wrap { background: var(--paper-2); border-top: 1px solid var(--line); }
+    .contact-inner {
+      max-width: 1100px; margin: 0 auto; padding: 64px 32px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+    }
+    .contact-inner h2 { font-family: var(--serif); font-size: 1.7rem; font-weight: 500; color: var(--ink); margin-bottom: 10px; }
+    .contact-inner p { color: var(--muted); font-size: .95rem; }
+    .contact-lines { display: flex; flex-direction: column; gap: 12px; }
+    .contact-line {
+      display: flex; align-items: center; gap: 13px;
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: 9px; padding: 15px 18px; text-decoration: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .contact-line:hover { border-color: var(--line-2); box-shadow: 0 6px 18px rgba(10,37,64,.06); }
+    .contact-line-mark { width: 38px; height: 38px; border-radius: 8px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .contact-line-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    .contact-line-val { font-size: .96rem; color: var(--ink); font-weight: 600; }
 
-    /* ── WHATSAPP ── */
+    /* ── FOOTER ── */
+    footer { background: var(--ink); color: #fff; padding: 48px 32px 40px; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; }
+    .footer-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; flex-wrap: wrap; padding-bottom: 28px; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .footer-brand-name { font-family: var(--serif); font-size: 1.16rem; font-weight: 600; }
+    .footer-brand-sub { font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-top: 4px; }
+    .footer-links { display: flex; gap: 26px; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,.78); text-decoration: none; font-size: .84rem; transition: color .15s; }
+    .footer-links a:hover { color: #fff; }
+    .footer-legal { padding-top: 24px; font-size: .76rem; color: rgba(255,255,255,.5); line-height: 1.7; max-width: 780px; }
+
+    /* ── WHATSAPP FLOAT ── */
     .whatsapp-float {
-      position: fixed; bottom: 22px; right: 22px; background: #25D366;
-      width: 54px; height: 54px; border-radius: 50%;
+      position: fixed; bottom: 24px; right: 24px; background: #25D366;
+      width: 56px; height: 56px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px rgba(0,0,0,.22); z-index: 999; transition: transform .2s;
+      box-shadow: 0 6px 18px rgba(0,0,0,.24); z-index: 999; transition: transform .2s;
     }
     .whatsapp-float:hover { transform: scale(1.08); }
 
+    @media (max-width: 980px) {
+      .areas-grid { grid-template-columns: repeat(2, 1fr); }
+      .proof-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 860px) {
-      .inscricao-inner { grid-template-columns: 1fr; gap: 24px; }
-      .hero h1 { font-size: 1.75rem; }
+      .inscricao-inner { grid-template-columns: 1fr; gap: 32px; }
+      .contact-inner { grid-template-columns: 1fr; gap: 24px; }
+      .levels { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.3rem; }
     }
     @media (max-width: 600px) {
-      .header-inner { padding: 0 16px; }
+      .cred-bar-inner { gap: 12px 18px; padding: 9px 18px; }
+      .header-inner { padding: 0 18px; height: 64px; }
+      .header-logo-name { font-size: .98rem; }
       .nav-link { display: none; }
+      .hero { padding: 60px 22px 68px; }
+      .hero h1 { font-size: 2rem; }
+      .section { padding: 56px 20px; }
+      .proof-inner, .inscricao-section, .contact-inner { padding-left: 20px; padding-right: 20px; }
+      .proof-inner { padding-top: 56px; padding-bottom: 56px; }
+      .inscricao-section { padding-top: 56px; padding-bottom: 56px; }
+      .areas-grid { grid-template-columns: 1fr; }
+      .proof-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
-      .hero { padding: 44px 20px 52px; }
-      section { padding: 38px 18px; }
+      .footer-top { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
+<!-- ── CREDIBILITY BAR ── -->
+<div class="cred-bar">
+  <div class="cred-bar-inner">
+    <span class="cred-bar-item">Diplomas já reconhecidos no Brasil — Plataforma Carolina Bori (MEC)</span>
+    <span class="cred-bar-item">Titulação internacional</span>
+    <span class="cred-bar-item">Estudantes em diversos estados</span>
+  </div>
+</div>
+
 <!-- ── HEADER ── -->
 <header>
   <div class="header-inner">
-    <div class="header-logo">
-      <div class="header-logo-name">Saint Alcuin of York Anglican College</div>
-      <div class="header-logo-sub">Instituição de Ensino Superior Internacional</div>
-    </div>
+    <a href="/" class="header-logo" style="flex-direction:row;align-items:center;gap:13px;">
+      <img src="/logo.jpeg" alt="Brasão Saint Alcuin of York Anglican College" class="brand-logo" />
+      <span style="display:flex;flex-direction:column;">
+        <span class="header-logo-name">Saint Alcuin of York</span>
+        <span class="header-logo-sub">Anglican College · Pós-Graduação Internacional</span>
+      </span>
+    </a>
     <nav class="header-nav">
       <a href="/programas/index.html" class="nav-link">Programas</a>
       <a href="/repositorio/" class="nav-link">Repositório</a>
@@ -232,93 +428,135 @@
 
 <!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-eyebrow">Saint Alcuin of York Anglican College</div>
-  <h1>Mestrado e Doutorado Internacional</h1>
-  <p>Instituição de ensino superior estrangeira dedicada à formação acadêmica avançada e à pesquisa científica de excelência.</p>
-  <a href="/selecao.html" class="hero-cta">Quero me inscrever</a>
+  <div class="hero-inner">
+    <span class="hero-eyebrow">Saint Alcuin of York Anglican College</span>
+    <h1>Mestrado e Doutorado <em>Internacional</em></h1>
+    <p>Formação de pesquisadores em nível de pós-graduação, com titulação internacional e diplomas já reconhecidos no Brasil pela Plataforma Carolina Bori (MEC).</p>
+    <a href="https://www.universidadsaintalcuin.com/#inscricao" class="hero-cta">Iniciar minha inscrição</a>
+  </div>
 </div>
 
-<!-- ── APRESENTAÇÃO ── -->
-<section>
-  <h2>Apresentação Institucional</h2>
-  <div class="card">
-    <p>O <strong>Saint Alcuin of York Anglican College</strong> é uma instituição de ensino superior estrangeira, regularmente constituída em seu país de origem, com atuação acadêmica em nível de pós-graduação.</p>
-    <p style="margin-top:10px;">A instituição oferece programas de Mestrado e Doutorado acadêmico, desenvolvidos para a formação de pesquisadores e profissionais de alto nível, com foco em produção científica original e rigor metodológico.</p>
-  </div>
-</section>
-
 <!-- ── PROGRAMAS ── -->
-<section>
-  <h2>Programas de Pós-Graduação</h2>
-  <div class="card">
-    <h3>Mestrado Acadêmico</h3>
-    <p>O Mestrado Acadêmico tem como objetivo aprofundar a formação científica do estudante, desenvolvendo competências em pesquisa e metodologia científica.</p>
-    <ul>
-      <li>Formação científica e acadêmica</li>
-      <li>Projeto de pesquisa e dissertação</li>
-      <li>Orientação acadêmica individual</li>
-      <li>Produção de artigos científicos</li>
-    </ul>
-    <p style="margin-top:12px;"><strong>Duração média:</strong> 26 meses &nbsp;·&nbsp; <a href="/programas/index.html" style="color:var(--secondary);font-weight:600;font-size:.88rem;">Ver todos os programas →</a></p>
+<div class="section">
+  <div class="section-head">
+    <div class="section-eyebrow">Programas de Pós-Graduação</div>
+    <h2 class="section-title">Dois caminhos acadêmicos, um mesmo rigor</h2>
+    <p class="section-lead">Programas acadêmicos voltados à produção científica original, com orientação individual e defesa perante banca.</p>
   </div>
-  <div class="card">
-    <h3>Doutorado Acadêmico</h3>
-    <p>O Doutorado Acadêmico visa à formação de pesquisadores de alto nível, capazes de produzir conhecimento original e relevante em sua área de atuação.</p>
-    <ul>
-      <li>Pesquisa científica aprofundada</li>
-      <li>Elaboração de tese original</li>
-      <li>Orientação acadêmica contínua</li>
-      <li>Produção científica avançada</li>
-    </ul>
-    <p style="margin-top:12px;"><strong>Duração média:</strong> 36 meses &nbsp;·&nbsp; <a href="/programas/index.html" style="color:var(--secondary);font-weight:600;font-size:.88rem;">Ver todos os programas →</a></p>
+  <div class="levels">
+    <div class="level-card">
+      <span class="level-tag">Mestrado Acadêmico</span>
+      <h3>Mestrado</h3>
+      <div class="level-dur">Duração média de 26 meses · modalidade EAD</div>
+      <ul>
+        <li>Formação científica e metodológica aprofundada</li>
+        <li>Projeto de pesquisa e dissertação</li>
+        <li>Orientação acadêmica individual</li>
+        <li>Produção de artigos científicos</li>
+      </ul>
+    </div>
+    <div class="level-card">
+      <span class="level-tag">Doutorado Acadêmico</span>
+      <h3>Doutorado</h3>
+      <div class="level-dur">Duração média de 36 meses · modalidade EAD</div>
+      <ul>
+        <li>Pesquisa científica de alto nível</li>
+        <li>Elaboração de tese original</li>
+        <li>Orientação acadêmica contínua</li>
+        <li>Produção científica avançada</li>
+      </ul>
+    </div>
   </div>
-</section>
+</div>
 
-<!-- ── MODALIDADE ── -->
-<section>
-  <h2>Modalidade e Funcionamento</h2>
-  <div class="card">
-    <p>Os programas são desenvolvidos pela instituição estrangeira, com atividades acadêmicas realizadas conforme a legislação educacional vigente no país de origem.</p>
-    <p style="margin-top:10px;">O reconhecimento dos títulos no Brasil depende de processo próprio conforme normas do Ministério da Educação (MEC).</p>
+<!-- ── ÁREAS ── -->
+<div class="areas-wrap">
+  <div class="section">
+    <div class="section-head">
+      <div class="section-eyebrow">Áreas de Conhecimento</div>
+      <h2 class="section-title">Oito áreas, mestrado e doutorado</h2>
+      <p class="section-lead">Cada área oferece programas de mestrado e doutorado acadêmico. Consulte as linhas de pesquisa e matrizes curriculares na página de programas.</p>
+    </div>
+    <div class="areas-grid">
+      <div class="area-cell"><div class="area-num">01</div><h4>Educação</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">02</div><h4>Direito</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">03</div><h4>Psicologia</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">04</div><h4>Administração</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">05</div><h4>Antropologia</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">06</div><h4>Neurociência</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">07</div><h4>Saúde Pública</h4><p>Mestrado · Doutorado</p></div>
+      <div class="area-cell"><div class="area-num">08</div><h4>Teologia</h4><p>Mestrado · Doutorado</p></div>
+    </div>
   </div>
-</section>
+</div>
 
-<!-- ── PROCESSO ── -->
-<section>
-  <h2>Processo de Ingresso</h2>
-  <div class="card">
-    <ul>
-      <li>Análise documental e acadêmica</li>
-      <li>Avaliação do histórico acadêmico</li>
-      <li>Verificação de aderência à linha de pesquisa</li>
-      <li>Encaminhamento e matrícula institucional</li>
-    </ul>
-    <p style="margin-top:12px;">Os critérios de aceitação são definidos exclusivamente pelo Saint Alcuin of York Anglican College.</p>
+<!-- ── PROVAS DE RECONHECIMENTO ── -->
+<div class="proof-wrap">
+  <div class="proof-inner">
+    <div class="proof-head">
+      <div class="proof-eyebrow">Reconhecimento no Brasil</div>
+      <h2>Diplomas já reconhecidos pela Carolina Bori</h2>
+      <p class="proof-lead">Diplomas emitidos pela instituição já foram reconhecidos no Brasil por meio da Plataforma Carolina Bori, sistema oficial do MEC. Cada processo abaixo é público e pode ser consultado diretamente.</p>
+    </div>
+    <div class="proof-grid">
+      <a class="proof-card" href="https://plataformacarolinabori.mec.gov.br/consulta-publica/processo/detalhar/377748" target="_blank" rel="noopener">
+        <span class="proof-badge">Deferido</span>
+        <span class="proof-card-label">Processo</span>
+        <span class="proof-card-num">377748</span>
+        <span class="proof-card-link">Consultar →</span>
+      </a>
+      <a class="proof-card" href="https://plataformacarolinabori.mec.gov.br/consulta-publica/processo/detalhar/368300" target="_blank" rel="noopener">
+        <span class="proof-badge">Deferido</span>
+        <span class="proof-card-label">Processo</span>
+        <span class="proof-card-num">368300</span>
+        <span class="proof-card-link">Consultar →</span>
+      </a>
+      <a class="proof-card" href="https://plataformacarolinabori.mec.gov.br/consulta-publica/processo/detalhar/378723" target="_blank" rel="noopener">
+        <span class="proof-badge">Deferido</span>
+        <span class="proof-card-label">Processo</span>
+        <span class="proof-card-num">378723</span>
+        <span class="proof-card-link">Consultar →</span>
+      </a>
+      <a class="proof-card" href="https://plataformacarolinabori.mec.gov.br/consulta-publica/processo/detalhar/454163" target="_blank" rel="noopener">
+        <span class="proof-badge">Deferido</span>
+        <span class="proof-card-label">Processo</span>
+        <span class="proof-card-num">454163</span>
+        <span class="proof-card-link">Consultar →</span>
+      </a>
+      <a class="proof-card" href="https://plataformacarolinabori.mec.gov.br/consulta-publica/processo/detalhar/431566" target="_blank" rel="noopener">
+        <span class="proof-badge">Deferido</span>
+        <span class="proof-card-label">Processo</span>
+        <span class="proof-card-num">431566</span>
+        <span class="proof-card-link">Consultar →</span>
+      </a>
+    </div>
+    <p class="proof-note">O reconhecimento é concedido ao diploma, caso a caso, conforme análise da instituição revalidadora na Plataforma Carolina Bori.</p>
   </div>
-</section>
+</div>
 
 <!-- ── INSCRIÇÃO ── -->
 <div class="inscricao-section" id="inscricao">
   <div class="inscricao-inner">
     <div class="inscricao-info">
+      <div class="section-eyebrow">Processo de Ingresso</div>
       <h2>Faça sua inscrição</h2>
       <p>Preencha o formulário com seus dados. Nossa equipe entrará em contato pelo WhatsApp para orientar você sobre o programa ideal e os próximos passos.</p>
       <div class="destaque">
-        <div class="destaque-icon">✓</div>
-        <div><strong>Processo simples e rápido</strong><span>Retorno em até 24h pelo WhatsApp</span></div>
+        <div class="destaque-mark">✓</div>
+        <div><strong>Retorno em até 24h</strong><span>Contato direto pelo WhatsApp informado</span></div>
       </div>
       <div class="destaque">
-        <div class="destaque-icon">🎓</div>
-        <div><strong>Mestrado e Doutorado</strong><span>Programas acadêmicos em diversas áreas</span></div>
+        <div class="destaque-mark">M</div>
+        <div><strong>Mestrado e Doutorado</strong><span>Programas acadêmicos em oito áreas</span></div>
       </div>
       <div class="destaque">
-        <div class="destaque-icon">🌐</div>
-        <div><strong>Instituição internacional</strong><span>Saint Alcuin of York Anglican College</span></div>
+        <div class="destaque-mark">I</div>
+        <div><strong>Titulação internacional</strong><span>Diplomas já reconhecidos via Carolina Bori</span></div>
       </div>
 
       <div class="ja-inscrito">
-        <strong style="color:var(--primary);display:block;margin-bottom:4px;">Já se inscreveu e foi aprovado?</strong>
-        Envie seus documentos com o código que recebemos por WhatsApp.
+        <strong>Já se inscreveu e foi aprovado?</strong>
+        Envie seus documentos com o código que você recebeu por WhatsApp.
         <br/><a href="/documentos.html">Enviar documentos →</a>
       </div>
     </div>
@@ -399,30 +637,63 @@
 </div>
 
 <!-- ── CONTATO ── -->
-<section>
-  <h2>Contato</h2>
-  <div class="contact">
-    <p>Para informações sobre os programas e processo de ingresso:</p>
-    <strong>WhatsApp: (75) 99840-3658</strong>
-    <strong>Site: universidadsaintalcuin.com</strong>
+<div class="contact-wrap">
+  <div class="contact-inner">
+    <div>
+      <h2>Fale com a coordenação</h2>
+      <p>Para informações sobre os programas, valores e processo de ingresso, fale conosco pelos canais oficiais.</p>
+    </div>
+    <div class="contact-lines">
+      <a class="contact-line" href="https://wa.me/75998403658" target="_blank" rel="noopener">
+        <span class="contact-line-mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="18" height="18" fill="#fff"><path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32z"/></svg>
+        </span>
+        <span><span class="contact-line-label">WhatsApp</span><br/><span class="contact-line-val">(75) 99840-3658</span></span>
+      </a>
+      <a class="contact-line" href="https://instagram.com/universidad_saint_alcuin" target="_blank" rel="noopener">
+        <span class="contact-line-mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.38C1.35 2.68.94 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.31 1.46-.72 2.13-1.38.66-.67 1.07-1.34 1.38-2.13.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.31-.79-.72-1.46-1.38-2.13-.67-.66-1.34-1.07-2.13-1.38-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 100 12.32 6.16 6.16 0 000-12.32zM12 16a4 4 0 110-8 4 4 0 010 8zm6.41-10.85a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"/></svg>
+        </span>
+        <span><span class="contact-line-label">Instagram</span><br/><span class="contact-line-val">@universidad_saint_alcuin</span></span>
+      </a>
+    </div>
   </div>
-</section>
+</div>
 
 <!-- ── FOOTER ── -->
 <footer>
-  <p>
-    © Saint Alcuin of York Anglican College — Todos os direitos reservados.<br/>
-    Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
-    O reconhecimento dos títulos no Brasil depende de processo próprio conforme normas do MEC.
-  </p>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <img src="/logo.jpeg" alt="Brasão Saint Alcuin of York" class="footer-logo" />
+        <div>
+          <div class="footer-brand-name">Saint Alcuin of York Anglican College</div>
+          <div class="footer-brand-sub">Pós-Graduação Internacional</div>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="/programas/index.html">Programas</a>
+        <a href="/repositorio/">Repositório</a>
+        <a href="/selecao.html">Processo Seletivo</a>
+        <a href="/area-do-aluno.html">Área do Aluno</a>
+        <a href="#inscricao">Inscrição</a>
+      </div>
+    </div>
+    <p class="footer-legal">
+      © Saint Alcuin of York Anglican College — Todos os direitos reservados.
+      Instituição de ensino superior estrangeira regularmente constituída em seu país de origem.
+      O reconhecimento de diplomas no Brasil ocorre caso a caso, por meio da Plataforma Carolina Bori (MEC), conforme normas vigentes.
+    </p>
+  </div>
 </footer>
 
-<!-- ── WHATSAPP ── -->
-<a href="https://wa.me/75998403658" target="_blank" aria-label="WhatsApp" class="whatsapp-float">
+<!-- ── WHATSAPP FLOAT ── -->
+<a href="https://wa.me/75998403658" target="_blank" rel="noopener" aria-label="WhatsApp" class="whatsapp-float">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="30" height="30" fill="#fff">
     <path d="M19.11 17.43c-.27-.14-1.59-.78-1.84-.87-.25-.09-.43-.14-.61.14-.18.27-.7.87-.86 1.05-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.72-1.34-1.61-1.5-1.88-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.54-.45-.47-.61-.48-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26 0 1.34.97 2.63 1.11 2.81.14.18 1.91 2.92 4.63 4.09.65.28 1.15.45 1.54.58.65.21 1.25.18 1.72.11.52-.08 1.59-.65 1.81-1.28.22-.63.22-1.17.16-1.28-.06-.11-.25-.18-.52-.32zM16.02 3C9.39 3 4 8.38 4 15.01c0 2.64.86 5.08 2.32 7.05L4 29l7.15-2.29a12.93 12.93 0 004.87.94c6.63 0 12.01-5.38 12.01-12.01C28.03 8.38 22.65 3 16.02 3zm0 22.01c-1.55 0-3.06-.36-4.42-1.04l-.32-.16-4.24 1.36 1.38-4.13-.21-.34a9.98 9.98 0 01-1.55-5.69c0-5.53 4.5-10.03 10.03-10.03s10.03 4.5 10.03 10.03-4.5 10.03-10.03 10.03z"/>
   </svg>
 </a>
+
 
 <script>
   const SUPA_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
