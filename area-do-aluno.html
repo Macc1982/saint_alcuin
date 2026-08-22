@@ -648,15 +648,46 @@
 
       <!-- AULAS AO VIVO -->
       <div class="tab-content" id="tab-aovivo">
-        <style>@keyframes pulseLive{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}</style>
+        <style>
+        @keyframes pulseLive{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
+        @keyframes lvEq{0%{transform:scaleY(.35)}50%{transform:scaleY(1)}100%{transform:scaleY(.35)}}
+        @keyframes lvGlow{0%{box-shadow:0 0 0 0 rgba(224,0,0,.28)}70%{box-shadow:0 0 0 12px rgba(224,0,0,0)}100%{box-shadow:0 0 0 0 rgba(224,0,0,0)}}
+        .lv-live-card{background:#fff;border:1.5px solid #f3b6b6;border-left:5px solid #E00000;border-radius:14px;padding:20px 22px;display:flex;align-items:center;gap:18px;margin-bottom:12px;animation:lvGlow 2.2s infinite;}
+        .lv-eq{display:flex;align-items:flex-end;gap:3px;height:26px;flex-shrink:0;}
+        .lv-eq span{width:4px;border-radius:2px;background:#E00000;height:100%;transform-origin:bottom;animation:lvEq 1s ease-in-out infinite;}
+        .lv-eq span:nth-child(2){animation-delay:.15s;}
+        .lv-eq span:nth-child(3){animation-delay:.3s;}
+        .lv-eq span:nth-child(4){animation-delay:.45s;}
+        .lv-live-pill{display:inline-flex;align-items:center;gap:6px;background:#E00000;color:#fff;font-size:.6rem;font-weight:800;letter-spacing:.12em;padding:3px 10px;border-radius:20px;animation:pulseLive 1.5s infinite;}
+        .lv-live-title{font-size:1.05rem;font-weight:700;color:var(--primary);margin-top:6px;}
+        .lv-live-meta{font-size:.78rem;color:var(--gray);margin-top:2px;}
+        .lv-btn-entrar{background:#E00000;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.84rem;font-weight:700;padding:12px 22px;cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s;flex-shrink:0;}
+        .lv-btn-entrar:hover{background:#c00000;transform:translateY(-1px);box-shadow:0 6px 16px rgba(224,0,0,.3);}
+        .lv-avatar{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.05rem;flex-shrink:0;}
+        .lv-empty{background:#fff;border:1px dashed #c9d3df;border-radius:14px;padding:34px 24px;text-align:center;color:var(--gray);}
+        .lv-empty svg{width:34px;height:34px;stroke:#9aa4b1;stroke-width:1.6;fill:none;margin-bottom:10px;}
+        .lv-empty-t{font-size:.9rem;font-weight:600;color:var(--primary);margin-bottom:3px;}
+        .lv-empty-s{font-size:.78rem;}
+        .lv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+        .lv-hist-card{background:#fff;border:1px solid var(--border);border-left:4px solid var(--secondary);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:transform .15s,box-shadow .15s,border-color .15s;}
+        .lv-hist-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(11,42,74,.1);border-color:#c8d6e8;}
+        .lv-hist-info{flex:1;min-width:0;}
+        .lv-hist-title{font-size:.92rem;font-weight:700;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .lv-hist-meta{font-size:.75rem;color:var(--gray);margin-top:3px;}
+        .lv-chip-pdf{display:inline-flex;align-items:center;gap:5px;background:#eef4fb;color:var(--secondary);border:none;font-family:inherit;font-size:.7rem;font-weight:700;padding:6px 12px;border-radius:20px;cursor:pointer;transition:background .15s;flex-shrink:0;}
+        .lv-chip-pdf:hover{background:#dce9f7;}
+        .lv-sec-label{display:flex;align-items:center;gap:9px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray);}
+        .lv-sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+        @media(max-width:900px){.lv-grid{grid-template-columns:1fr;}}
+        </style>
         <div class="page-title">Aulas ao Vivo</div>
         <div class="page-sub">Transmissões da comunidade acadêmica</div>
         <div id="aovivo-criar" style="display:none;margin-bottom:16px;">
           <button class="btn btn-primary" onclick="abrirCriarLive()">+ Criar aula ao vivo</button>
         </div>
-        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin:4px 0 10px;">Ao vivo agora</div>
+        <div class="lv-sec-label" style="margin:4px 0 12px;">Ao vivo agora</div>
         <div id="lista-lives-ativas"><div class="loading">Carregando...</div></div>
-        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin:18px 0 10px;">Últimas aulas</div>
+        <div class="lv-sec-label" style="margin:22px 0 12px;">Últimas aulas</div>
         <div id="lista-lives-historico"></div>
       </div>
 
@@ -1962,17 +1993,24 @@ async function carregarLivesAluno(){
   const {data:ativas,error:e1}=await sb.from('lives')
     .select('id,titulo,iniciada_em,pdf_url,pdf_nome,criador:estudantes(nome,avatar_url)')
     .eq('status','ativa').order('iniciada_em',{ascending:false});
-  if(e1){elA.innerHTML='<div class="card"><div class="empty">Erro ao carregar as aulas ao vivo.</div></div>';}
-  else if(!ativas||!ativas.length){elA.innerHTML='<div class="card"><div class="empty">Nenhuma aula ao vivo agora. Quando alguém iniciar uma transmissão, ela aparece aqui.</div></div>';}
+  if(e1){elA.innerHTML='<div class="lv-empty"><div class="lv-empty-t">Erro ao carregar as aulas ao vivo.</div><div class="lv-empty-s">Atualize a página para tentar novamente.</div></div>';}
+  else if(!ativas||!ativas.length){elA.innerHTML=`
+    <div class="lv-empty">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+      <div class="lv-empty-t">Nenhuma transmissão no momento</div>
+      <div class="lv-empty-s">Quando uma aula ao vivo começar, ela aparece aqui com destaque.</div>
+    </div>`;}
   else{
     elA.innerHTML=ativas.map(l=>`
-      <div class="card" style="display:flex;align-items:center;gap:14px;">
-        <span style="width:10px;height:10px;border-radius:50%;background:#E00000;flex-shrink:0;animation:pulseLive 1.5s infinite;"></span>
+      <div class="lv-live-card">
+        <div class="lv-eq"><span></span><span></span><span></span><span></span></div>
+        <div class="lv-avatar" style="background:${corAvatarLive(l.criador&&l.criador.nome)};">${((l.criador&&l.criador.nome||'?').trim()[0]||'?').toUpperCase()}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;">${l.titulo}</div>
-          <div style="font-size:.78rem;color:var(--gray);">com ${(l.criador&&l.criador.nome||'—').split(' ')[0]} · ao vivo desde ${horaBR(l.iniciada_em)}</div>
+          <span class="lv-live-pill">AO VIVO</span>
+          <div class="lv-live-title">${l.titulo}</div>
+          <div class="lv-live-meta">com ${(l.criador&&l.criador.nome||'—').split(' ')[0]} · transmitindo desde ${horaBR(l.iniciada_em)}</div>
         </div>
-        <button class="btn btn-primary" onclick="entrarLive('${l.id}')">Entrar</button>
+        <button class="lv-btn-entrar" onclick="entrarLive('${l.id}')">Entrar na transmissão</button>
       </div>`).join('');
   }
 
@@ -1982,17 +2020,31 @@ async function carregarLivesAluno(){
   const {data:hist,error:e2}=await sb.from('lives')
     .select('id,titulo,iniciada_em,encerrada_em,pdf_url,pdf_nome,criador:estudantes(nome)')
     .eq('status','encerrada').order('encerrada_em',{ascending:false}).limit(12);
-  if(e2||!hist||!hist.length){elH.innerHTML='<div class="card"><div class="empty">Nenhuma aula encerrada ainda.</div></div>';}
+  if(e2||!hist||!hist.length){elH.innerHTML='<div class="lv-empty"><div class="lv-empty-t">Nenhuma aula encerrada ainda</div><div class="lv-empty-s">As transmissões realizadas ficam registradas aqui.</div></div>';}
   else{
-    elH.innerHTML=hist.map(l=>`
-      <div class="card" style="display:flex;align-items:center;gap:14px;">
-        <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;">${l.titulo}</div>
-          <div style="font-size:.78rem;color:var(--gray);">com ${(l.criador&&l.criador.nome||'—').split(' ')[0]} · ${dataBR(String(l.iniciada_em).slice(0,10))}</div>
+    elH.innerHTML='<div class="lv-grid">'+hist.map(l=>`
+      <div class="lv-hist-card">
+        <div class="lv-avatar" style="background:${corAvatarLive(l.criador&&l.criador.nome)};width:40px;height:40px;font-size:.95rem;">${((l.criador&&l.criador.nome||'?').trim()[0]||'?').toUpperCase()}</div>
+        <div class="lv-hist-info">
+          <div class="lv-hist-title" title="${l.titulo}">${l.titulo}</div>
+          <div class="lv-hist-meta">com ${(l.criador&&l.criador.nome||'—').split(' ')[0]} · ${dataBR(String(l.iniciada_em).slice(0,10))}${duracaoLive(l.iniciada_em,l.encerrada_em)}</div>
         </div>
-        ${l.pdf_url?`<button class="btn btn-outline" onclick="window.open('${l.pdf_url}','_blank')">Material (PDF)</button>`:''}
-      </div>`).join('');
+        ${l.pdf_url?`<button class="lv-chip-pdf" onclick="window.open('${l.pdf_url}','_blank')">PDF</button>`:''}
+      </div>`).join('')+'</div>';
   }
+}
+function corAvatarLive(nome){
+  const cores=['#145da0','#0b2a4a','#6d28d9','#166534','#b45309','#9d174d','#0e7490'];
+  let s=0; const n=String(nome||'');
+  for(let i=0;i<n.length;i++) s=(s+n.charCodeAt(i))%cores.length;
+  return cores[s];
+}
+function duracaoLive(ini,fim){
+  if(!ini||!fim) return '';
+  const m=Math.round((new Date(fim)-new Date(ini))/60000);
+  if(!isFinite(m)||m<1) return '';
+  if(m<60) return ' · '+m+' min';
+  return ' · '+Math.floor(m/60)+'h'+String(m%60).padStart(2,'0');
 }
 function horaBR(iso){
   if(!iso) return '—';
