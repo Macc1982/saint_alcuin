@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Saint Alcuin of York — Área do Aluno</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--primary:#0b2a4a;--secondary:#145da0;--text:#2b2b2b;--light:#f5f7fa;--white:#fff;--gray:#6b7280;--border:#dde3ea;--green:#166534;--green-bg:#dcfce7;--red-bg:#fee2e2;--red-text:#991b1b;--yellow-bg:#fef9c3;--yellow-txt:#854d0e;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -64,13 +67,24 @@
   .aula-embreve{display:flex;align-items:center;gap:16px;opacity:.72;background:#f6f8fb;border:1px dashed #c4cfdc;}
   .aula-embreve .eb-lock{flex-shrink:0;width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#0b2a4a,#145da0);color:#c9a24b;display:flex;align-items:center;justify-content:center;}
   .aula-embreve .eb-txt{color:#8792a3;font-style:italic;margin-top:2px;}
-  #screen-login{align-items:center;justify-content:center;background:var(--light);padding:40px 20px;}
-  .login-box{width:100%;max-width:420px;background:var(--white);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.1);overflow:hidden;}
-  .login-top{background:linear-gradient(135deg,var(--primary),var(--secondary));padding:32px 36px;text-align:center;color:#fff;}
-  .login-top h2{font-size:1.1rem;font-weight:700;margin-bottom:4px;}
-  .login-top p{font-size:.72rem;opacity:.85;}
-  .login-body{padding:32px 36px;}
-  .login-error{background:var(--red-bg);border:1px solid #fca5a5;color:var(--red-text);font-size:.78rem;padding:10px 14px;border-radius:6px;margin-bottom:14px;display:none;text-align:center;}
+  #screen-login{align-items:center;justify-content:center;background:#0a2540;background-image:radial-gradient(55% 70% at 50% -5%,rgba(236,0,0,.12),transparent 60%),radial-gradient(45% 60% at 85% 110%,rgba(18,54,94,.65),transparent 65%);padding:48px 20px;}
+  .login-shell{width:100%;max-width:410px;display:flex;flex-direction:column;align-items:center;}
+  .login-crest{width:96px;height:96px;object-fit:cover;border-radius:22px;box-shadow:0 12px 34px rgba(0,0,0,.4);margin-bottom:20px;}
+  .login-wordmark{font-family:"Fraunces",Georgia,"Times New Roman",serif;font-size:1.72rem;font-weight:600;color:#fff;letter-spacing:-.01em;text-align:center;line-height:1.15;}
+  .login-sub{font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.55);margin:8px 0 32px;text-align:center;}
+  .login-box{width:100%;background:#fff;border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.38);padding:32px 32px 26px;}
+  #screen-login .form-group label{color:#0a2540;}
+  #screen-login .form-group input{padding:12px 14px;border-radius:8px;font-size:.9rem;}
+  #screen-login .form-group input:focus{border-color:#c1121f;box-shadow:0 0 0 3px rgba(193,18,31,.1);}
+  .btn-login{width:100%;background:#c1121f;color:#fff;font-family:inherit;font-size:.92rem;font-weight:700;padding:13px;border:none;border-radius:8px;cursor:pointer;transition:background .18s,transform .18s,box-shadow .18s;margin-top:4px;}
+  .btn-login:hover{background:#a30f1a;transform:translateY(-1px);box-shadow:0 6px 18px rgba(193,18,31,.3);}
+  .btn-login:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+  .login-help{text-align:center;margin-top:18px;font-size:.76rem;color:#6b7280;}
+  .login-help a{color:#c1121f;font-weight:600;text-decoration:none;}
+  .login-help a:hover{text-decoration:underline;}
+  .login-error{background:#fdecec;border:1px solid #f2b8b8;color:#9c2a2a;font-size:.78rem;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:none;text-align:center;}
+  .login-foot{margin-top:28px;font-size:.68rem;color:rgba(255,255,255,.4);text-align:center;letter-spacing:.04em;}
+  @media(max-width:480px){.login-box{padding:26px 22px 22px;}.login-wordmark{font-size:1.45rem;}.login-crest{width:84px;height:84px;}}
   #screen-dashboard{background:var(--light);}
   .dash-body{display:grid;grid-template-columns:210px 1fr;flex:1;}
   .sidebar{background:var(--white);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto;}
@@ -507,17 +521,18 @@
 
 <!-- LOGIN -->
 <div id="screen-login" class="screen active">
-  <div class="login-box">
-    <div class="login-top"><h2>Saint Alcuin of York</h2><p>Portal do Aluno — Acesso Institucional</p></div>
-    <div class="login-body">
+  <div class="login-shell">
+    <img src="/logo.jpeg" alt="Brasão Saint Alcuin of York Anglican College" class="login-crest"/>
+    <div class="login-wordmark">Saint Alcuin of York</div>
+    <div class="login-sub">Anglican College · Portal do Aluno</div>
+    <div class="login-box">
       <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
-      <div class="form-group"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com"/></div>
-      <div class="form-group"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()"/></div>
-      <button class="btn btn-secondary btn-full" id="btnLogin" onclick="fazerLogin()">Entrar</button>
-      <div style="text-align:center;margin-top:16px;font-size:.75rem;color:var(--gray);">
-        Problemas de acesso? <a href="https://wa.me/75998403658" target="_blank" style="color:var(--secondary);">Entre em contato</a>
-      </div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"/></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()"/></div>
+      <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Entrar</button>
+      <div class="login-help">Problemas de acesso? <a href="https://wa.me/75998403658" target="_blank">Fale com a secretaria</a></div>
     </div>
+    <div class="login-foot">© Saint Alcuin of York Anglican College</div>
   </div>
 </div>
 
