@@ -450,9 +450,39 @@
   .ativ-enunciado{font-size:.84rem;color:var(--text);line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);white-space:pre-wrap;}
   .ativ-secao{padding:14px 20px;border-top:1px solid var(--border);background:#fbfcfd;}
   .ativ-secao-tit{font-size:.72rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
-  .anexo-linha{display:flex;align-items:center;gap:10px;padding:10px 0;font-size:.84rem;min-height:46px;}
-  .anexo-linha:not(:last-child){border-bottom:1px solid var(--border);}
-  .anexo-ic{width:16px;height:16px;stroke:var(--gray);stroke-width:1.7;fill:none;flex-shrink:0;}
+  /* Arquivos da atividade — cartões clicáveis com selo por tipo */
+  .anexo-linha{display:flex;align-items:center;gap:14px;padding:12px 14px;font-size:.84rem;
+               background:var(--white);border:1px solid var(--border);border-radius:12px;
+               margin-bottom:9px;cursor:pointer;
+               transition:transform .16s,box-shadow .16s,border-color .16s;}
+  .anexo-linha:last-child{margin-bottom:0;}
+  .anexo-linha:hover{transform:translateY(-2px);border-color:#c8d6e8;
+                     box-shadow:0 8px 20px rgba(11,42,74,.09);}
+  .anexo-linha:focus-visible{outline:none;box-shadow:0 0 0 2px var(--secondary);}
+  /* Selo do tipo de arquivo (cor = função: um tom por formato) */
+  .anexo-selo{width:42px;height:42px;border-radius:10px;flex-shrink:0;
+              display:flex;flex-direction:column;align-items:center;justify-content:center;
+              gap:1px;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
+  .anexo-selo svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.9;fill:none;}
+  .anexo-selo b{font-size:.5rem;font-weight:800;letter-spacing:.06em;line-height:1;}
+  .anexo-selo.t-pdf{background:linear-gradient(150deg,#e0242f,#a30f1a);}
+  .anexo-selo.t-doc{background:linear-gradient(150deg,#1c72c7,#0b3f78);}
+  .anexo-selo.t-img{background:linear-gradient(150deg,#0e9f6e,#066148);}
+  .anexo-selo.t-file{background:linear-gradient(150deg,#6b7688,#3b475a);}
+  .anexo-nome{flex:1;min-width:0;}
+  .anexo-nome .n{font-weight:600;color:var(--primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .anexo-nome .f{font-size:.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-top:1px;}
+  .anexo-baixar{display:flex;align-items:center;gap:7px;flex-shrink:0;
+                background:var(--secondary);color:#fff;border:none;border-radius:8px;
+                font-family:inherit;font-size:.78rem;font-weight:600;padding:9px 16px;cursor:pointer;
+                transition:background .15s,box-shadow .15s;}
+  .anexo-baixar:hover{background:#1068b5;box-shadow:0 4px 12px rgba(20,93,160,.28);}
+  .anexo-baixar:focus-visible{outline:none;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--secondary);}
+  .anexo-baixar svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;}
+  @media(max-width:640px){
+    .anexo-baixar span{display:none;}
+    .anexo-baixar{padding:9px 12px;}
+  }
   .entrega-ic{width:38px;height:38px;border-radius:9px;background:#eef4fb;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .entrega-ic svg{width:18px;height:18px;stroke:var(--secondary);stroke-width:1.7;fill:none;}
   .entrega-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
@@ -547,7 +577,7 @@
 <!-- DASHBOARD -->
 <div id="screen-dashboard" class="screen">
   <header class="site-header">
-    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v3.8" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#16a34a;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
+    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v3.9" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563eb;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="text-align:right;">
         <div style="font-size:.84rem;font-weight:600;" id="dash-name">—</div>
@@ -583,7 +613,7 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v3.8" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#16a34a;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v3.9" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2563eb;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
       <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo<span id="selo-aovivo-nav" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:8px;animation:pulseLive 1.5s infinite;">AO VIVO</span></div>
@@ -1522,11 +1552,13 @@ function renderAtividades(){
       // anexos
       let secAnexos='';
       if(t.anexos && t.anexos.length){
-        secAnexos='<div class="ativ-secao"><div class="ativ-secao-tit">Arquivos da atividade</div>'+
+        secAnexos='<div class="ativ-secao"><div class="ativ-secao-tit">Arquivos da atividade · '+t.anexos.length+'</div>'+
           t.anexos.map(function(x){
-            return '<div class="anexo-linha"><svg class="anexo-ic" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>'+
-              '<span style="flex:1;min-width:0;">'+x.nome_arquivo+'</span>'+
-              '<button class="btn btn-outline" style="font-size:.74rem;padding:6px 14px;" onclick="baixarAnexo(\''+x.path+'\')">Baixar</button>'+
+            const p=(x.path||'').replace(/'/g,"\\'");
+            return '<div class="anexo-linha" tabindex="0" role="button" onclick="baixarAnexo(\''+p+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();baixarAnexo(\''+p+'\')}">'+
+              seloArquivo(x.nome_arquivo)+
+              '<div class="anexo-nome"><div class="n">'+x.nome_arquivo+'</div><div class="f">'+extArquivo(x.nome_arquivo)+'</div></div>'+
+              '<button class="anexo-baixar" onclick="event.stopPropagation();baixarAnexo(\''+p+'\')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg><span>Baixar</span></button>'+
             '</div>';
           }).join('')+'</div>';
       }
@@ -1604,6 +1636,22 @@ function trilhaItem(nodeCls,icon,ultimo,conteudo){
     '</div>'+
     '<div class="trilha-conteudo">'+conteudo+'</div>'+
   '</div>';
+}
+
+// Tipo de arquivo pelo nome → rótulo e selo colorido
+function extArquivo(nome){
+  const m=String(nome||'').match(/\.([a-z0-9]+)(?:\?|$)/i);
+  return m ? m[1].toUpperCase() : 'ARQUIVO';
+}
+function seloArquivo(nome){
+  const e=extArquivo(nome).toLowerCase();
+  const docSvg='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+  const imgSvg='<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+  let cls='t-file', ic=docSvg, lbl=extArquivo(nome).slice(0,4);
+  if(e==='pdf'){cls='t-pdf';lbl='PDF';}
+  else if(e==='doc'||e==='docx'){cls='t-doc';lbl='DOC';}
+  else if(['png','jpg','jpeg','gif','webp'].includes(e)){cls='t-img';ic=imgSvg;lbl='IMG';}
+  return '<div class="anexo-selo '+cls+'">'+ic+'<b>'+lbl+'</b></div>';
 }
 
 // Bucket privado → URL assinada temporária
