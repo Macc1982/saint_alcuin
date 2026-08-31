@@ -249,9 +249,9 @@
   .nota-ring::before{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--white);}
   .nota-ring-val{position:relative;z-index:1;font-size:1.3rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;}
   #lista-notas td{padding:14px;}
-  #lista-notas td:first-child{font-weight:600;color:var(--primary);}
-  #lista-notas td:nth-child(2),#lista-notas td:nth-child(3),#lista-notas td:nth-child(4),#lista-notas td:nth-child(5){text-align:center;font-variant-numeric:tabular-nums;}
-  #lista-notas td:nth-child(5){font-weight:600;color:var(--primary);}
+  #lista-notas td:nth-child(2){font-weight:600;color:var(--primary);}
+  #lista-notas td:nth-child(3),#lista-notas td:nth-child(4),#lista-notas td:nth-child(5),#lista-notas td:nth-child(6){text-align:center;font-variant-numeric:tabular-nums;}
+  #lista-notas td:nth-child(6){font-weight:600;color:var(--primary);}
 
   .fin-alerta{background:var(--red-bg);color:var(--red-text);padding:13px 18px;border-radius:10px;font-size:.8rem;margin-bottom:16px;display:none;border:1px solid #f3d1d4;}
   .fin-prox{background:#eef4fb;color:#1e40af;padding:13px 18px;border-radius:10px;font-size:.8rem;margin-bottom:16px;display:none;border:1px solid #d8e6f6;}
@@ -577,7 +577,7 @@
 <!-- DASHBOARD -->
 <div id="screen-dashboard" class="screen">
   <header class="site-header">
-    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v4.0" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#0ea5e9;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
+    <div><div class="header-brand-name">Saint Alcuin of York<span id="dot-versao-m" title="v4.1" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;margin-left:7px;vertical-align:middle;"></span></div><div class="header-brand-sub">Portal Acadêmico</div></div>
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="text-align:right;">
         <div style="font-size:.84rem;font-weight:600;" id="dash-name">—</div>
@@ -613,7 +613,7 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v4.0" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0ea5e9;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v4.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
       <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo<span id="selo-aovivo-nav" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:8px;animation:pulseLive 1.5s infinite;">AO VIVO</span></div>
@@ -779,7 +779,7 @@
         </div>
         <div class="table-wrap">
           <table class="data-table">
-            <thead><tr><th>Disciplina</th><th>Nota 1</th><th>Nota 2</th><th>Trabalho</th><th>Média</th><th>Situação</th></tr></thead>
+            <thead><tr><th style="width:44px;">#</th><th>Disciplina</th><th>Nota 1</th><th>Nota 2</th><th>Trabalho</th><th>Média</th><th>Situação</th></tr></thead>
             <tbody id="lista-notas"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
           </table>
         </div>
@@ -1361,7 +1361,7 @@ async function carregarNotas(){
   if(!estudante)return;
   const{data}=await sb.from('notas').select('*,disciplinas(nome)').eq('aluno_id',estudante.id);
   if(!data?.length){
-    document.getElementById('lista-notas').innerHTML='<tr><td colspan="6" class="empty">Nenhuma nota lançada ainda.</td></tr>';
+    document.getElementById('lista-notas').innerHTML='<tr><td colspan="7" class="empty">Nenhuma nota lançada ainda.</td></tr>';
     document.getElementById('media-geral').textContent='—';
     document.getElementById('st-media').textContent='—';
     return;
@@ -1371,10 +1371,10 @@ async function carregarNotas(){
   document.getElementById('media-geral').textContent=mg;
   document.getElementById('st-media').textContent=mg;
   document.getElementById('notas-resumo').textContent=data.length+' disciplinas · Aprovado em '+data.filter(n=>(n.media||0)>=7).length+' de '+data.length;
-  document.getElementById('lista-notas').innerHTML=data.map(n=>{
+  document.getElementById('lista-notas').innerHTML=data.map((n,i)=>{
     const m=n.media||0;
     const[cls,sit]=m>=7?['badge-green','Aprovado']:m>=5?['badge-yellow','Recuperação']:['badge-red','Reprovado'];
-    return`<tr><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+    return`<tr><td style="color:var(--gray);font-variant-numeric:tabular-nums;font-weight:600;">${i+1}</td><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
   }).join('');
 }
 
