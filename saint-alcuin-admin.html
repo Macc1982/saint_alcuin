@@ -6,6 +6,9 @@
 <title>Admin — Saint Alcuin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet"/>
 <style>
   :root{--primary:#0b2a4a;--secondary:#145da0;--text:#2b2b2b;--light:#f5f7fa;--white:#fff;--gray:#6b7280;--border:#dde3ea;--green:#166534;--green-bg:#dcfce7;--red-bg:#fee2e2;--red-text:#991b1b;--yellow-bg:#fef9c3;--yellow-txt:#854d0e;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -244,15 +247,39 @@
   .sec-title:first-child{margin-top:0;}
 
   /* ---------- Agrupamento por curso ---------- */
-  .grupo-curso{margin-bottom:26px;}
+  /* Hierarquia visual em 3 níveis: CURSO > DISCIPLINA > tabela.
+     Só camada visual — as classes já existem no render, aqui muda só a aparência. */
+
+  /* Nível 1 — CURSO: âncora forte da seção */
+  .grupo-curso{margin-bottom:40px;}
   .grupo-curso:last-child{margin-bottom:0;}
-  .grupo-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 0 0 12px;margin-bottom:14px;position:relative;}
-  .grupo-head::before{content:'';position:absolute;left:0;top:2px;bottom:2px;width:3px;background:var(--primary);border-radius:2px;}
-  .grupo-nome{font-size:.95rem;font-weight:700;color:var(--primary);letter-spacing:-.01em;}
-  .grupo-meta{font-size:.72rem;color:var(--gray);font-variant-numeric:tabular-nums;}
+  .grupo-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+              padding:0 0 12px 16px;margin-bottom:20px;position:relative;
+              border-bottom:1px solid var(--border);}
+  .grupo-head::before{content:'';position:absolute;left:0;top:1px;bottom:14px;width:5px;
+                      background:#c1121f;border-radius:3px;}
+  .grupo-nome{font-family:'Fraunces',Georgia,serif;font-size:1.28rem;font-weight:600;
+              color:var(--primary);letter-spacing:-.015em;line-height:1.2;}
+  .grupo-meta{font-size:.74rem;color:var(--gray);font-variant-numeric:tabular-nums;
+              flex-shrink:0;white-space:nowrap;}
   .grupo-alerta{color:#854d0e;font-weight:700;}
-  .grupo-disc{font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gray);margin:14px 0 7px;}
+
+  /* Nível 2 — DISCIPLINA: faixa com identidade própria (o que faltava separar) */
+  .grupo-disc{display:flex;align-items:center;gap:9px;
+              font-size:.9rem;font-weight:700;letter-spacing:.005em;text-transform:none;
+              color:var(--primary);
+              background:linear-gradient(90deg,#eef3f9 0%,#f7fafc 100%);
+              border-left:3px solid var(--secondary);border-radius:6px;
+              padding:9px 14px;margin:26px 0 10px;}
+  .grupo-disc:first-of-type{margin-top:4px;}
+  .grupo-disc::before{content:'';width:6px;height:6px;border-radius:50%;
+                      background:var(--secondary);flex-shrink:0;}
+
+  /* Nível 3 — TABELA: cabeçalhos recuam para trás da disciplina */
   .grupo-curso .table-wrap{box-shadow:none;border:1px solid var(--border);}
+  .grupo-curso .data-table thead th{font-size:.64rem;font-weight:600;letter-spacing:.06em;
+                                     text-transform:uppercase;color:#9aa4b2;
+                                     background:#fbfcfd;padding-top:9px;padding-bottom:9px;}
 
   /* ---------- Extração de capa ---------- */
   .capa-extracao{display:flex;gap:22px;align-items:flex-start;margin-top:16px;
@@ -333,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#14b8a6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.2" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d4a017;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
