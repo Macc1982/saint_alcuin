@@ -360,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.4" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.3" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -821,7 +821,7 @@
 
           <div class="form-row">
             <div class="form-group"><label>Disponível para</label>
-              <select id="bib-curso" onchange="onCursoBib()"><option value="">Selecione o curso...</option></select>
+              <select id="bib-curso"><option value="">Todos os cursos</option></select>
             </div>
             <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:12px;">
               <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer;">
@@ -963,9 +963,6 @@
             <div class="form-group"><label>Curso *</label><select id="m-curso" onchange="onCursoMaterial();sincExtraCursos()"><option value="">Selecione o curso</option></select></div>
             <div class="form-group"><label>Disciplina</label>
               <select id="m-disciplina"><option value="">— Material geral do curso —</option></select>
-            </div>
-            <div class="form-group"><label>Página da capa</label>
-              <input type="number" id="m-pag-capa" min="1" value="1" title="Página do PDF usada como capa (alguns livros têm a capa na 3 ou 4)"/>
             </div>
           </div>
           <div class="form-row">
@@ -2609,26 +2606,6 @@ function onCursoMaterial(){
   });
 }
 
-// Filtra as disciplinas da Biblioteca pelo curso de destino escolhido.
-// Evita cair numa disciplina duplicada de outro curso.
-function onCursoBib(){
-  const cursoId=document.getElementById('bib-curso').value;
-  const sel=document.getElementById('bib-disciplina');
-  if(!sel) return;
-  if(!cursoId){
-    sel.innerHTML='<option value="">Selecione o curso primeiro...</option>';
-    return;
-  }
-  const cn=(cursosCache.find(x=>x.id===cursoId)||{}).nome||'Curso';
-  let html='<option value="">Selecione a disciplina...</option>';
-  discCache.filter(d=>d.curso_id===cursoId)
-    .sort((a,b)=>(a.nome||'').localeCompare(b.nome||''))
-    .forEach(d=>{
-      html+='<option value="'+d.id+'" data-curso="'+d.curso_id+'" data-cursonome="'+String(cn).replace(/"/g,'')+'">'+d.nome+'</option>';
-    });
-  sel.innerHTML=html;
-}
-
 function onFileSelected(e){
   selectedFiles = Array.from(e.target.files || []);
   const el=document.getElementById('fileName');
@@ -2656,28 +2633,6 @@ function onVideoSelected(e){
   if(!document.getElementById('m-titulo').value.trim()){
     document.getElementById('m-titulo').value=videoFile.name.replace(/\.[^.]+$/,'');
   }
-}
-
-// Extrai a capa de um PDF (pagina informada) e devolve um Blob JPEG.
-// Devolve null se nao der - nunca bloqueia o upload do material.
-async function capaDoPdf(file, pagina){
-  try{
-    if(!window.pdfjsLib) return null;
-    const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
-    const n   = Math.min(Math.max(parseInt(pagina,10)||1,1), pdf.numPages);
-    const pg  = await pdf.getPage(n);
-    const escala = 1100 / pg.getViewport({scale:1}).width;
-    const vp = pg.getViewport({scale:escala});
-    const cv = document.createElement('canvas');
-    cv.width = vp.width; cv.height = vp.height;
-    await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
-    const alvoH = Math.min(cv.height, Math.round(cv.width * 1.5));
-    const corte = document.createElement('canvas');
-    corte.width = cv.width; corte.height = alvoH;
-    corte.getContext('2d').drawImage(cv,0,0,cv.width,alvoH,0,0,cv.width,alvoH);
-    return await new Promise(r => corte.toBlob(r,'image/jpeg',0.88));
-  }catch(err){ console.error('[capa lote]',err); return null; }
 }
 
 async function adicionarMaterial(){
@@ -2773,22 +2728,9 @@ async function adicionarMaterial(){
     const {data:pub}=sb.storage.from('materiais').getPublicUrl(path);
     const titulo = file.name.replace(/\.[^.]+$/,'');
 
-    // capa: extraida da pagina informada (padrao 1). Se falhar, segue sem capa.
-    let capa_url = null;
-    const pagCapa = document.getElementById('m-pag-capa');
-    const blobCapa = await capaDoPdf(file, pagCapa ? pagCapa.value : 1);
-    if(blobCapa){
-      const cpath = pasta+'/capas/'+Date.now()+'_'+i+'.jpg';
-      const {error:cErr}=await sb.storage.from('materiais')
-        .upload(cpath,blobCapa,{upsert:false,contentType:'image/jpeg'});
-      if(!cErr) capa_url = sb.storage.from('materiais').getPublicUrl(cpath).data.publicUrl;
-      else console.error('[capa upload lote]',cErr);
-    }
-
     const {error:dbErr}=await sb.from('materiais').insert({
       titulo, curso_id, disciplina_id, tipo:'pdf',
-      categoria: 'material',
-      url: pub.publicUrl, capa_url, descricao: desc||null, ordem: i
+      url: pub.publicUrl, descricao: desc||null, ordem: i
     });
     if(dbErr){ falhas++; console.error('[db]',file.name,dbErr); continue; }
     ok++;
@@ -2979,24 +2921,9 @@ async function salvarObra(){
   if(!disciplina_id){ toast('Selecione a disciplina do material.','error'); btn.disabled=false; btn.textContent=id?'Salvar alterações':'Adicionar material'; return; }
   if(!arquivo_url){ toast('Envie o PDF do material.','error'); btn.disabled=false; btn.textContent=id?'Salvar alterações':'Adicionar material'; return; }
 
-  // curso de destino escolhido no formulario
-  const curso_sel = document.getElementById('bib-curso').value || null;
+  // curso da disciplina escolhida
   const opt = document.querySelector('#bib-disciplina option[value="'+disciplina_id+'"]');
-  const curso_da_disc = opt ? opt.getAttribute('data-curso') : null;
-
-  if(!curso_sel){
-    toast('Selecione o curso de destino.','error');
-    btn.disabled=false; btn.textContent = id?'Salvar alteracoes':'Adicionar material';
-    return;
-  }
-  // Trava: existem disciplinas com o mesmo nome em cursos diferentes.
-  if(curso_da_disc && curso_da_disc !== curso_sel){
-    const nomeDisc = opt ? (opt.getAttribute('data-cursonome')||'outro curso') : 'outro curso';
-    toast('Essa disciplina pertence a '+nomeDisc+', nao ao curso selecionado. Escolha a disciplina do curso certo.','error');
-    btn.disabled=false; btn.textContent = id?'Salvar alteracoes':'Adicionar material';
-    return;
-  }
-  const curso_id_mat = curso_sel;
+  const curso_id_mat = opt ? opt.getAttribute('data-curso') : null;
 
   const matPayload={
     titulo, autor,
@@ -3043,7 +2970,7 @@ async function carregarBiblioteca(){
     Object.keys(porCurso).sort().forEach(cn=>{
       html+='<optgroup label="'+cn+'">';
       porCurso[cn].sort((a,b)=>(a.nome||'').localeCompare(b.nome||'')).forEach(d=>{
-        html+='<option value="'+d.id+'" data-curso="'+d.curso_id+'" data-cursonome="'+cn.replace(/"/g,'')+'">'+d.nome+'  ·  '+cn+'</option>';
+        html+='<option value="'+d.id+'" data-curso="'+d.curso_id+'">'+d.nome+'</option>';
       });
       html+='</optgroup>';
     });
