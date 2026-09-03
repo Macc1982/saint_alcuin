@@ -360,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.7" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.8" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -1001,15 +1001,24 @@
         </div>
 
         <div class="card">
-          <div style="margin-bottom:12px;"><strong style="font-size:.95rem;">Adicionar aluno a este progresso</strong></div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <select id="cert-add-aluno" style="flex:1;min-width:260px;"></select>
-            <button class="btn btn-primary" id="btnCertAdd" onclick="addAlunoProgresso()">Adicionar</button>
+          <div style="margin-bottom:4px;"><strong style="font-size:.95rem;">Adicionar aluno ao trâmite</strong></div>
+          <div style="font-size:.78rem;color:#6b7280;line-height:1.6;margin-bottom:14px;">
+            Aplica o rito padrão de <span id="cert-modelo-n">8</span> etapas, todas pendentes, e já libera a tela no portal do aluno.
           </div>
-          <div style="font-size:.76rem;color:#6b7280;margin-top:10px;line-height:1.6;">
-            O aluno recebe as mesmas etapas da tela acima, todas pendentes, e já passa a ver a tela no portal.
+          <div class="form-row" style="align-items:flex-end;">
+            <div class="form-group" style="flex:1;">
+              <label>Aluno</label>
+              <select id="cert-add-aluno"></select>
+            </div>
+            <div class="form-group" style="flex:0 0 auto;">
+              <button class="btn btn-primary" id="btnCertAdd" onclick="addAlunoProgresso()">Adicionar</button>
+            </div>
           </div>
-          <div id="cert-rep-log" style="font-size:.8rem;margin-top:10px;line-height:1.7;"></div>
+          <details style="margin-top:4px;">
+            <summary style="font-size:.78rem;color:#145da0;cursor:pointer;">Ver o rito padrão</summary>
+            <ol id="cert-modelo-lista" style="font-size:.78rem;color:#6b7280;line-height:1.8;margin:10px 0 0 18px;"></ol>
+          </details>
+          <div id="cert-rep-log" style="font-size:.8rem;margin-top:12px;line-height:1.7;"></div>
         </div>
       </div>
 
@@ -2187,17 +2196,17 @@ async function carregarCertAdmin(){
   sel.innerHTML='<option value="">Selecione o aluno...</option>'+opts;
   const dest=document.getElementById('cert-add-aluno');
   if(dest) dest.innerHTML='<option value="">Escolha o aluno...</option>'+opts;
+  const ol=document.getElementById('cert-modelo-lista');
+  if(ol) ol.innerHTML=CERT_MODELO.map(m=>'<li>'+escAdm(m.nome)+(m.orgao?' <span style="color:#9aa3ad;">— '+escAdm(m.orgao)+'</span>':'')+'</li>').join('');
+  const n=document.getElementById('cert-modelo-n');
+  if(n) n.textContent=CERT_MODELO.length;
 }
 
 // Copia as etapas da tela para um aluno e ja libera a tela no portal dele.
 async function addAlunoProgresso(){
-  const origemId=document.getElementById('cert-aluno').value;
   const alvo=document.getElementById('cert-add-aluno').value;
   const log=document.getElementById('cert-rep-log');
-  if(!origemId){ toast('Selecione primeiro o aluno de origem.','error'); return; }
-  if(!certEtapas.length){ toast('Não há etapas na tela para copiar.','error'); return; }
   if(!alvo){ toast('Escolha o aluno.','error'); return; }
-  if(alvo===origemId){ toast('Esse já é o aluno da tela.','error'); return; }
 
   const nome=(certAlunos.find(a=>a.id===alvo)||{}).nome||'aluno';
   const btn=document.getElementById('btnCertAdd');
@@ -2222,10 +2231,10 @@ async function addAlunoProgresso(){
       proc=r.data;
     }
 
-    const linhas=certEtapas.map((e,i)=>({
+    // rito padrao, sempre — independe do aluno aberto na tela
+    const linhas=CERT_MODELO.map((e,i)=>({
       processo_id: proc.id, ordem: i,
-      nome: String(e.nome).trim(),
-      orgao: (e.orgao&&String(e.orgao).trim())||null,
+      nome: e.nome, orgao: e.orgao||null,
       status: 'pendente', data_evento: null, observacao: null
     }));
     const ins=await sb.from('certificacao_etapas').insert(linhas);
@@ -2237,6 +2246,7 @@ async function addAlunoProgresso(){
     log.innerHTML='<span style="color:#166534;">'+escAdm(nome)+' adicionado e já visível no portal.</span>';
     toast(nome+' adicionado.','success');
     document.getElementById('cert-add-aluno').value='';
+    if(document.getElementById('cert-aluno').value===alvo) await onCertAluno();
   }catch(err){
     console.error('[add progresso]',err);
     log.innerHTML='<span style="color:#991b1b;">Não foi possível adicionar: '+escAdm(err.message||'erro')+'</span>';
