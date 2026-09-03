@@ -360,12 +360,13 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.3" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.5" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
       <div class="nav-item" onclick="showTab('financeiro',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Financeiro</div>
       <div class="nav-item" onclick="showTab('documentos',this)"><svg viewBox="0 0 24 24"><path d="M4 4h5l2 3h9a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Documentos</div>
+      <div class="nav-item" onclick="showTab('certificacao',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5L17 22l-5-3-5 3 1.5-8.5"/></svg>Certificação</div>
       <div class="nav-item" onclick="showTab('materiais',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('noticias',this)"><svg viewBox="0 0 24 24"><path d="M2 20V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14z"/><path d="M6 8h12M6 12h12M6 16h7"/></svg>Notícias</div>
       <div class="nav-item" onclick="showTab('linhas',this)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Linhas de pesquisa</div>
@@ -953,6 +954,53 @@
       </div>
 
       <!-- MATERIAIS -->
+      <div class="tab" id="tab-certificacao">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Tramitação da certificação</div>
+            <div class="page-sub">Escolha o aluno, monte as etapas e libere a visualização no portal</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;">
+              <label>Aluno *</label>
+              <select id="cert-aluno" onchange="onCertAluno()"><option value="">Carregando alunos...</option></select>
+            </div>
+            <div class="form-group">
+              <label>Visível para o aluno</label>
+              <div style="display:flex;align-items:center;gap:10px;height:38px;">
+                <input type="checkbox" id="cert-visivel" style="width:18px;height:18px;cursor:pointer;" onchange="salvarCertVisivel()"/>
+                <span id="cert-visivel-txt" style="font-size:.82rem;color:#6b7280;">Oculto</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Observação geral (opcional, o aluno vê)</label>
+            <input type="text" id="cert-obs-geral" placeholder="Ex.: documentação protocolada, aguardando análise"/>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="salvarCertProcesso()">Salvar cabeçalho</button>
+            <button class="btn btn-outline" onclick="aplicarModeloCert()">Aplicar modelo padrão de etapas</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+            <strong style="font-size:.95rem;">Etapas do trâmite</strong>
+            <button class="btn btn-outline btn-sm" onclick="addEtapaCert()">Adicionar etapa</button>
+          </div>
+          <div id="cert-etapas"><div class="empty">Selecione um aluno.</div></div>
+          <div style="margin-top:16px;">
+            <button class="btn btn-primary" id="btnCertEtapas" onclick="salvarCertEtapas()">Salvar etapas</button>
+          </div>
+          <div style="font-size:.76rem;color:#6b7280;margin-top:14px;line-height:1.6;border-top:1px solid #dde3ea;padding-top:12px;">
+            A data só aparece para o aluno em etapas marcadas como concluídas. Etapas pendentes ficam sem data, porque dependem de terceiros.
+          </div>
+        </div>
+      </div>
+
       <div class="tab" id="tab-materiais">
         <div class="page-title">Materiais</div>
         <div class="page-sub">PDFs e videoaulas — organizados por disciplina</div>
@@ -2102,6 +2150,188 @@ async function iniciarApp(){
   ]);
 }
 
+/* ===== Tramitação da certificação ===== */
+let certAlunos=[], certProc=null, certEtapas=[];
+
+const CERT_MODELO=[
+  {nome:'Conclusão do programa',                 orgao:'Saint Alcuin of York'},
+  {nome:'Emissão do diploma',                    orgao:'Saint Alcuin of York — Chile'},
+  {nome:'Legalização e Apostila de Haia',        orgao:'Autoridade competente — Chile'},
+  {nome:'Envio da documentação ao Brasil',       orgao:''},
+  {nome:'Protocolo na Plataforma Carolina Bori', orgao:'MEC — Plataforma Carolina Bori'},
+  {nome:'Análise pela universidade',             orgao:'Universidade revalidadora'},
+  {nome:'Conclusão do trâmite',                  orgao:''}
+];
+
+async function carregarCertAdmin(){
+  const sel=document.getElementById('cert-aluno');
+  if(certAlunos.length){ return; }
+  const {data}=await sb.from('estudantes')
+    .select('id,nome,matricula,cursos(nome)').order('nome');
+  certAlunos=data||[];
+  sel.innerHTML='<option value="">Selecione o aluno...</option>'+
+    certAlunos.map(a=>'<option value="'+a.id+'">'+escAdm(a.nome)+
+      ' — '+escAdm(a.cursos?.nome||'sem curso')+'</option>').join('');
+}
+
+async function onCertAluno(){
+  const alunoId=document.getElementById('cert-aluno').value;
+  const box=document.getElementById('cert-etapas');
+  certProc=null; certEtapas=[];
+  if(!alunoId){
+    box.innerHTML='<div class="empty">Selecione um aluno.</div>';
+    document.getElementById('cert-visivel').checked=false;
+    document.getElementById('cert-obs-geral').value='';
+    setCertVisTxt(false);
+    return;
+  }
+  box.innerHTML='<div class="loading">Carregando...</div>';
+
+  const {data:proc}=await sb.from('certificacao_processo')
+    .select('*').eq('aluno_id',alunoId).maybeSingle();
+  certProc=proc||null;
+
+  document.getElementById('cert-visivel').checked = !!(proc && proc.visivel);
+  document.getElementById('cert-obs-geral').value = (proc && proc.observacao)||'';
+  setCertVisTxt(!!(proc && proc.visivel));
+
+  if(proc){
+    const {data:et}=await sb.from('certificacao_etapas')
+      .select('*').eq('processo_id',proc.id).order('ordem');
+    certEtapas=et||[];
+  }
+  renderCertEtapas();
+}
+
+function setCertVisTxt(v){
+  const el=document.getElementById('cert-visivel-txt');
+  if(el){ el.textContent = v?'Visível no portal':'Oculto'; el.style.color = v?'#166534':'#6b7280'; }
+}
+
+function renderCertEtapas(){
+  const box=document.getElementById('cert-etapas');
+  if(!certEtapas.length){
+    box.innerHTML='<div class="empty">Nenhuma etapa. Use "Aplicar modelo padrão" ou "Adicionar etapa".</div>';
+    return;
+  }
+  let html='<div class="table-wrap"><table><thead><tr>'+
+    '<th style="width:34px;">#</th><th>Etapa</th><th>Órgão</th>'+
+    '<th style="width:130px;">Status</th><th style="width:140px;">Data (se concluída)</th>'+
+    '<th>Observação</th><th style="width:80px;"></th></tr></thead><tbody>';
+  certEtapas.forEach((e,i)=>{
+    html+='<tr>'+
+      '<td>'+(i+1)+'</td>'+
+      '<td><input type="text" value="'+escAdm(e.nome)+'" oninput="certSet('+i+',\'nome\',this.value)" style="width:100%;"/></td>'+
+      '<td><input type="text" value="'+escAdm(e.orgao||'')+'" oninput="certSet('+i+',\'orgao\',this.value)" style="width:100%;"/></td>'+
+      '<td><select onchange="certSet('+i+',\'status\',this.value)">'+
+        '<option value="pendente"'+(e.status==='pendente'?' selected':'')+'>Pendente</option>'+
+        '<option value="andamento"'+(e.status==='andamento'?' selected':'')+'>Em andamento</option>'+
+        '<option value="concluida"'+(e.status==='concluida'?' selected':'')+'>Concluída</option>'+
+      '</select></td>'+
+      '<td><input type="date" value="'+(e.data_evento?String(e.data_evento).slice(0,10):'')+'" oninput="certSet('+i+',\'data_evento\',this.value)"/></td>'+
+      '<td><input type="text" value="'+escAdm(e.observacao||'')+'" oninput="certSet('+i+',\'observacao\',this.value)" style="width:100%;"/></td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button class="btn btn-outline btn-sm" onclick="moverEtapaCert('+i+',-1)" title="Subir">&uarr;</button> '+
+        '<button class="btn btn-danger btn-sm" onclick="removerEtapaCert('+i+')" title="Remover">&times;</button>'+
+      '</td></tr>';
+  });
+  box.innerHTML=html+'</tbody></table></div>';
+}
+
+function certSet(i,campo,val){ if(certEtapas[i]) certEtapas[i][campo]= val===''?null:val; }
+function addEtapaCert(){ certEtapas.push({nome:'Nova etapa',orgao:'',status:'pendente',data_evento:null,observacao:''}); renderCertEtapas(); }
+function removerEtapaCert(i){ certEtapas.splice(i,1); renderCertEtapas(); }
+function moverEtapaCert(i,d){
+  const j=i+d; if(j<0||j>=certEtapas.length) return;
+  const t=certEtapas[i]; certEtapas[i]=certEtapas[j]; certEtapas[j]=t; renderCertEtapas();
+}
+function aplicarModeloCert(){
+  if(certEtapas.length && !confirm('Isso substitui as etapas atuais na tela. Continuar?')) return;
+  certEtapas=CERT_MODELO.map(m=>({nome:m.nome,orgao:m.orgao,status:'pendente',data_evento:null,observacao:''}));
+  renderCertEtapas();
+  toast('Modelo aplicado. Ajuste e clique em Salvar etapas.','success');
+}
+
+// Garante que existe o processo do aluno e devolve o registro.
+async function garantirCertProcesso(alunoId){
+  if(certProc) return certProc;
+  const {data,error}=await sb.from('certificacao_processo')
+    .insert({aluno_id:alunoId,visivel:false}).select().single();
+  if(error){ toast('Erro ao criar processo: '+error.message,'error'); return null; }
+  certProc=data; return data;
+}
+
+async function salvarCertVisivel(){
+  const alunoId=document.getElementById('cert-aluno').value;
+  const vis=document.getElementById('cert-visivel').checked;
+  if(!alunoId){ document.getElementById('cert-visivel').checked=false; toast('Selecione o aluno.','error'); return; }
+  const proc=await garantirCertProcesso(alunoId);
+  if(!proc){ document.getElementById('cert-visivel').checked=false; return; }
+  const {error}=await sb.from('certificacao_processo')
+    .update({visivel:vis,atualizado_em:new Date().toISOString()}).eq('id',proc.id);
+  if(error){ toast('Erro: '+error.message,'error'); return; }
+  certProc.visivel=vis; setCertVisTxt(vis);
+  toast(vis?'Visível para o aluno.':'Oculto para o aluno.','success');
+}
+
+async function salvarCertProcesso(){
+  const alunoId=document.getElementById('cert-aluno').value;
+  if(!alunoId){ toast('Selecione o aluno.','error'); return; }
+  const proc=await garantirCertProcesso(alunoId);
+  if(!proc) return;
+  const {error}=await sb.from('certificacao_processo').update({
+    observacao: document.getElementById('cert-obs-geral').value.trim()||null,
+    visivel: document.getElementById('cert-visivel').checked,
+    atualizado_em: new Date().toISOString()
+  }).eq('id',proc.id);
+  if(error){ toast('Erro: '+error.message,'error'); return; }
+  toast('Cabeçalho salvo.','success');
+}
+
+async function salvarCertEtapas(){
+  const alunoId=document.getElementById('cert-aluno').value;
+  if(!alunoId){ toast('Selecione o aluno.','error'); return; }
+  const vazia=certEtapas.find(e=>!String(e.nome||'').trim());
+  if(vazia){ toast('Toda etapa precisa de nome.','error'); return; }
+
+  const btn=document.getElementById('btnCertEtapas');
+  btn.disabled=true; btn.textContent='Salvando...';
+
+  const proc=await garantirCertProcesso(alunoId);
+  if(!proc){ btn.disabled=false; btn.textContent='Salvar etapas'; return; }
+
+  // regrava a lista inteira: simples e evita divergencia de ordem
+  const {error:delErr}=await sb.from('certificacao_etapas').delete().eq('processo_id',proc.id);
+  if(delErr){ toast('Erro ao limpar: '+delErr.message,'error'); btn.disabled=false; btn.textContent='Salvar etapas'; return; }
+
+  if(certEtapas.length){
+    const linhas=certEtapas.map((e,i)=>({
+      processo_id: proc.id,
+      ordem: i,
+      nome: String(e.nome).trim(),
+      orgao: (e.orgao&&String(e.orgao).trim())||null,
+      status: e.status||'pendente',
+      // data so faz sentido em etapa concluida
+      data_evento: (e.status==='concluida' && e.data_evento) ? e.data_evento : null,
+      observacao: (e.observacao&&String(e.observacao).trim())||null
+    }));
+    const {error:insErr}=await sb.from('certificacao_etapas').insert(linhas);
+    if(insErr){ toast('Erro ao salvar: '+insErr.message,'error'); btn.disabled=false; btn.textContent='Salvar etapas'; return; }
+  }
+
+  await sb.from('certificacao_processo')
+    .update({atualizado_em:new Date().toISOString()}).eq('id',proc.id);
+
+  btn.disabled=false; btn.textContent='Salvar etapas';
+  toast('Etapas salvas.','success');
+  await onCertAluno();
+}
+
+function escAdm(t){
+  return String(t==null?'':t)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 function showTab(name,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
@@ -2113,6 +2343,7 @@ function showTab(name,el){
   if(name==='presencas') carregarPresencas();
   if(name==='noticias') carregarNoticiasAdm();
   if(name==='executivo') carregarExecutivo();
+  if(name==='certificacao') carregarCertAdmin();
 }
 
 async function carregarCursos(){
