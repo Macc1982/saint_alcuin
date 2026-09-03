@@ -360,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.6" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.7" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -1001,21 +1001,15 @@
         </div>
 
         <div class="card">
-          <div style="margin-bottom:6px;"><strong style="font-size:.95rem;">Replicar estas etapas para outros alunos</strong></div>
-          <div style="font-size:.78rem;color:#6b7280;line-height:1.6;margin-bottom:14px;">
-            Copia a lista de etapas que está na tela acima. Todas entram como pendentes, sem data —
-            cada aluno está num ponto diferente do trâmite. Alunos que já têm etapas são pulados, para não apagar o que existe.
+          <div style="margin-bottom:12px;"><strong style="font-size:.95rem;">Adicionar aluno a este progresso</strong></div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <select id="cert-add-aluno" style="flex:1;min-width:260px;"></select>
+            <button class="btn btn-primary" id="btnCertAdd" onclick="addAlunoProgresso()">Adicionar</button>
           </div>
-          <div class="form-group">
-            <label>Alunos de destino (segure Ctrl/Cmd para marcar vários)</label>
-            <select id="cert-destinos" multiple size="9" style="width:100%;"></select>
+          <div style="font-size:.76rem;color:#6b7280;margin-top:10px;line-height:1.6;">
+            O aluno recebe as mesmas etapas da tela acima, todas pendentes, e já passa a ver a tela no portal.
           </div>
-          <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;">
-            <input type="checkbox" id="cert-rep-visivel" style="width:17px;height:17px;cursor:pointer;"/>
-            <label for="cert-rep-visivel" style="font-size:.82rem;color:#6b7280;cursor:pointer;">Já deixar visível no portal para os selecionados</label>
-          </div>
-          <button class="btn btn-primary" id="btnCertReplicar" onclick="replicarCert()">Replicar etapas</button>
-          <div id="cert-rep-log" style="font-size:.78rem;color:#6b7280;margin-top:14px;line-height:1.7;"></div>
+          <div id="cert-rep-log" style="font-size:.8rem;margin-top:10px;line-height:1.7;"></div>
         </div>
       </div>
 
@@ -2191,66 +2185,66 @@ async function carregarCertAdmin(){
   const opts = certAlunos.map(a=>'<option value="'+a.id+'">'+escAdm(a.nome)+
       ' — '+escAdm(a.cursos?.nome||'sem curso')+'</option>').join('');
   sel.innerHTML='<option value="">Selecione o aluno...</option>'+opts;
-  const dest=document.getElementById('cert-destinos');
-  if(dest) dest.innerHTML=opts;
+  const dest=document.getElementById('cert-add-aluno');
+  if(dest) dest.innerHTML='<option value="">Escolha o aluno...</option>'+opts;
 }
 
-// Copia a lista de etapas da tela para outros alunos, sempre como pendentes.
-async function replicarCert(){
+// Copia as etapas da tela para um aluno e ja libera a tela no portal dele.
+async function addAlunoProgresso(){
   const origemId=document.getElementById('cert-aluno').value;
+  const alvo=document.getElementById('cert-add-aluno').value;
+  const log=document.getElementById('cert-rep-log');
   if(!origemId){ toast('Selecione primeiro o aluno de origem.','error'); return; }
-  if(!certEtapas.length){ toast('Não há etapas na tela para replicar.','error'); return; }
+  if(!certEtapas.length){ toast('Não há etapas na tela para copiar.','error'); return; }
+  if(!alvo){ toast('Escolha o aluno.','error'); return; }
+  if(alvo===origemId){ toast('Esse já é o aluno da tela.','error'); return; }
 
-  const dest=document.getElementById('cert-destinos');
-  const alvos=[...dest.selectedOptions].map(o=>o.value).filter(id=>id!==origemId);
-  if(!alvos.length){ toast('Selecione ao menos um aluno de destino.','error'); return; }
+  const nome=(certAlunos.find(a=>a.id===alvo)||{}).nome||'aluno';
+  const btn=document.getElementById('btnCertAdd');
+  btn.disabled=true; btn.textContent='Adicionando...';
 
-  const jaVisivel=document.getElementById('cert-rep-visivel').checked;
-  const btn=document.getElementById('btnCertReplicar');
-  btn.disabled=true; btn.textContent='Replicando...';
+  try{
+    let {data:proc}=await sb.from('certificacao_processo')
+      .select('*').eq('aluno_id',alvo).maybeSingle();
 
-  const criados=[], pulados=[], falhas=[];
-
-  for(const alvo of alvos){
-    const nome=(certAlunos.find(a=>a.id===alvo)||{}).nome||alvo;
-    try{
-      let {data:proc}=await sb.from('certificacao_processo')
-        .select('*').eq('aluno_id',alvo).maybeSingle();
-
-      if(!proc){
-        const r=await sb.from('certificacao_processo')
-          .insert({aluno_id:alvo,visivel:false}).select().single();
-        if(r.error){ falhas.push(nome); continue; }
-        proc=r.data;
-      } else {
-        const {count}=await sb.from('certificacao_etapas')
-          .select('id',{count:'exact',head:true}).eq('processo_id',proc.id);
-        if(count && count>0){ pulados.push(nome); continue; }
+    if(proc){
+      const {count}=await sb.from('certificacao_etapas')
+        .select('id',{count:'exact',head:true}).eq('processo_id',proc.id);
+      if(count && count>0){
+        btn.disabled=false; btn.textContent='Adicionar';
+        log.innerHTML='<span style="color:#854d0e;">'+escAdm(nome)+' já tem etapas. Abra o aluno na lista acima para editar.</span>';
+        return;
       }
+    } else {
+      const r=await sb.from('certificacao_processo')
+        .insert({aluno_id:alvo,visivel:false}).select().single();
+      if(r.error) throw r.error;
+      proc=r.data;
+    }
 
-      const linhas=certEtapas.map((e,i)=>({
-        processo_id: proc.id, ordem: i,
-        nome: String(e.nome).trim(),
-        orgao: (e.orgao&&String(e.orgao).trim())||null,
-        status: 'pendente', data_evento: null, observacao: null
-      }));
-      const ins=await sb.from('certificacao_etapas').insert(linhas);
-      if(ins.error){ falhas.push(nome); continue; }
+    const linhas=certEtapas.map((e,i)=>({
+      processo_id: proc.id, ordem: i,
+      nome: String(e.nome).trim(),
+      orgao: (e.orgao&&String(e.orgao).trim())||null,
+      status: 'pendente', data_evento: null, observacao: null
+    }));
+    const ins=await sb.from('certificacao_etapas').insert(linhas);
+    if(ins.error) throw ins.error;
 
-      await sb.from('certificacao_processo')
-        .update({visivel:jaVisivel,atualizado_em:new Date().toISOString()}).eq('id',proc.id);
-      criados.push(nome);
-    }catch(err){ console.error('[replicar]',err); falhas.push(nome); }
+    await sb.from('certificacao_processo')
+      .update({visivel:true,atualizado_em:new Date().toISOString()}).eq('id',proc.id);
+
+    log.innerHTML='<span style="color:#166534;">'+escAdm(nome)+' adicionado e já visível no portal.</span>';
+    toast(nome+' adicionado.','success');
+    document.getElementById('cert-add-aluno').value='';
+  }catch(err){
+    console.error('[add progresso]',err);
+    log.innerHTML='<span style="color:#991b1b;">Não foi possível adicionar: '+escAdm(err.message||'erro')+'</span>';
+    toast('Erro ao adicionar.','error');
   }
-
-  btn.disabled=false; btn.textContent='Replicar etapas';
-  let log='';
-  if(criados.length) log+='<div style="color:#166534;">Replicado para '+criados.length+': '+escAdm(criados.join(', '))+'</div>';
-  if(pulados.length) log+='<div style="color:#854d0e;">Pulados (já tinham etapas): '+escAdm(pulados.join(', '))+'</div>';
-  if(falhas.length)  log+='<div style="color:#991b1b;">Falharam: '+escAdm(falhas.join(', '))+'</div>';
-  document.getElementById('cert-rep-log').innerHTML=log||'Nada a fazer.';
-  toast(criados.length?('Replicado para '+criados.length+' aluno(s).'):'Nenhum aluno recebeu as etapas.', criados.length?'success':'error');
+  btn.disabled=false; btn.textContent='Adicionar';
 }
+
 
 async function onCertAluno(){
   const alunoId=document.getElementById('cert-aluno').value;
