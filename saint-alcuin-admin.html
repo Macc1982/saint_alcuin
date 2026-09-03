@@ -360,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.8" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.9" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -591,6 +591,12 @@
         <div id="fin-sem-plano" style="display:none;">
           <div class="card">
             <div class="card-header"><div class="card-title">Gerar plano de pagamento</div></div>
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+              <button type="button" class="btn btn-primary btn-sm" id="modo-padrao-btn" onclick="setModoPlano('padrao')">Plano padrão</button>
+              <button type="button" class="btn btn-outline btn-sm" id="modo-neg-btn" onclick="setModoPlano('negociado')">Negociado — transferência / integralização</button>
+            </div>
+
+            <div id="plano-padrao">
             <div class="fin-hint">
               Este aluno ainda não tem plano. Defina os valores negociados e gere as parcelas.
               <br/><strong>Mestrado:</strong> matrícula + 26 mensalidades &nbsp;·&nbsp; <strong>Doutorado:</strong> matrícula + 36 mensalidades
@@ -612,6 +618,35 @@
               <div class="form-group"><label>1ª mensalidade (deixe vazio = mês seguinte)</label><input type="date" id="g-venc-1"/></div>
             </div>
             <button class="btn btn-primary" id="btnGerar" onclick="gerarPlano()">Gerar parcelas</button>
+            </div>
+
+            <div id="plano-negociado" style="display:none;">
+              <div class="fin-hint">
+                Para alunos de transferência ou integralização de créditos, com valor e forma de pagamento próprios.
+                <br/><span style="color:var(--gray);">A entrada é lançada como a primeira cobrança e o restante é dividido em parcelas iguais. Tudo entra na receita como qualquer outro plano.</span>
+              </div>
+              <div class="form-row-4">
+                <div class="form-group"><label>Valor total do curso (R$) *</label><input type="number" id="n-total" step="0.01" min="0" placeholder="0,00" oninput="previaNegociado()"/></div>
+                <div class="form-group"><label>Entrada *</label><input type="number" id="n-entrada" step="0.01" min="0" placeholder="0,00" oninput="previaNegociado()"/></div>
+                <div class="form-group"><label>Entrada em</label>
+                  <select id="n-entrada-un" onchange="previaNegociado()">
+                    <option value="reais">R$ (valor)</option>
+                    <option value="pct">% do total</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Restante em quantas vezes *</label><input type="number" id="n-qtd" min="1" max="60" value="12" oninput="previaNegociado()"/></div>
+              </div>
+              <div class="form-row-4">
+                <div class="form-group"><label>Vencimento da entrada *</label><input type="date" id="n-venc-entrada"/></div>
+                <div class="form-group"><label>1ª parcela *</label><input type="date" id="n-venc-1" oninput="previaNegociado()"/></div>
+                <div class="form-group"><label>Dia do vencimento *</label><input type="number" id="n-dia" min="1" max="31" value="10"/></div>
+                <div class="form-group"><label>Observação (opcional)</label><input type="text" id="n-obs" placeholder="Ex.: transferência"/></div>
+              </div>
+              <div id="n-previa" style="background:#eef4fa;border-left:3px solid #145da0;padding:12px 14px;border-radius:0 6px 6px 0;font-size:.85rem;color:#0b2a4a;line-height:1.7;margin-bottom:16px;">
+                Preencha o total, a entrada e o número de parcelas.
+              </div>
+              <button class="btn btn-primary" id="btnGerarNeg" onclick="gerarPlanoNegociado()">Gerar parcelas negociadas</button>
+            </div>
           </div>
         </div>
 
@@ -2765,6 +2800,103 @@ function renderParcelas(parcelas, cfg){
       <td>${acao}</td>
     </tr>`;
   }).join('');
+}
+
+// Alterna entre o plano padrao (intocado) e o negociado.
+function setModoPlano(m){
+  const pad=m==='padrao';
+  document.getElementById('plano-padrao').style.display   = pad?'block':'none';
+  document.getElementById('plano-negociado').style.display= pad?'none':'block';
+  document.getElementById('modo-padrao-btn').className = 'btn btn-sm '+(pad?'btn-primary':'btn-outline');
+  document.getElementById('modo-neg-btn').className    = 'btn btn-sm '+(pad?'btn-outline':'btn-primary');
+  if(!pad && !document.getElementById('n-venc-entrada').value){
+    document.getElementById('n-venc-entrada').value=hojeISO();
+  }
+  previaNegociado();
+}
+
+// Calcula entrada, valor da parcela e sobra de centavos.
+function calcNegociado(){
+  const total = parseFloat(document.getElementById('n-total').value);
+  const bruta = parseFloat(document.getElementById('n-entrada').value);
+  const un    = document.getElementById('n-entrada-un').value;
+  const qtd   = parseInt(document.getElementById('n-qtd').value,10);
+  if(isNaN(total)||total<=0||isNaN(bruta)||bruta<0||isNaN(qtd)||qtd<1) return null;
+
+  const entrada = un==='pct' ? Math.round(total*(bruta/100)*100)/100 : Math.round(bruta*100)/100;
+  if(entrada>total) return {erro:'A entrada é maior que o valor total.'};
+
+  const restante = Math.round((total-entrada)*100)/100;
+  const parcela  = Math.floor((restante/qtd)*100)/100;
+  const soma     = Math.round(parcela*qtd*100)/100;
+  const sobra    = Math.round((restante-soma)*100)/100;  // vai na ultima parcela
+  return {total,entrada,restante,qtd,parcela,sobra,ultima:Math.round((parcela+sobra)*100)/100};
+}
+
+function previaNegociado(){
+  const el=document.getElementById('n-previa');
+  if(!el) return;
+  const c=calcNegociado();
+  if(!c){ el.innerHTML='Preencha o total, a entrada e o número de parcelas.'; return; }
+  if(c.erro){ el.innerHTML='<span style="color:#991b1b;">'+c.erro+'</span>'; return; }
+  let t='Entrada de <strong>'+brl(c.entrada)+'</strong> + <strong>'+c.qtd+'x</strong> de <strong>'+brl(c.parcela)+'</strong>';
+  if(c.sobra>0) t+=' (a última fica '+brl(c.ultima)+' para fechar o total)';
+  t+='<br/>Total do plano: <strong>'+brl(c.total)+'</strong>';
+  el.innerHTML=t;
+}
+
+// Usa a MESMA rpc do plano padrao: entrada entra como a primeira cobranca,
+// restante como parcelas iguais. Nada muda no banco.
+async function gerarPlanoNegociado(){
+  const alunoId=finAlunoAtual;
+  if(!alunoId){toast('Selecione um aluno.','error');return;}
+  const c=calcNegociado();
+  if(!c){toast('Preencha total, entrada e número de parcelas.','error');return;}
+  if(c.erro){toast(c.erro,'error');return;}
+
+  const vencEntrada=document.getElementById('n-venc-entrada').value||null;
+  const venc1=document.getElementById('n-venc-1').value||null;
+  const dia=parseInt(document.getElementById('n-dia').value,10);
+  if(!vencEntrada){toast('Informe o vencimento da entrada.','error');return;}
+  if(!venc1){toast('Informe o vencimento da 1ª parcela.','error');return;}
+  if(isNaN(dia)||dia<1||dia>31){toast('Dia de vencimento deve ser entre 1 e 31.','error');return;}
+
+  if(!confirm('Gerar plano negociado?\n\nEntrada '+brl(c.entrada)+' em '+dataBR(vencEntrada)+
+              '\n'+c.qtd+' parcelas de '+brl(c.parcela)+(c.sobra>0?' (última '+brl(c.ultima)+')':'')+
+              '\nTotal '+brl(c.total))) return;
+
+  const btn=document.getElementById('btnGerarNeg');
+  btn.disabled=true; btn.textContent='Gerando...';
+
+  const {error}=await sb.rpc('gerar_parcelas',{
+    p_aluno_id: alunoId,
+    p_valor_matricula: c.entrada,
+    p_valor_mensalidade: c.parcela,
+    p_qtd_mensalidades: c.qtd,
+    p_dia_vencimento: dia,
+    p_venc_matricula: vencEntrada,
+    p_primeiro_vencimento: venc1,
+    p_recriar: false
+  });
+  if(error){ btn.disabled=false; btn.textContent='Gerar parcelas negociadas'; toast('Erro: '+error.message,'error'); return; }
+
+  // ajusta a ultima parcela para fechar o total exato, se sobrou centavo
+  const obs=document.getElementById('n-obs').value.trim();
+  try{
+    if(c.sobra>0){
+      await sb.from('financeiro_parcelas')
+        .update({valor:c.ultima})
+        .eq('aluno_id',alunoId).eq('tipo','mensalidade').eq('numero',c.qtd);
+    }
+    if(obs){
+      await sb.from('financeiro_parcelas')
+        .update({observacao:obs}).eq('aluno_id',alunoId).eq('tipo','matricula').eq('numero',0);
+    }
+  }catch(err){ console.error('[negociado ajuste]',err); }
+
+  btn.disabled=false; btn.textContent='Gerar parcelas negociadas';
+  toast('Plano negociado gerado: entrada + '+c.qtd+' parcelas.','success');
+  await carregarFinanceiroAluno();
 }
 
 async function gerarPlano(){
