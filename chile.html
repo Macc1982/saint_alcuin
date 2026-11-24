@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Seminário Internacional Saint Alcuin · Chile 2027</title>
+<meta name="description" content="Seminário Internacional Saint Alcuin em Santiago, Chile, 5 e 6 de janeiro de 2027. Inscrições abertas para mestrado e doutorado."/>
+
+<!-- Open Graph / WhatsApp / Instagram -->
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Seminário Internacional Saint Alcuin · Chile 2027"/>
+<meta property="og:description" content="Santiago, 5 e 6 de janeiro de 2027. Vagas limitadas para mestrado e doutorado. Inscreva-se."/>
+<meta property="og:image" content="https://www.universidadsaintalcuin.com/logo.jpeg"/>
+<meta property="og:url" content="https://www.universidadsaintalcuin.com/chile.html"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Seminário Internacional Saint Alcuin · Chile 2027"/>
+<meta name="twitter:description" content="Santiago, 5 e 6 de janeiro de 2027. Inscreva-se."/>
+<meta name="twitter:image" content="https://www.universidadsaintalcuin.com/logo.jpeg"/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --azul:#0a2540; --azul2:#0e3357; --vermelho:#c1121f; --vermelho2:#ec0000;
+    --texto:#1a2b3c; --cinza:#6b7280; --borda:#dbe3ec; --claro:#f5f7fa; --branco:#fff;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;color:var(--texto);background:var(--claro);line-height:1.6;}
+  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px;}
+
+  /* HERO */
+  .hero{background:linear-gradient(160deg,var(--azul) 0%,var(--azul2) 100%);color:#fff;position:relative;overflow:hidden;}
+  .hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(193,18,31,.18),transparent 55%);pointer-events:none;}
+  .hero-in{position:relative;z-index:1;text-align:center;padding:54px 20px 60px;}
+  .brasao{width:92px;height:92px;border-radius:50%;object-fit:cover;margin:0 auto 22px;border:3px solid rgba(255,255,255,.9);box-shadow:0 8px 30px rgba(0,0,0,.3);background:#fff;}
+  .hero .kicker{font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:#9fc2e8;font-weight:600;margin-bottom:14px;}
+  .hero h1{font-size:2.5rem;font-weight:600;line-height:1.1;margin-bottom:16px;letter-spacing:-.01em;}
+  .hero .local{font-size:1.15rem;color:#dce7f3;margin-bottom:6px;}
+  .hero .data-badge{display:inline-block;background:var(--vermelho);color:#fff;font-weight:700;padding:8px 20px;border-radius:30px;font-size:1rem;margin-top:14px;letter-spacing:.01em;}
+  .cta{display:inline-block;background:var(--vermelho);color:#fff;font-weight:700;font-size:1.05rem;padding:15px 40px;border-radius:12px;text-decoration:none;margin-top:30px;transition:transform .15s,box-shadow .15s;box-shadow:0 8px 24px rgba(193,18,31,.35);}
+  .cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(193,18,31,.45);}
+
+  /* seletor de idioma */
+  .lang{position:absolute;top:16px;right:16px;z-index:2;display:flex;gap:4px;}
+  .lang button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-family:inherit;font-size:.72rem;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:background .15s;}
+  .lang button.on{background:#fff;color:var(--azul);}
+
+  /* SEÇÕES */
+  section{padding:48px 0;}
+  .sec-tit{font-size:1.7rem;font-weight:600;color:var(--azul);text-align:center;margin-bottom:8px;}
+  .sec-sub{text-align:center;color:var(--cinza);margin-bottom:34px;font-size:1rem;}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;}
+  .card{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:24px;box-shadow:0 6px 20px rgba(11,42,74,.05);}
+  .card h3{font-size:1.1rem;color:var(--azul);margin-bottom:12px;font-weight:600;}
+  .card ul{list-style:none;}
+  .card li{padding:5px 0 5px 24px;position:relative;font-size:.95rem;}
+  .card li::before{content:'';position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:50%;background:var(--vermelho);}
+  .card.x li::before{background:var(--cinza);}
+  .valor-num{font-family:'Fraunces',serif;font-size:2.2rem;font-weight:700;color:var(--azul);}
+  .valor-sub{color:var(--cinza);font-size:.9rem;}
+
+  .regras{background:#fff;border-left:4px solid var(--vermelho);border-radius:10px;padding:22px 26px;margin-top:10px;}
+  .regras li{padding:6px 0 6px 22px;position:relative;}
+  .regras li::before{content:'›';position:absolute;left:0;color:var(--vermelho);font-weight:700;}
+
+  /* FORMULÁRIO */
+  .form-sec{background:var(--azul);color:#fff;}
+  .form-sec .sec-tit,.form-sec .sec-sub{color:#fff;}
+  .form-sec .sec-sub{color:#cfe0f0;}
+  .form-card{background:#fff;color:var(--texto);border-radius:18px;padding:30px;max-width:640px;margin:0 auto;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+  .fg{margin-bottom:16px;position:relative;}
+  .fg label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px;color:var(--azul);}
+  .fg input,.fg select,.fg textarea{width:100%;border:1.5px solid var(--borda);border-radius:9px;padding:11px 13px;font-family:inherit;font-size:.95rem;color:var(--texto);background:var(--claro);outline:none;transition:border-color .15s;}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--azul);}
+  .fg textarea{resize:vertical;min-height:70px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:520px){.row2{grid-template-columns:1fr;}}
+  .ac-box{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--borda);border-top:none;border-radius:0 0 9px 9px;max-height:200px;overflow-y:auto;z-index:20;display:none;box-shadow:0 10px 24px rgba(0,0,0,.12);}
+  .ac-box div{padding:9px 13px;cursor:pointer;font-size:.9rem;}
+  .ac-box div:hover,.ac-box div.sel{background:var(--claro);}
+  .ac-box small{color:var(--cinza);}
+  .lgpd{display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:var(--texto);background:var(--claro);padding:12px;border-radius:9px;margin:4px 0 18px;}
+  .lgpd input{width:auto;margin-top:3px;flex-shrink:0;}
+  .btn-enviar{width:100%;background:var(--vermelho);color:#fff;border:none;border-radius:11px;padding:15px;font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .15s,opacity .15s;}
+  .btn-enviar:hover{background:var(--vermelho2);}
+  .btn-enviar:disabled{opacity:.6;cursor:not-allowed;}
+  .erro{color:var(--vermelho);font-size:.8rem;margin-top:5px;display:none;}
+  .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;}
+
+  /* SUCESSO */
+  .sucesso{display:none;text-align:center;padding:20px;}
+  .sucesso .check{width:72px;height:72px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+  .sucesso .check svg{width:38px;height:38px;stroke:#166534;stroke-width:3;fill:none;}
+  .sucesso h3{font-size:1.5rem;color:var(--azul);margin-bottom:10px;}
+  .sucesso p{color:var(--cinza);margin-bottom:20px;}
+  .btn-wa{display:inline-flex;align-items:center;gap:8px;background:#25d366;color:#fff;font-weight:700;padding:13px 26px;border-radius:11px;text-decoration:none;}
+
+  /* RODAPÉ */
+  footer{background:var(--azul2);color:#aac3dd;text-align:center;padding:34px 20px;font-size:.85rem;}
+  footer .marca{color:#fff;font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="lang">
+    <button data-lang="pt" class="on" onclick="setLang('pt')">PT</button>
+    <button data-lang="es" onclick="setLang('es')">ES</button>
+    <button data-lang="en" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="hero-in">
+    <img src="/logo.jpeg" alt="Saint Alcuin of York" class="brasao"/>
+    <div class="kicker" data-i18n="kicker">Saint Alcuin of York Anglican College</div>
+    <h1 data-i18n="titulo">Seminário Internacional<br/>Chile 2027</h1>
+    <div class="local" data-i18n="local">Santiago, Chile</div>
+    <div class="data-badge" data-i18n="datas">5 e 6 de janeiro de 2027</div>
+    <br/>
+    <a href="#inscricao" class="cta" data-i18n="cta">Quero me inscrever</a>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-tit" data-i18n="sobre_tit">Um seminário internacional de pós-graduação</h2>
+    <p class="sec-sub" data-i18n="sobre_sub">Encontro presencial em Santiago para alunos de mestrado e doutorado da Saint Alcuin.</p>
+    <div class="cards">
+      <div class="card">
+        <h3 data-i18n="c_quando">Quando e onde</h3>
+        <ul>
+          <li data-i18n="c_quando_1">5 e 6 de janeiro de 2027</li>
+          <li data-i18n="c_quando_2">Santiago, Chile</li>
+          <li data-i18n="c_quando_3">Encontro presencial</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 data-i18n="c_inclui">O que está incluído</h3>
+        <ul>
+          <li data-i18n="c_inclui_1">Aulas e atividades do seminário</li>
+          <li data-i18n="c_inclui_2">Certificado de participação</li>
+          <li data-i18n="c_inclui_3">Hospedagem</li>
+          <li data-i18n="c_inclui_4">Alimentação</li>
+        </ul>
+      </div>
+      <div class="card x">
+        <h3 data-i18n="c_naoinclui">Não incluído</h3>
+        <ul>
+          <li data-i18n="c_naoinclui_1">Transporte aéreo (por conta do participante)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 data-i18n="c_invest">Investimento</h3>
+        <div class="valor-num">R$ 1.500</div>
+        <div class="valor-sub" data-i18n="c_invest_sub">Pago à Nacional Pesquisa e Educação</div>
+        <div style="margin-top:12px;font-size:.9rem;color:var(--vermelho);font-weight:600;" data-i18n="c_vagas">30 vagas (mestrado e doutorado)</div>
+      </div>
+    </div>
+
+    <div style="margin-top:26px;">
+      <h3 style="color:var(--azul);font-size:1.1rem;margin-bottom:6px;" data-i18n="regras_tit">Regras de participação</h3>
+      <ul class="regras">
+        <li data-i18n="regra_1">Passaporte ou documento de identidade emitido há no máximo 10 anos.</li>
+        <li data-i18n="regra_2">Estar matriculado ou se matricular em um programa da Saint Alcuin.</li>
+        <li data-i18n="regra_3">Inscrições até 5 de dezembro de 2026.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="form-sec" id="inscricao">
+  <div class="wrap">
+    <h2 class="sec-tit" data-i18n="form_tit">Faça sua inscrição</h2>
+    <p class="sec-sub" data-i18n="form_sub">Preencha os dados abaixo. Nossa equipe acadêmica entrará em contato.</p>
+
+    <div class="form-card">
+      <form id="formInsc" autocomplete="off">
+        <!-- honeypot anti-spam -->
+        <div class="hp"><label>Deixe em branco</label><input type="text" id="hp_site" tabindex="-1" autocomplete="off"/></div>
+
+        <div class="fg">
+          <label data-i18n="l_nome">Nome completo *</label>
+          <input type="text" id="nome" required/>
+          <div class="erro" id="e_nome" data-i18n="err_nome">Informe seu nome completo.</div>
+        </div>
+
+        <div class="row2">
+          <div class="fg">
+            <label data-i18n="l_email">E-mail *</label>
+            <input type="email" id="email" required/>
+            <div class="erro" id="e_email" data-i18n="err_email">E-mail inválido.</div>
+          </div>
+          <div class="fg">
+            <label data-i18n="l_whats">WhatsApp *</label>
+            <input type="tel" id="whatsapp" required placeholder="(00) 00000-0000"/>
+            <div class="erro" id="e_whats" data-i18n="err_whats">Informe um WhatsApp válido.</div>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label data-i18n="l_cidade">Cidade *</label>
+          <input type="text" id="cidade" required autocomplete="off" data-i18n-ph="ph_cidade" placeholder="Comece a digitar..."/>
+          <input type="hidden" id="estado"/>
+          <div class="ac-box" id="acBox"></div>
+          <div class="erro" id="e_cidade" data-i18n="err_cidade">Informe sua cidade.</div>
+        </div>
+
+        <div class="row2">
+          <div class="fg">
+            <label data-i18n="l_area">Área de interesse *</label>
+            <select id="area" required>
+              <option value="" data-i18n="opt_sel">Selecione...</option>
+              <option>Educação</option><option>Direito</option><option>Psicologia</option>
+              <option>Administração</option><option>Antropologia</option><option>Neurociência</option>
+              <option>Saúde Pública</option><option>Teologia</option>
+            </select>
+            <div class="erro" id="e_area" data-i18n="err_area">Selecione a área.</div>
+          </div>
+          <div class="fg">
+            <label data-i18n="l_nivel">Nível *</label>
+            <select id="nivel" required>
+              <option value="" data-i18n="opt_sel">Selecione...</option>
+              <option value="Mestrado" data-i18n="opt_mest">Mestrado</option>
+              <option value="Doutorado" data-i18n="opt_dout">Doutorado</option>
+            </select>
+            <div class="erro" id="e_nivel" data-i18n="err_nivel">Selecione o nível.</div>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label data-i18n="l_situacao">Sua situação *</label>
+          <select id="situacao" required>
+            <option value="" data-i18n="opt_sel">Selecione...</option>
+            <option value="formado" data-i18n="opt_formado">Aluno já formado</option>
+            <option value="em_andamento" data-i18n="opt_andamento">Curso em andamento</option>
+            <option value="ingressar" data-i18n="opt_ingressar">Quero ingressar agora</option>
+          </select>
+          <div class="erro" id="e_situacao" data-i18n="err_situacao">Selecione sua situação.</div>
+        </div>
+
+        <div class="fg">
+          <label data-i18n="l_duvida">Alguma dúvida? (opcional)</label>
+          <textarea id="duvida" data-i18n-ph="ph_duvida" placeholder="Escreva aqui sua pergunta..."></textarea>
+        </div>
+
+        <div class="lgpd">
+          <input type="checkbox" id="lgpd" required/>
+          <label for="lgpd" style="font-weight:400;color:var(--texto);margin:0;" data-i18n="lgpd_txt">Autorizo a Saint Alcuin a usar meus dados para contato sobre este seminário e sobre os programas da instituição, conforme a LGPD. Posso pedir a exclusão a qualquer momento pelo WhatsApp de atendimento.</label>
+        </div>
+        <div class="erro" id="e_lgpd" style="margin-top:-12px;margin-bottom:12px;" data-i18n="err_lgpd">É necessário aceitar para continuar.</div>
+
+        <button type="submit" class="btn-enviar" id="btnEnviar" data-i18n="btn_enviar">Enviar inscrição</button>
+        <div class="erro" id="e_geral" style="text-align:center;margin-top:12px;"></div>
+      </form>
+
+      <div class="sucesso" id="sucesso">
+        <div class="check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <h3 data-i18n="suc_tit">Inscrição recebida!</h3>
+        <p data-i18n="suc_txt">Enviamos uma confirmação para o seu e-mail. Aguarde nossa equipe acadêmica entrar em contato.</p>
+        <a href="#" class="btn-wa" id="btnWa" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.042z"/></svg>
+          <span data-i18n="suc_wa">Falar no WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="marca">Saint Alcuin of York</div>
+  <div>Anglican College · universidadsaintalcuin.com</div>
+</footer>
+
+<!-- =====================================================
+     ESPAÇO PARA O PIXEL DA META
+     Cole aqui o bloco completo do seu Meta Pixel (a tag script
+     do Pixel inteira). O evento "Lead" ja esta preparado no envio:
+     procure a linha "if(window.fbq) fbq('track','Lead');" mais abaixo
+     e descomente-a depois de colar o Pixel.
+     ===================================================== -->
+
+<script>
+// ===================== CONFIG =====================
+const EVENTO = 'chile-2027';
+const SUPA_URL = 'https://foleplydhwxjyflejfjq.supabase.co';
+const SUPA_ANON = 'sb_publishable_VUa914gJ5JmZH8uEWiBgTw_Z4YroDiA'; // chave anon (protegida por RLS)
+const EDGE_FN = SUPA_URL + '/functions/v1/inscricao-chile';
+const WHATS = '5575998403658'; // WhatsApp de atendimento
+const CIDADES = [{"n": "Rio Branco", "u": "AC"}, {"n": "Cruzeiro do Sul", "u": "AC"}, {"n": "Maceió", "u": "AL"}, {"n": "Arapiraca", "u": "AL"}, {"n": "Macapá", "u": "AP"}, {"n": "Santana", "u": "AP"}, {"n": "Manaus", "u": "AM"}, {"n": "Parintins", "u": "AM"}, {"n": "Salvador", "u": "BA"}, {"n": "Feira de Santana", "u": "BA"}, {"n": "Vitória da Conquista", "u": "BA"}, {"n": "Camaçari", "u": "BA"}, {"n": "Juazeiro", "u": "BA"}, {"n": "Ilhéus", "u": "BA"}, {"n": "Itabuna", "u": "BA"}, {"n": "Paulo Afonso", "u": "BA"}, {"n": "Barreiras", "u": "BA"}, {"n": "Alagoinhas", "u": "BA"}, {"n": "Teixeira de Freitas", "u": "BA"}, {"n": "Jequié", "u": "BA"}, {"n": "Fortaleza", "u": "CE"}, {"n": "Caucaia", "u": "CE"}, {"n": "Juazeiro do Norte", "u": "CE"}, {"n": "Maracanaú", "u": "CE"}, {"n": "Sobral", "u": "CE"}, {"n": "Crato", "u": "CE"}, {"n": "Brasília", "u": "DF"}, {"n": "Vitória", "u": "ES"}, {"n": "Vila Velha", "u": "ES"}, {"n": "Serra", "u": "ES"}, {"n": "Cariacica", "u": "ES"}, {"n": "Cachoeiro de Itapemirim", "u": "ES"}, {"n": "Linhares", "u": "ES"}, {"n": "Colatina", "u": "ES"}, {"n": "Goiânia", "u": "GO"}, {"n": "Aparecida de Goiânia", "u": "GO"}, {"n": "Anápolis", "u": "GO"}, {"n": "Rio Verde", "u": "GO"}, {"n": "Luziânia", "u": "GO"}, {"n": "São Luís", "u": "MA"}, {"n": "Imperatriz", "u": "MA"}, {"n": "Timon", "u": "MA"}, {"n": "Caxias", "u": "MA"}, {"n": "Cuiabá", "u": "MT"}, {"n": "Várzea Grande", "u": "MT"}, {"n": "Rondonópolis", "u": "MT"}, {"n": "Sinop", "u": "MT"}, {"n": "Campo Grande", "u": "MS"}, {"n": "Dourados", "u": "MS"}, {"n": "Três Lagoas", "u": "MS"}, {"n": "Belo Horizonte", "u": "MG"}, {"n": "Uberlândia", "u": "MG"}, {"n": "Contagem", "u": "MG"}, {"n": "Juiz de Fora", "u": "MG"}, {"n": "Betim", "u": "MG"}, {"n": "Montes Claros", "u": "MG"}, {"n": "Uberaba", "u": "MG"}, {"n": "Governador Valadares", "u": "MG"}, {"n": "Ipatinga", "u": "MG"}, {"n": "Sete Lagoas", "u": "MG"}, {"n": "Divinópolis", "u": "MG"}, {"n": "Poços de Caldas", "u": "MG"}, {"n": "Belém", "u": "PA"}, {"n": "Ananindeua", "u": "PA"}, {"n": "Santarém", "u": "PA"}, {"n": "Marabá", "u": "PA"}, {"n": "Castanhal", "u": "PA"}, {"n": "João Pessoa", "u": "PB"}, {"n": "Campina Grande", "u": "PB"}, {"n": "Santa Rita", "u": "PB"}, {"n": "Patos", "u": "PB"}, {"n": "Curitiba", "u": "PR"}, {"n": "Londrina", "u": "PR"}, {"n": "Maringá", "u": "PR"}, {"n": "Ponta Grossa", "u": "PR"}, {"n": "Cascavel", "u": "PR"}, {"n": "São José dos Pinhais", "u": "PR"}, {"n": "Foz do Iguaçu", "u": "PR"}, {"n": "Guarapuava", "u": "PR"}, {"n": "Recife", "u": "PE"}, {"n": "Jaboatão dos Guararapes", "u": "PE"}, {"n": "Olinda", "u": "PE"}, {"n": "Caruaru", "u": "PE"}, {"n": "Petrolina", "u": "PE"}, {"n": "Paulista", "u": "PE"}, {"n": "Garanhuns", "u": "PE"}, {"n": "Teresina", "u": "PI"}, {"n": "Parnaíba", "u": "PI"}, {"n": "Picos", "u": "PI"}, {"n": "Rio de Janeiro", "u": "RJ"}, {"n": "São Gonçalo", "u": "RJ"}, {"n": "Duque de Caxias", "u": "RJ"}, {"n": "Nova Iguaçu", "u": "RJ"}, {"n": "Niterói", "u": "RJ"}, {"n": "Belford Roxo", "u": "RJ"}, {"n": "Campos dos Goytacazes", "u": "RJ"}, {"n": "Petrópolis", "u": "RJ"}, {"n": "Volta Redonda", "u": "RJ"}, {"n": "Macaé", "u": "RJ"}, {"n": "Natal", "u": "RN"}, {"n": "Mossoró", "u": "RN"}, {"n": "Parnamirim", "u": "RN"}, {"n": "Porto Alegre", "u": "RS"}, {"n": "Caxias do Sul", "u": "RS"}, {"n": "Pelotas", "u": "RS"}, {"n": "Canoas", "u": "RS"}, {"n": "Santa Maria", "u": "RS"}, {"n": "Gravataí", "u": "RS"}, {"n": "Novo Hamburgo", "u": "RS"}, {"n": "Passo Fundo", "u": "RS"}, {"n": "Rio Grande", "u": "RS"}, {"n": "Porto Velho", "u": "RO"}, {"n": "Ji-Paraná", "u": "RO"}, {"n": "Ariquemes", "u": "RO"}, {"n": "Boa Vista", "u": "RR"}, {"n": "Florianópolis", "u": "SC"}, {"n": "Joinville", "u": "SC"}, {"n": "Blumenau", "u": "SC"}, {"n": "São José", "u": "SC"}, {"n": "Chapecó", "u": "SC"}, {"n": "Itajaí", "u": "SC"}, {"n": "Criciúma", "u": "SC"}, {"n": "Lages", "u": "SC"}, {"n": "Balneário Camboriú", "u": "SC"}, {"n": "São Paulo", "u": "SP"}, {"n": "Guarulhos", "u": "SP"}, {"n": "Campinas", "u": "SP"}, {"n": "São Bernardo do Campo", "u": "SP"}, {"n": "Santo André", "u": "SP"}, {"n": "Osasco", "u": "SP"}, {"n": "São José dos Campos", "u": "SP"}, {"n": "Ribeirão Preto", "u": "SP"}, {"n": "Sorocaba", "u": "SP"}, {"n": "Santos", "u": "SP"}, {"n": "Mauá", "u": "SP"}, {"n": "São José do Rio Preto", "u": "SP"}, {"n": "Mogi das Cruzes", "u": "SP"}, {"n": "Diadema", "u": "SP"}, {"n": "Jundiaí", "u": "SP"}, {"n": "Piracicaba", "u": "SP"}, {"n": "Bauru", "u": "SP"}, {"n": "Franca", "u": "SP"}, {"n": "Praia Grande", "u": "SP"}, {"n": "Aracaju", "u": "SE"}, {"n": "Nossa Senhora do Socorro", "u": "SE"}, {"n": "Lagarto", "u": "SE"}, {"n": "Palmas", "u": "TO"}, {"n": "Araguaína", "u": "TO"}, {"n": "Gurupi", "u": "TO"}];
+const abriuEm = Date.now();
+
+// ===================== i18n =====================
+const I18N = {
+  pt:{kicker:'Saint Alcuin of York Anglican College',titulo:'Seminário Internacional<br>Chile 2027',local:'Santiago, Chile',datas:'5 e 6 de janeiro de 2027',cta:'Quero me inscrever',
+    sobre_tit:'Um seminário internacional de pós-graduação',sobre_sub:'Encontro presencial em Santiago para alunos de mestrado e doutorado da Saint Alcuin.',
+    c_quando:'Quando e onde',c_quando_1:'5 e 6 de janeiro de 2027',c_quando_2:'Santiago, Chile',c_quando_3:'Encontro presencial',
+    c_inclui:'O que está incluído',c_inclui_1:'Aulas e atividades do seminário',c_inclui_2:'Certificado de participação',c_inclui_3:'Hospedagem',c_inclui_4:'Alimentação',
+    c_naoinclui:'Não incluído',c_naoinclui_1:'Transporte aéreo (por conta do participante)',
+    c_invest:'Investimento',c_invest_sub:'Pago à Nacional Pesquisa e Educação',c_vagas:'30 vagas (mestrado e doutorado)',
+    regras_tit:'Regras de participação',regra_1:'Passaporte ou documento de identidade emitido há no máximo 10 anos.',regra_2:'Estar matriculado ou se matricular em um programa da Saint Alcuin.',regra_3:'Inscrições até 5 de dezembro de 2026.',
+    form_tit:'Faça sua inscrição',form_sub:'Preencha os dados abaixo. Nossa equipe acadêmica entrará em contato.',
+    l_nome:'Nome completo *',l_email:'E-mail *',l_whats:'WhatsApp *',l_cidade:'Cidade *',l_area:'Área de interesse *',l_nivel:'Nível *',l_situacao:'Sua situação *',l_duvida:'Alguma dúvida? (opcional)',
+    ph_cidade:'Comece a digitar...',ph_duvida:'Escreva aqui sua pergunta...',opt_sel:'Selecione...',opt_mest:'Mestrado',opt_dout:'Doutorado',
+    opt_formado:'Aluno já formado',opt_andamento:'Curso em andamento',opt_ingressar:'Quero ingressar agora',
+    lgpd_txt:'Autorizo a Saint Alcuin a usar meus dados para contato sobre este seminário e sobre os programas da instituição, conforme a LGPD. Posso pedir a exclusão a qualquer momento pelo WhatsApp de atendimento.',
+    btn_enviar:'Enviar inscrição',suc_tit:'Inscrição recebida!',suc_txt:'Enviamos uma confirmação para o seu e-mail. Aguarde nossa equipe acadêmica entrar em contato.',suc_wa:'Falar no WhatsApp',
+    err_nome:'Informe seu nome completo.',err_email:'E-mail inválido.',err_whats:'Informe um WhatsApp válido.',err_cidade:'Informe sua cidade.',err_area:'Selecione a área.',err_nivel:'Selecione o nível.',err_situacao:'Selecione sua situação.',err_lgpd:'É necessário aceitar para continuar.'},
+  es:{kicker:'Saint Alcuin of York Anglican College',titulo:'Seminario Internacional<br>Chile 2027',local:'Santiago, Chile',datas:'5 y 6 de enero de 2027',cta:'Quiero inscribirme',
+    sobre_tit:'Un seminario internacional de posgrado',sobre_sub:'Encuentro presencial en Santiago para alumnos de maestría y doctorado de Saint Alcuin.',
+    c_quando:'Cuándo y dónde',c_quando_1:'5 y 6 de enero de 2027',c_quando_2:'Santiago, Chile',c_quando_3:'Encuentro presencial',
+    c_inclui:'Qué incluye',c_inclui_1:'Clases y actividades del seminario',c_inclui_2:'Certificado de participación',c_inclui_3:'Alojamiento',c_inclui_4:'Alimentación',
+    c_naoinclui:'No incluye',c_naoinclui_1:'Transporte aéreo (por cuenta del participante)',
+    c_invest:'Inversión',c_invest_sub:'Pagado a Nacional Pesquisa e Educação',c_vagas:'30 cupos (maestría y doctorado)',
+    regras_tit:'Reglas de participación',regra_1:'Pasaporte o documento de identidad emitido hace máximo 10 años.',regra_2:'Estar matriculado o matricularse en un programa de Saint Alcuin.',regra_3:'Inscripciones hasta el 5 de diciembre de 2026.',
+    form_tit:'Haz tu inscripción',form_sub:'Completa los datos. Nuestro equipo académico te contactará.',
+    l_nome:'Nombre completo *',l_email:'Correo electrónico *',l_whats:'WhatsApp *',l_cidade:'Ciudad *',l_area:'Área de interés *',l_nivel:'Nivel *',l_situacao:'Tu situación *',l_duvida:'¿Alguna duda? (opcional)',
+    ph_cidade:'Empieza a escribir...',ph_duvida:'Escribe aquí tu pregunta...',opt_sel:'Selecciona...',opt_mest:'Maestría',opt_dout:'Doctorado',
+    opt_formado:'Ya graduado',opt_andamento:'Cursando',opt_ingressar:'Quiero ingresar ahora',
+    lgpd_txt:'Autorizo a Saint Alcuin a usar mis datos para contacto sobre este seminario y sobre los programas de la institución, conforme a la ley de protección de datos. Puedo pedir la exclusión en cualquier momento por el WhatsApp de atención.',
+    btn_enviar:'Enviar inscripción',suc_tit:'¡Inscripción recibida!',suc_txt:'Enviamos una confirmación a tu correo. Espera el contacto de nuestro equipo académico.',suc_wa:'Hablar por WhatsApp',
+    err_nome:'Escribe tu nombre completo.',err_email:'Correo inválido.',err_whats:'Escribe un WhatsApp válido.',err_cidade:'Escribe tu ciudad.',err_area:'Selecciona el área.',err_nivel:'Selecciona el nivel.',err_situacao:'Selecciona tu situación.',err_lgpd:'Debes aceptar para continuar.'},
+  en:{kicker:'Saint Alcuin of York Anglican College',titulo:'International Seminar<br>Chile 2027',local:'Santiago, Chile',datas:'January 5 and 6, 2027',cta:'I want to apply',
+    sobre_tit:'An international postgraduate seminar',sobre_sub:'In-person gathering in Santiago for Saint Alcuin master and doctoral students.',
+    c_quando:'When and where',c_quando_1:'January 5 and 6, 2027',c_quando_2:'Santiago, Chile',c_quando_3:'In-person event',
+    c_inclui:'What is included',c_inclui_1:'Seminar classes and activities',c_inclui_2:'Certificate of participation',c_inclui_3:'Accommodation',c_inclui_4:'Meals',
+    c_naoinclui:'Not included',c_naoinclui_1:'Air travel (participant’s responsibility)',
+    c_invest:'Investment',c_invest_sub:'Paid to Nacional Pesquisa e Educação',c_vagas:'30 spots (master and doctorate)',
+    regras_tit:'Participation rules',regra_1:'Passport or ID document issued within the last 10 years.',regra_2:'Be enrolled or enroll in a Saint Alcuin program.',regra_3:'Applications until December 5, 2026.',
+    form_tit:'Apply now',form_sub:'Fill in the details below. Our academic team will contact you.',
+    l_nome:'Full name *',l_email:'Email *',l_whats:'WhatsApp *',l_cidade:'City *',l_area:'Area of interest *',l_nivel:'Level *',l_situacao:'Your situation *',l_duvida:'Any questions? (optional)',
+    ph_cidade:'Start typing...',ph_duvida:'Write your question here...',opt_sel:'Select...',opt_mest:'Master',opt_dout:'Doctorate',
+    opt_formado:'Already graduated',opt_andamento:'Currently studying',opt_ingressar:'I want to enroll now',
+    lgpd_txt:'I authorize Saint Alcuin to use my data to contact me about this seminar and the institution’s programs, in accordance with data protection law. I may request deletion at any time via the support WhatsApp.',
+    btn_enviar:'Submit application',suc_tit:'Application received!',suc_txt:'We sent a confirmation to your email. Please wait for our academic team to contact you.',suc_wa:'Chat on WhatsApp',
+    err_nome:'Enter your full name.',err_email:'Invalid email.',err_whats:'Enter a valid WhatsApp.',err_cidade:'Enter your city.',err_area:'Select the area.',err_nivel:'Select the level.',err_situacao:'Select your situation.',err_lgpd:'You must accept to continue.'}
+};
+let LANG = localStorage.getItem('say_lang') || 'pt';
+function setLang(l){
+  LANG=l; try{localStorage.setItem('say_lang',l);}catch(e){}
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n'); if(I18N[l][k]!==undefined) el.innerHTML=I18N[l][k];});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{const k=el.getAttribute('data-i18n-ph'); if(I18N[l][k]!==undefined) el.placeholder=I18N[l][k];});
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.getAttribute('data-lang')===l));
+  document.documentElement.lang = l==='pt'?'pt-BR':l;
+}
+
+// ===================== UTM =====================
+function getUTMs(){
+  const p=new URLSearchParams(location.search);
+  const src=(p.get('utm_source')||'').toLowerCase();
+  let origem='direto';
+  if(src.includes('insta'))origem='instagram'; else if(src.includes('face')||src.includes('fb'))origem='facebook';
+  else if(src.includes('google'))origem='google'; else if(src.includes('whats')||src.includes('wa'))origem='whatsapp';
+  else if(src)origem=src;
+  return {utm_source:p.get('utm_source')||'',utm_medium:p.get('utm_medium')||'',utm_campaign:p.get('utm_campaign')||'',utm_content:p.get('utm_content')||'',origem};
+}
+
+// ===================== Autocomplete cidade =====================
+const inCidade=document.getElementById('cidade'), acBox=document.getElementById('acBox'), inEstado=document.getElementById('estado');
+function norm(s){return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();}
+inCidade.addEventListener('input',()=>{
+  inEstado.value='';
+  const q=norm(inCidade.value.trim());
+  if(q.length<2){acBox.style.display='none';return;}
+  const hits=CIDADES.filter(c=>norm(c.n).includes(q)).slice(0,8);
+  if(!hits.length){acBox.style.display='none';return;}
+  acBox.innerHTML=hits.map(c=>'<div data-n="'+c.n+'" data-u="'+c.u+'">'+c.n+' <small>· '+c.u+'</small></div>').join('');
+  acBox.style.display='block';
+  acBox.querySelectorAll('div').forEach(d=>d.onclick=()=>{inCidade.value=d.dataset.n;inEstado.value=d.dataset.u;acBox.style.display='none';});
+});
+document.addEventListener('click',e=>{if(!acBox.contains(e.target)&&e.target!==inCidade)acBox.style.display='none';});
+
+// ===================== Validação + envio =====================
+const form=document.getElementById('formInsc'), btn=document.getElementById('btnEnviar');
+function showErr(id,on){document.getElementById(id).style.display=on?'block':'none';}
+function validEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);}
+function soDigitos(s){return (s.match(/\d/g)||[]).length;}
+
+form.addEventListener('submit',async(ev)=>{
+  ev.preventDefault();
+  document.getElementById('e_geral').style.display='none';
+
+  // honeypot + tempo mínimo (anti-spam)
+  if(document.getElementById('hp_site').value){return;}
+  if(Date.now()-abriuEm < 3000){document.getElementById('e_geral').textContent='Aguarde um instante e tente novamente.';document.getElementById('e_geral').style.display='block';return;}
+
+  const nome=document.getElementById('nome').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const whatsapp=document.getElementById('whatsapp').value.trim();
+  const cidade=document.getElementById('cidade').value.trim();
+  const estado=inEstado.value;
+  const area=document.getElementById('area').value;
+  const nivel=document.getElementById('nivel').value;
+  const situacao=document.getElementById('situacao').value;
+  const duvida=document.getElementById('duvida').value.trim();
+  const lgpd=document.getElementById('lgpd').checked;
+
+  let ok=true;
+  showErr('e_nome', !(nome.length>=3)); if(nome.length<3)ok=false;
+  showErr('e_email', !validEmail(email)); if(!validEmail(email))ok=false;
+  showErr('e_whats', soDigitos(whatsapp)<10); if(soDigitos(whatsapp)<10)ok=false;
+  showErr('e_cidade', !cidade); if(!cidade)ok=false;
+  showErr('e_area', !area); if(!area)ok=false;
+  showErr('e_nivel', !nivel); if(!nivel)ok=false;
+  showErr('e_situacao', !situacao); if(!situacao)ok=false;
+  showErr('e_lgpd', !lgpd); if(!lgpd)ok=false;
+  if(!ok)return;
+
+  btn.disabled=true; btn.textContent='Enviando...';
+  const utm=getUTMs();
+  const payload={evento:EVENTO,nome,email,whatsapp,cidade,estado,area,nivel,situacao,duvida,aceite_lgpd:true,...utm};
+
+  try{
+    const r=await fetch(EDGE_FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_ANON},body:JSON.stringify(payload)});
+    if(!r.ok){const t=await r.text();throw new Error(t||('HTTP '+r.status));}
+    // sucesso
+    form.style.display='none';
+    const suc=document.getElementById('sucesso'); suc.style.display='block';
+    const nomeWa=encodeURIComponent('Olá! Sou '+nome+' e acabei de me inscrever no Seminário Internacional Saint Alcuin, Chile 2027.');
+    document.getElementById('btnWa').href='https://wa.me/'+WHATS+'?text='+nomeWa;
+    // Pixel: evento Lead (descomente ao colar o pixel)
+    // if(window.fbq) fbq('track','Lead');
+    suc.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(err){
+    document.getElementById('e_geral').textContent='Não foi possível enviar agora. Tente novamente ou fale no WhatsApp '+ '(75) 99840-3658.';
+    document.getElementById('e_geral').style.display='block';
+    btn.disabled=false; btn.textContent=I18N[LANG].btn_enviar;
+  }
+});
+
+// init
+setLang(LANG);
+</script>
+</body>
+</html>

@@ -360,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v5.9" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v6.0" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#e11d48;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -385,6 +385,8 @@
       <div class="nav-label">Aulas ao Vivo</div>
       <div class="nav-item" onclick="showTab('criadores',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Criadores</div>
       <div class="nav-item" onclick="showTab('presencas',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Presença</div>
+      <div class="nav-label">Eventos</div>
+      <div class="nav-item" onclick="showTab('insc-chile',this)"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Inscrições Chile</div>
     </nav>
     <div class="main">
 
@@ -1539,7 +1541,57 @@
         </div>
       </div>
 
+      <!-- ============ EVENTOS: INSCRIÇÕES CHILE ============ -->
+      <div class="tab" id="tab-insc-chile">
+        <div class="page-title">Inscrições · Seminário Chile 2027</div>
+        <div class="page-sub">Inscrições recebidas pela página pública (chile.html)</div>
+
+        <div class="kpi-grid">
+          <div class="kpi kpi-blue"><div class="kpi-top"><div class="kpi-label">Total de inscritos</div></div><div class="kpi-value" id="ic-total">—</div><div class="kpi-foot">&nbsp;</div></div>
+          <div class="kpi kpi-green"><div class="kpi-top"><div class="kpi-label">Hoje</div></div><div class="kpi-value" id="ic-hoje">—</div><div class="kpi-foot">&nbsp;</div></div>
+          <div class="kpi kpi-neutral"><div class="kpi-top"><div class="kpi-label">Quer ingressar</div></div><div class="kpi-value" id="ic-ingressar">—</div><div class="kpi-foot">novos alunos em potencial</div></div>
+          <div class="kpi kpi-red"><div class="kpi-top"><div class="kpi-label">Confirmados</div></div><div class="kpi-value" id="ic-confirmados">—</div><div class="kpi-foot">&nbsp;</div></div>
+        </div>
+
+        <div class="card" style="margin-top:4px;">
+          <div class="card-header" style="flex-wrap:wrap;gap:10px;">
+            <div class="card-title">Inscritos <span class="card-hint" id="ic-hint"></span></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <input type="text" id="ic-busca" placeholder="Buscar por nome..." oninput="renderInscChile()" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;min-width:180px;"/>
+              <select id="ic-f-status" onchange="renderInscChile()" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;">
+                <option value="">Todos os status</option>
+                <option value="nova">Nova</option><option value="contatada">Contatada</option>
+                <option value="confirmada">Confirmada</option><option value="desistiu">Desistiu</option>
+              </select>
+              <select id="ic-f-origem" onchange="renderInscChile()" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:6px;font-size:.8rem;">
+                <option value="">Todas as origens</option>
+                <option value="instagram">Instagram</option><option value="facebook">Facebook</option>
+                <option value="google">Google</option><option value="whatsapp">WhatsApp</option><option value="direto">Direto</option>
+              </select>
+              <button class="btn btn-outline" onclick="exportarInscChileCSV()">Exportar CSV</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Data</th><th>Nome</th><th>WhatsApp</th><th>Cidade</th><th>Curso</th><th>Situação</th><th>Origem</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead>
+              <tbody id="ic-tabela"><tr><td colspan="9" class="loading">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
+</div>
+
+<!-- MODAL: FICHA DA INSCRIÇÃO CHILE -->
+<div class="modal-bg" id="modal-insc-chile">
+  <div class="modal-box" style="max-width:560px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div class="modal-title">Ficha da inscrição</div>
+      <button class="btn btn-outline btn-sm" onclick="fecharModal('modal-insc-chile')">Fechar</button>
+    </div>
+    <div id="ic-ficha" style="margin-top:14px;"></div>
   </div>
 </div>
 
@@ -1881,6 +1933,115 @@ function toast(msg,type=''){
 
 function abrirModal(id){ document.getElementById(id).classList.add('open'); }
 function fecharModal(id){ document.getElementById(id).classList.remove('open'); }
+
+/* ============ EVENTOS: INSCRIÇÕES CHILE ============ */
+let inscChileCache = [];
+const IC_SITUACAO = { formado:'Aluno formado', em_andamento:'Curso em andamento', ingressar:'Quer ingressar' };
+const IC_WHATS = '5575998403658';
+
+async function carregarInscChile(){
+  const { data, error } = await sb.from('inscricoes_eventos')
+    .select('*').eq('evento','chile-2027').order('criado_em',{ascending:false});
+  if(error){ toast('Erro ao carregar inscrições: '+error.message,'error'); return; }
+  inscChileCache = data || [];
+
+  const hojeStr = new Date().toISOString().slice(0,10);
+  document.getElementById('ic-total').textContent = inscChileCache.length;
+  document.getElementById('ic-hoje').textContent = inscChileCache.filter(r=>(r.criado_em||'').slice(0,10)===hojeStr).length;
+  document.getElementById('ic-ingressar').textContent = inscChileCache.filter(r=>r.situacao==='ingressar').length;
+  document.getElementById('ic-confirmados').textContent = inscChileCache.filter(r=>r.status==='confirmada').length;
+  renderInscChile();
+}
+
+function renderInscChile(){
+  const busca = (document.getElementById('ic-busca').value||'').toLowerCase();
+  const fS = document.getElementById('ic-f-status').value;
+  const fO = document.getElementById('ic-f-origem').value;
+  const vis = inscChileCache.filter(r=>
+    (!busca || (r.nome||'').toLowerCase().includes(busca)) &&
+    (!fS || r.status===fS) &&
+    (!fO || r.origem===fO)
+  );
+  document.getElementById('ic-hint').textContent = vis.length+' de '+inscChileCache.length;
+  const tb = document.getElementById('ic-tabela');
+  if(!vis.length){ tb.innerHTML='<tr><td colspan="9" class="empty">Nenhuma inscrição.</td></tr>'; return; }
+
+  tb.innerHTML = vis.map(r=>{
+    const i = inscChileCache.indexOf(r);
+    const data = r.criado_em ? new Date(r.criado_em).toLocaleDateString('pt-BR') : '—';
+    const cidade = [r.cidade, r.estado].filter(Boolean).join(' · ') || '—';
+    const curso = [r.area, r.nivel].filter(Boolean).join(' · ') || '—';
+    const sit = IC_SITUACAO[r.situacao] || '—';
+    const statusSel = ['nova','contatada','confirmada','desistiu'].map(s=>
+      '<option value="'+s+'"'+(r.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>').join('');
+    return '<tr>'+
+      '<td>'+data+'</td>'+
+      '<td><strong>'+(r.nome||'—')+'</strong></td>'+
+      '<td>'+(r.whatsapp||'—')+'</td>'+
+      '<td>'+cidade+'</td>'+
+      '<td>'+curso+'</td>'+
+      '<td>'+sit+'</td>'+
+      '<td>'+(r.origem||'—')+'</td>'+
+      '<td><select onchange="mudarStatusInscChile(\''+r.id+'\',this.value)" style="padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.75rem;">'+statusSel+'</select></td>'+
+      '<td style="white-space:nowrap;text-align:right;">'+
+        '<button class="btn btn-primary btn-sm" onclick="abrirInscChile('+i+')">Abrir</button> '+
+        '<button class="btn btn-outline btn-sm" onclick="whatsInscChile('+i+')">WhatsApp</button>'+
+      '</td></tr>';
+  }).join('');
+}
+
+function abrirInscChile(idx){
+  const r = inscChileCache[idx];
+  const linha = (lbl,val)=> '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><div style="min-width:130px;color:var(--gray);font-size:.82rem;">'+lbl+'</div><div style="flex:1;font-size:.9rem;">'+(val||'—')+'</div></div>';
+  const data = r.criado_em ? new Date(r.criado_em).toLocaleString('pt-BR') : '—';
+  document.getElementById('ic-ficha').innerHTML =
+    linha('Nome', '<strong>'+(r.nome||'')+'</strong>')+
+    linha('E-mail', r.email)+
+    linha('WhatsApp', r.whatsapp)+
+    linha('Cidade', [r.cidade,r.estado].filter(Boolean).join(' · '))+
+    linha('Área', r.area)+
+    linha('Nível', r.nivel)+
+    linha('Situação', IC_SITUACAO[r.situacao]||r.situacao)+
+    linha('Dúvida', r.duvida ? '<em>'+r.duvida+'</em>' : '—')+
+    linha('Origem', r.origem)+
+    linha('Campanha', [r.utm_source,r.utm_campaign,r.utm_content].filter(Boolean).join(' / '))+
+    linha('Status', r.status)+
+    linha('E-mail enviado', r.email_enviado ? 'Sim' : 'Não')+
+    linha('Inscrito em', data)+
+    '<div style="margin-top:16px;"><button class="btn btn-outline btn-sm" onclick="whatsInscChile('+idx+')">Falar no WhatsApp</button></div>';
+  abrirModal('modal-insc-chile');
+}
+
+function whatsInscChile(idx){
+  const r = inscChileCache[idx];
+  const num = (r.whatsapp||'').replace(/\D/g,'');
+  const alvo = num.length>=10 ? (num.length<=11 ? '55'+num : num) : IC_WHATS;
+  const msg = encodeURIComponent('Olá '+((r.nome||'').split(' ')[0])+'! Aqui é da Saint Alcuin, sobre sua inscrição no Seminário Internacional Chile 2027.');
+  window.open('https://wa.me/'+alvo+'?text='+msg,'_blank');
+}
+
+async function mudarStatusInscChile(id, novo){
+  const { error } = await sb.from('inscricoes_eventos').update({ status: novo }).eq('id', id);
+  if(error){ toast('Erro ao mudar status: '+error.message,'error'); return; }
+  const r = inscChileCache.find(x=>x.id===id); if(r) r.status=novo;
+  document.getElementById('ic-confirmados').textContent = inscChileCache.filter(x=>x.status==='confirmada').length;
+  toast('Status atualizado.','success');
+}
+
+function exportarInscChileCSV(){
+  if(!inscChileCache.length){ toast('Nada para exportar.','error'); return; }
+  const cols = ['criado_em','nome','email','whatsapp','cidade','estado','area','nivel','situacao','duvida','origem','utm_source','utm_campaign','status'];
+  const head = cols.join(';');
+  const esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const linhas = inscChileCache.map(r=>cols.map(c=>esc(r[c])).join(';'));
+  const csv = '﻿'+head+'\n'+linhas.join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'inscricoes-chile-2027.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 
 // Formata número como moeda BRL
 function brl(v){
@@ -2461,6 +2622,7 @@ function showTab(name,el){
   if(name==='noticias') carregarNoticiasAdm();
   if(name==='executivo') carregarExecutivo();
   if(name==='certificacao') carregarCertAdmin();
+  if(name==='insc-chile') carregarInscChile();
 }
 
 async function carregarCursos(){
