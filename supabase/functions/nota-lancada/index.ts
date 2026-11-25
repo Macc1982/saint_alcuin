@@ -32,8 +32,8 @@ function emailHTML(nome: string, disciplina: string, media: number, feedback?: s
   const mediaFmt = Number.isInteger(media) ? String(media) : media.toFixed(1).replace('.', ',');
   const fbClean = (feedback||'').trim();
   const fbBloco = fbClean ? `
-          <div style="background:#fff8f0;border-left:4px solid #c1121f;border-radius:8px;padding:16px 18px;margin:0 0 22px;">
-            <div style="font-size:12px;color:#9a3412;text-transform:uppercase;letter-spacing:1px;font-weight:bold;margin-bottom:7px;">Observação do professor</div>
+          <div style="background:#f0fdf4;border-left:4px solid #16a34a;border-radius:8px;padding:16px 18px;margin:0 0 22px;">
+            <div style="font-size:12px;color:#15803d;text-transform:uppercase;letter-spacing:1px;font-weight:bold;margin-bottom:7px;">Observação do professor</div>
             <div style="font-size:14.5px;color:#1a2b3c;line-height:1.65;">${esc(fbClean)}</div>
           </div>` : '';
   return `<!DOCTYPE html>
