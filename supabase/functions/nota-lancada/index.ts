@@ -26,10 +26,16 @@ function situacaoDe(media: number){
   return { txt:'Reprovado', cor:'#991b1b', bg:'#fee2e2' };
 }
 
-function emailHTML(nome: string, disciplina: string, media: number){
+function emailHTML(nome: string, disciplina: string, media: number, feedback?: string){
   const primeiro = esc((nome||'').split(' ')[0] || 'estudante');
   const sit = situacaoDe(media);
   const mediaFmt = Number.isInteger(media) ? String(media) : media.toFixed(1).replace('.', ',');
+  const fbClean = (feedback||'').trim();
+  const fbBloco = fbClean ? `
+          <div style="background:#fff8f0;border-left:4px solid #c1121f;border-radius:8px;padding:16px 18px;margin:0 0 22px;">
+            <div style="font-size:12px;color:#9a3412;text-transform:uppercase;letter-spacing:1px;font-weight:bold;margin-bottom:7px;">Observação do professor</div>
+            <div style="font-size:14.5px;color:#1a2b3c;line-height:1.65;">${esc(fbClean)}</div>
+          </div>` : '';
   return `<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
 <body style="margin:0;padding:0;background:#eef2f7;font-family:Arial,Helvetica,sans-serif;">
@@ -52,6 +58,7 @@ function emailHTML(nome: string, disciplina: string, media: number){
               <div style="display:inline-block;margin-top:14px;padding:6px 18px;border-radius:30px;font-size:14px;font-weight:bold;color:${sit.cor};background:${sit.bg};">${sit.txt}</div>
             </td></tr>
           </table>
+          ${fbBloco}
           <p style="margin:0 0 24px;">Acesse o portal para ver o detalhe das notas e o seu desempenho.</p>
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 8px;"><tr><td style="background:#c1121f;border-radius:10px;">
             <a href="${PORTAL_URL}" style="display:inline-block;padding:13px 32px;color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;">Acessar o portal</a>
@@ -76,6 +83,7 @@ Deno.serve(async (req) => {
     const aluno_id = d.aluno_id;
     const disciplina = d.disciplina || 'Disciplina';
     const media = typeof d.media === 'number' ? d.media : parseFloat(d.media);
+    const feedback = (d.feedback || '').toString().slice(0, 500);
 
     if (!aluno_id || isNaN(media)) {
       return new Response(JSON.stringify({ error: 'aluno_id e media são obrigatórios.' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
@@ -105,7 +113,7 @@ Deno.serve(async (req) => {
         from: REMETENTE,
         to: [est.email],
         subject: 'Nota lançada — ' + disciplina + ' · Saint Alcuin',
-        html: emailHTML(est.nome, disciplina, media),
+        html: emailHTML(est.nome, disciplina, media, feedback),
       }),
     });
 

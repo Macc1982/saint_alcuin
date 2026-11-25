@@ -596,7 +596,15 @@
     <div class="login-box">
       <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
       <div class="form-group"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="email"/></div>
-      <div class="form-group"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()"/></div>
+      <div class="form-group"><label>Senha</label>
+        <div style="position:relative;">
+          <input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding-right:44px;" onkeydown="if(event.key==='Enter')fazerLogin()"/>
+          <button type="button" id="toggle-senha" onclick="toggleSenha()" aria-label="Mostrar senha" title="Mostrar senha"
+            style="position:absolute;top:50%;right:8px;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:6px;display:flex;align-items:center;color:#9aa4b2;">
+            <svg id="icon-olho" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
       <button class="btn-login" id="btnLogin" onclick="fazerLogin()">Entrar</button>
       <div class="login-help">Problemas de acesso? <a href="https://wa.me/75998403658" target="_blank">Fale com a secretaria</a></div>
     </div>
@@ -643,7 +651,7 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v4.3" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v4.4" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
       <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo<span id="selo-aovivo-nav" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:8px;animation:pulseLive 1.5s infinite;">AO VIVO</span></div>
@@ -959,6 +967,19 @@ function dataBR(iso){
   if(!iso) return '—';
   const [y,m,d]=String(iso).slice(0,10).split('-');
   return `${d}/${m}/${y}`;
+}
+
+// Olhinho: mostra/esconde a senha no login
+function toggleSenha(){
+  const inp=document.getElementById('l-senha'), btn=document.getElementById('toggle-senha'), ic=document.getElementById('icon-olho');
+  if(!inp)return;
+  const mostrar = inp.type==='password';
+  inp.type = mostrar ? 'text' : 'password';
+  if(btn){ btn.setAttribute('aria-label', mostrar?'Ocultar senha':'Mostrar senha'); btn.title = mostrar?'Ocultar senha':'Mostrar senha'; }
+  // alterna o ícone (olho / olho cortado)
+  if(ic){ ic.innerHTML = mostrar
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'; }
 }
 
 async function fazerLogin(){
@@ -1500,8 +1521,19 @@ async function carregarNotas(){
   document.getElementById('lista-notas').innerHTML=data.map((n,i)=>{
     const m=n.media||0;
     const[cls,sit]=m>=7?['badge-green','Aprovado']:m>=5?['badge-yellow','Recuperação']:['badge-red','Reprovado'];
-    return`<tr><td style="color:var(--gray);font-variant-numeric:tabular-nums;font-weight:600;">${i+1}</td><td>${n.disciplinas?.nome||'—'}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+    const fb=(n.feedback||'').trim();
+    const discNome=(n.disciplinas?.nome||'—');
+    const toggle=fb?` <button onclick="toggleFeedbackNota(${i})" title="Ver observação do professor" style="border:none;background:none;cursor:pointer;color:var(--secondary);font-size:.8rem;vertical-align:middle;padding:0 0 0 4px;">💬</button>`:'';
+    const linha=`<tr><td style="color:var(--gray);font-variant-numeric:tabular-nums;font-weight:600;">${i+1}</td><td>${discNome}${toggle}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+    const subFb=fb?`<tr id="fb-nota-${i}" style="display:none;"><td></td><td colspan="6" style="padding:0 14px 14px;"><div style="background:#fff8f0;border-left:3px solid var(--vermelho,#c1121f);border-radius:0 8px 8px 0;padding:12px 16px;"><div style="font-size:.7rem;color:#9a3412;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:5px;">Observação do professor</div><div style="font-size:.88rem;color:var(--texto,#1a2b3c);line-height:1.6;">${fb.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div></td></tr>`:'';
+    return linha+subFb;
   }).join('');
+}
+
+// Mostra/esconde a observação do professor na linha da nota
+function toggleFeedbackNota(i){
+  const el=document.getElementById('fb-nota-'+i);
+  if(el) el.style.display = el.style.display==='none' ? 'table-row' : 'none';
 }
 
 /* ==========================================================================

@@ -1487,6 +1487,11 @@
             <div class="form-group"><label>Nota 2</label><input type="number" id="n-2" min="0" max="10" step="0.1" placeholder="0.0" oninput="calcMedia()"/></div>
             <div class="form-group"><label>Trabalho</label><input type="number" id="n-t" min="0" max="10" step="0.1" placeholder="0.0" oninput="calcMedia()"/></div>
           </div>
+          <div class="form-group" style="margin-top:4px;">
+            <label>Feedback do professor <span style="color:var(--gray);font-weight:400;">(opcional · motivo da nota, vai no e-mail e no portal)</span></label>
+            <textarea id="n-feedback" maxlength="500" rows="3" placeholder="Ex.: Ótimo domínio do tema no artigo. Reveja a formatação das referências ABNT." oninput="contaFeedback()" style="width:100%;resize:vertical;font-family:inherit;font-size:.9rem;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;"></textarea>
+            <div style="text-align:right;font-size:.72rem;color:var(--gray);margin-top:3px;"><span id="feedback-count">0</span>/500</div>
+          </div>
           <div class="nota-acao">
             <span id="media-preview" class="media-preview"></span>
             <button class="btn btn-primary" onclick="lancarNota()">Salvar nota</button>
@@ -4650,7 +4655,8 @@ async function lancarNota(){
   const trabalho=parseFloat(document.getElementById('n-t').value)||null;
   if(!aluno_id||!disciplina_id){toast('Selecione aluno e disciplina.','error');return;}
   const media=nota1&&nota2&&trabalho?+((nota1+nota2+trabalho)/3).toFixed(1):null;
-  const{error}=await sb.from('notas').upsert({aluno_id,disciplina_id,nota1,nota2,trabalho,media},{onConflict:'aluno_id,disciplina_id'});
+  const feedback=(document.getElementById('n-feedback').value||'').trim().slice(0,500)||null;
+  const{error}=await sb.from('notas').upsert({aluno_id,disciplina_id,nota1,nota2,trabalho,media,feedback},{onConflict:'aluno_id,disciplina_id'});
   if(error){toast('Erro: '+error.message,'error');return;}
   const disc=discCache.find(d=>d.id===disciplina_id);
   notificar(aluno_id,'nota','Nota lançada', (disc?disc.nome:'Disciplina')+(media!=null?' · média '+media:''));
@@ -4659,21 +4665,28 @@ async function lancarNota(){
   // E-mail ao aluno — SÓ quando a média está fechada (as 3 notas preenchidas).
   // Nota parcial não dispara; o e-mail sai no lançamento que completa as 3.
   if(nota1!=null && nota2!=null && trabalho!=null && media!=null){
-    emailNotaLancada(aluno_id, (disc?disc.nome:'Disciplina'), media);
+    emailNotaLancada(aluno_id, (disc?disc.nome:'Disciplina'), media, feedback);
   }
 
-  ['n-1','n-2','n-t'].forEach(id=>document.getElementById(id).value='');
+  ['n-1','n-2','n-t','n-feedback'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('media-preview').textContent='';
+  const fc=document.getElementById('feedback-count'); if(fc) fc.textContent='0';
   await carregarNotas();
 }
 
+// Contador de caracteres do feedback
+function contaFeedback(){
+  const el=document.getElementById('n-feedback'), c=document.getElementById('feedback-count');
+  if(el&&c) c.textContent=el.value.length;
+}
+
 // Dispara o e-mail de nota (Edge Function nota-lancada). Best-effort: não trava o fluxo.
-async function emailNotaLancada(aluno_id, disciplina, media){
+async function emailNotaLancada(aluno_id, disciplina, media, feedback){
   try{
     const r=await fetch(SUPA_URL+'/functions/v1/nota-lancada',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
-      body:JSON.stringify({aluno_id, disciplina, media})
+      body:JSON.stringify({aluno_id, disciplina, media, feedback: feedback||null})
     });
     const j=await r.json().catch(()=>({}));
     if(r.ok && j.email_enviado){ toast('E-mail da nota enviado ao aluno.','success'); }
@@ -4725,6 +4738,7 @@ async function editarNota(id){
   document.getElementById('n-1').value=data.nota1??'';
   document.getElementById('n-2').value=data.nota2??'';
   document.getElementById('n-t').value=data.trabalho??'';
+  const fb=document.getElementById('n-feedback'); if(fb){ fb.value=data.feedback||''; contaFeedback(); }
   const mp=document.getElementById('media-preview');
   if(mp&&data.media!=null) mp.textContent='Média: '+data.media;
   // rola até o formulário
