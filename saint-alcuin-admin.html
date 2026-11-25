@@ -360,7 +360,7 @@
   <div class="body">
     <nav class="sidebar">
       <div class="nav-label">Gestão</div>
-      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v6.0" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#e11d48;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard<span id="dot-versao-adm" title="v6.1" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7c3aed;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('executivo',this)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Executivo</div>
       <div class="nav-item" onclick="showTab('matriculas',this)" id="nav-matriculas"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg>Matrículas</div>
       <div class="nav-item" onclick="showTab('alunos',this)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Alunos</div>
@@ -4655,9 +4655,30 @@ async function lancarNota(){
   const disc=discCache.find(d=>d.id===disciplina_id);
   notificar(aluno_id,'nota','Nota lançada', (disc?disc.nome:'Disciplina')+(media!=null?' · média '+media:''));
   toast('Nota salva!','success');
+
+  // E-mail ao aluno — SÓ quando a média está fechada (as 3 notas preenchidas).
+  // Nota parcial não dispara; o e-mail sai no lançamento que completa as 3.
+  if(nota1!=null && nota2!=null && trabalho!=null && media!=null){
+    emailNotaLancada(aluno_id, (disc?disc.nome:'Disciplina'), media);
+  }
+
   ['n-1','n-2','n-t'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('media-preview').textContent='';
   await carregarNotas();
+}
+
+// Dispara o e-mail de nota (Edge Function nota-lancada). Best-effort: não trava o fluxo.
+async function emailNotaLancada(aluno_id, disciplina, media){
+  try{
+    const r=await fetch(SUPA_URL+'/functions/v1/nota-lancada',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
+      body:JSON.stringify({aluno_id, disciplina, media})
+    });
+    const j=await r.json().catch(()=>({}));
+    if(r.ok && j.email_enviado){ toast('E-mail da nota enviado ao aluno.','success'); }
+    else if(r.ok && !j.email_enviado){ toast('Nota salva, mas o e-mail não pôde ser enviado (aluno sem e-mail?).','error'); }
+  }catch(e){ /* e-mail é best-effort; a nota já foi salva */ }
 }
 
 // Helper: cria uma notificação in-app para o aluno
