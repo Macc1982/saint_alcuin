@@ -651,7 +651,7 @@
   <div class="dash-body">
     <nav class="sidebar">
       <div class="nav-label">Principal</div>
-      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v4.4" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-left:8px;flex-shrink:0;"></span></div>
+      <div class="nav-item active" onclick="showTab('home',this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Início<span id="dot-versao" title="v4.5" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#06b6d4;margin-left:8px;flex-shrink:0;"></span></div>
       <div class="nav-item" onclick="showTab('materiais',this)" id="nav-mat"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Materiais</div>
       <div class="nav-item" onclick="showTab('aulas',this)" id="nav-aulas"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Videoaulas</div>
       <div class="nav-item" onclick="showTab('aovivo',this)" id="nav-aovivo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>Aulas ao Vivo<span id="selo-aovivo-nav" style="display:none;background:#E00000;color:#fff;font-size:.58rem;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:8px;animation:pulseLive 1.5s infinite;">AO VIVO</span></div>
@@ -1523,8 +1523,9 @@ async function carregarNotas(){
     const[cls,sit]=m>=7?['badge-green','Aprovado']:m>=5?['badge-yellow','Recuperação']:['badge-red','Reprovado'];
     const fb=(n.feedback||'').trim();
     const discNome=(n.disciplinas?.nome||'—');
-    const toggle=fb?` <button onclick="toggleFeedbackNota(${i})" title="Ver observação do professor" style="border:none;background:none;cursor:pointer;color:var(--secondary);font-size:.8rem;vertical-align:middle;padding:0 0 0 4px;">💬</button>`:'';
-    const linha=`<tr><td style="color:var(--gray);font-variant-numeric:tabular-nums;font-weight:600;">${i+1}</td><td>${discNome}${toggle}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
+    const toggle=fb?`<button id="fb-btn-${i}" onclick="toggleFeedbackNota(${i})" title="Ver observação do professor" style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;border:none;background:none;cursor:pointer;color:var(--secondary);font-size:.78rem;font-weight:600;font-family:inherit;padding:0;">💬 <span>ver observação</span> <span class="fb-caret">▾</span></button>`:'';
+    const celDisc=toggle?`<div>${discNome}</div>${toggle}`:discNome;
+    const linha=`<tr><td style="color:var(--gray);font-variant-numeric:tabular-nums;font-weight:600;">${i+1}</td><td>${celDisc}</td><td>${n.nota1??'—'}</td><td>${n.nota2??'—'}</td><td>${n.trabalho??'—'}</td><td><strong>${n.media??'—'}</strong></td><td><span class="badge ${cls}">${sit}</span></td></tr>`;
     const subFb=fb?`<tr id="fb-nota-${i}" style="display:none;"><td></td><td colspan="6" style="padding:0 14px 14px;"><div style="background:#fff8f0;border-left:3px solid var(--vermelho,#c1121f);border-radius:0 8px 8px 0;padding:12px 16px;"><div style="font-size:.7rem;color:#9a3412;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:5px;">Observação do professor</div><div style="font-size:.88rem;color:var(--texto,#1a2b3c);line-height:1.6;">${fb.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div></div></td></tr>`:'';
     return linha+subFb;
   }).join('');
@@ -1533,7 +1534,14 @@ async function carregarNotas(){
 // Mostra/esconde a observação do professor na linha da nota
 function toggleFeedbackNota(i){
   const el=document.getElementById('fb-nota-'+i);
-  if(el) el.style.display = el.style.display==='none' ? 'table-row' : 'none';
+  const btn=document.getElementById('fb-btn-'+i);
+  if(!el) return;
+  const abrindo = el.style.display==='none';
+  el.style.display = abrindo ? 'table-row' : 'none';
+  if(btn){
+    const caret=btn.querySelector('.fb-caret'); if(caret) caret.textContent = abrindo ? '▴' : '▾';
+    const txt=btn.querySelector('span:not(.fb-caret)'); if(txt) txt.textContent = abrindo ? 'ocultar observação' : 'ver observação';
+  }
 }
 
 /* ==========================================================================
